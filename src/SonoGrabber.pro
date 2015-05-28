@@ -16,9 +16,13 @@ LIBS += "-L../igtlink/lib/igtl" -lOpenIGTLink
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    igtlinkclient.cpp
+    igtlinkclient.cpp \
+    worker.cpp \
+    igtlconnection.cpp
 
 HEADERS  += mainwindow.h \
-    igtlinkclient.h
+    igtlinkclient.h \
+    worker.h \
+    igtlconnection.h
 
 FORMS    += mainwindow.ui

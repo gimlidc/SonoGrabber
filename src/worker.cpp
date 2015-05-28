@@ -3,6 +3,13 @@
 #include "igtlconnection.h"
 #include "igtlinkclient.h"
 
+Worker::Worker(IgtlConnection* conn)
+{
+    connection = conn;
+}
+
+Worker::~Worker() {}
+
 int Worker::saveTransform(const igtl::TransformMessage::Pointer &transMsg)
 {
    igtl::Matrix4x4 matrix;
@@ -175,7 +182,7 @@ int Worker::isRunning()
     return r;
 }
 
-void Worker::listen(IgtlConnection connection)
+void Worker::start()
 {
     int resultCode;
     // Create a message buffer to receive header
@@ -193,7 +200,7 @@ void Worker::listen(IgtlConnection connection)
     Terminate = false;
     Lock.unlock();
 
-    connection.openSocket();
+    connection->openSocket();
 
     while (1)
       {
@@ -210,7 +217,7 @@ void Worker::listen(IgtlConnection connection)
         headerMsg->InitPack();
 
         // Receive generic header from the socket
-        int r = connection.socket->Receive(headerMsg->GetPackPointer(), headerMsg->GetPackSize());
+        int r = connection->socket->Receive(headerMsg->GetPackPointer(), headerMsg->GetPackSize());
         if (r == 0)
         {
             qWarning() << "Receive error:" << r;
@@ -239,20 +246,20 @@ void Worker::listen(IgtlConnection connection)
         // Check data type and receive data body
         if (qstrcmp(headerMsg->GetDeviceType(), "TRANSFORM") == 0)
           {
-          ReceiveTransform(connection.socket, headerMsg);
+          ReceiveTransform(connection->socket, headerMsg);
           }
         else if (qstrcmp(headerMsg->GetDeviceType(), "POSITION") == 0)
           {
-            ReceivePosition(connection.socket, headerMsg);
+            ReceivePosition(connection->socket, headerMsg);
           }
         else if (qstrcmp(headerMsg->GetDeviceType(), "IMAGE") == 0)
           {
-            ReceiveImage(connection.socket, headerMsg);
+            ReceiveImage(connection->socket, headerMsg);
           }
         else
           {
           qWarning() << "Receiving unknown message:" << headerMsg->GetDeviceType();
-          connection.socket->Skip(headerMsg->GetBodySizeToRead(), 0);
+          connection->socket->Skip(headerMsg->GetBodySizeToRead(), 0);
           }
       }
 

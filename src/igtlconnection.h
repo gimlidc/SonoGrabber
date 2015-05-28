@@ -3,22 +3,21 @@
 
 #include "igtlClientSocket.h"
 #include "igtlSocket.h"
+#include <QString>
 
 class IgtlConnection
 {
 
-    const char *_hostname;
-    const int _port;
-    // params for socket opening
-    igtl::ClientSocket _socket;
+    QString _hostname;
+    int _port;
 
 public:
-    IgtlConnection();
+    IgtlConnection(QString hostname, const int port);
     ~IgtlConnection();
-    igtl::Socket openSocket();
-
-    // ready connection
-    igtl::Socket * socket;
+    int openSocket();
+    void closeSocket();
+    // opened socket
+    igtl::ClientSocket * socket;
 };
 
 #endif // IGTLCONNECTION_H

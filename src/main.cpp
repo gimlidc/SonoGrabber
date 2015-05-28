@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include <QApplication>
 #include <QtDebug>
+#include <QSettings>
 
 #include "igtlinkclient.h"
 
@@ -8,6 +9,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    QSettings settings(QString("../sonoGrabber.conf"), QSettings::IniFormat);
     MainWindow w;
     IGTLinkClient client;
 
@@ -16,7 +18,7 @@ int main(int argc, char *argv[])
 
     w.show();
 
-    client.setup("192.168.56.100");
+    client.setup(settings.value("plusServer","host").toString(), settings.value("plusServer", "port").toInt());
     client.setOutputFile("pokus","Image_Probe","ProbeToTracker,ReferenceToTracker", 10);
     //client.setup("localhost",18944);
     //connect()

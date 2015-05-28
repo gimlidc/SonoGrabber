@@ -20,6 +20,7 @@ class Worker : public QObject
     static bool Terminate;
     static QReadWriteLock Lock;
 
+    IgtlConnection* connection;
     QString _filename;
     QFile rawFile; // File object which handles raw (image) data (.raw)
     QFile headerFile;  // File object which handles the metaheader file (*.mhd)
@@ -46,11 +47,13 @@ class Worker : public QObject
     void closeFiles();
     void openHeaderFile();
 public:
+    Worker(IgtlConnection* connection);
+    ~Worker();
     void setOutputFile(const char *filename, const char *ilist, const char *tlist, int chS);
     static void stop();
     static int isRunning();
 public slots:
-    void listen(IgtlConnection connection);
+    void start();
 signals:
     void transformReceived(const igtl::TransformMessage::Pointer& transMsg);
     void positionReceived(const igtl::PositionMessage::Pointer& posMsg);
