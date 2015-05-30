@@ -18,7 +18,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::newSession()
 {
-    ui->lineEdit->setText(this->dirPath.append("/").append(SessionNameGenerator::generate(this->dirPath)));
+    ui->lineEdit->setText(this->dirPath + "/" + SessionNameGenerator::generate(this->dirPath));
 }
 
 void MainWindow::setOutputDir(QString dirPath, QString sessionName)
@@ -27,7 +27,7 @@ void MainWindow::setOutputDir(QString dirPath, QString sessionName)
     QString subdirName = sessionName;
     if (subdirName.isEmpty())
         subdirName = SessionNameGenerator::generate(dirPath);
-    ui->lineEdit->setText(dirPath.append("/").append(subdirName));
+    ui->lineEdit->setText(this->dirPath + "/" + subdirName);
 }
 
 void MainWindow::toggleRun(bool buttonPressed)

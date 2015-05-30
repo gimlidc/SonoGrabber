@@ -35,7 +35,7 @@ public:
      */
     void closeSocket();
     /** opened socket handler */
-    igtl::ClientSocket * socket;
+    igtl::ClientSocket::Pointer socket;
 };
 
 #endif // IGTLCONNECTION_H

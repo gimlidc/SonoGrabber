@@ -11,20 +11,22 @@ IgtlConnection::IgtlConnection(QString hostname, const int port, QObject *parent
 
 IgtlConnection::~IgtlConnection()
 {
-    //delete _hostname;
+    delete _hostname;
 }
 
-QString IgtlConnection::getHostname() {
+QString IgtlConnection::getHostname()
+{
     return *_hostname;
 }
 
-int IgtlConnection::getPort() {
+int IgtlConnection::getPort()
+{
     return _port;
 }
 
 int IgtlConnection::openSocket()
 {
-    qWarning()  << "connect" << getHostname() << ":" << getPort();
+    qDebug() << "Trying to connect an IGT server:" << getHostname() << ":" << getPort();
     int r = socket->ConnectToServer(getHostname().toStdString().c_str(), getPort());
 
     if (r != 0)

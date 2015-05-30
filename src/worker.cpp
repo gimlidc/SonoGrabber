@@ -81,18 +81,21 @@ void Worker::flushData(double ts)
 
 }
 
-void Worker::setOutput(QString filename, QStringList images, QStringList transformations, int chS)
+void Worker::setOutput(QString filename, QStringList images, QStringList transformations, int imagesInOneFile)
 {
-    qDebug() << "output file setting:" << filename;
+    qDebug() << "Output directory:" << filename << "Grabbed images:" << images << "Grabbed transformations:" << transformations << "Chunk size:" << imagesInOneFile;
     int i;
     _filename = filename;
-    chunkSize = chS;
+    chunkSize = imagesInOneFile;
+
     imgNameList = QStringList(images);
     for (i = 0; i < imgNameList.size(); ++i)
         imgMsgList.append(igtl::ImageMessage::New());
+
     transNameList = QStringList(transformations);
     for (i = 0; i < transNameList.size(); ++i)
         transMsgList.append(igtl::TransformMessage::New());
+
     imgTS.fill(0.0,imgNameList.size());
     transTS.fill(0.0,transNameList.size());
 }
@@ -202,7 +205,6 @@ void Worker::start()
     Terminate = false;
     Lock.unlock();
 
-    qWarning() << "Trying to server connect ";
     resultCode = connection->openSocket();
     if (resultCode != 0)
     {
