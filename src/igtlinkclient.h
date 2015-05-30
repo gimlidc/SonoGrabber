@@ -11,6 +11,7 @@
 #include <QSettings>
 
 #include "worker.h"
+#include "igtlconnection.h"
 #include "igtlOSUtil.h"
 #include "igtlMessageHeader.h"
 #include "igtlTransformMessage.h"
@@ -24,21 +25,27 @@ class IGTLinkClient : public QObject
     Q_OBJECT
     QThread _workerThread;
     Worker* worker;
-    IgtlConnection* connection;
 protected:
     igtl::ClientSocket::Pointer _socket;
-    QString _hostname;
-    int _port;
 
 public:
+    /**
+     * @brief ErrorType describes error when data parsing is broken.
+     */
     enum ErrorType
     {
         UserInterrupt, ReceiveError
     };
-    explicit IGTLinkClient(QObject *parent = 0);
+    explicit IGTLinkClient(IgtlConnection * connection, QObject *parent = 0);
     ~IGTLinkClient();
-    void setup(QString hostname, int port = 18944);
-    void setOutputFile(const char *filename, const char *ilist, const char *tlist, int chS = 1000);
+    /**
+     * @brief setOutput configure output of the session
+     * @param dirName directory where output will be stored. Directory should be empty or non-existent.
+     * @param images set of image labels parsed from the stream (stored into output)
+     * @param transformations set of transformation labels parsed from the stream
+     * @param imagesInOneFile number of images stored into one file (prevents huge files)
+     */
+    void setOutput(QString dirName, QStringList images, QStringList transformations, int imagesInOneFile);
 public slots:
     void startReading();
     void handleTransform(const igtl::TransformMessage::Pointer& transMsg);

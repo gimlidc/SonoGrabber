@@ -2,26 +2,34 @@
 #include "igtlClientSocket.h"
 #include <QDebug>
 
-IgtlConnection::IgtlConnection(QString hostname, const int port)
+IgtlConnection::IgtlConnection(QString hostname, const int port, QObject *parent) : QObject(parent)
 {
-    this->_hostname = hostname;
-    this->_port = port;
-    this->socket = igtl::ClientSocket::New();
+    _hostname = new QString(hostname);
+    _port = port;
+    socket = igtl::ClientSocket::New();
 }
 
 IgtlConnection::~IgtlConnection()
 {
+    //delete _hostname;
+}
 
+QString IgtlConnection::getHostname() {
+    return *_hostname;
+}
+
+int IgtlConnection::getPort() {
+    return _port;
 }
 
 int IgtlConnection::openSocket()
 {
-    int r = socket->ConnectToServer(_hostname.toLatin1(), _port);
+    qWarning()  << "connect" << getHostname() << ":" << getPort();
+    int r = socket->ConnectToServer(getHostname().toStdString().c_str(), getPort());
 
     if (r != 0)
-    {
       qWarning() << "Cannot connect to the server.";
-    }
+
     return r;
 }
 

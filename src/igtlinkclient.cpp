@@ -7,7 +7,7 @@
 QReadWriteLock Worker::Lock;
 bool Worker::Terminate = true;
 
-IGTLinkClient::IGTLinkClient(QObject *parent) : QObject(parent)
+IGTLinkClient::IGTLinkClient(IgtlConnection * connection, QObject *parent) : QObject(parent)
 {
     worker = new Worker(connection);
     worker->moveToThread(&_workerThread);
@@ -19,23 +19,15 @@ IGTLinkClient::IGTLinkClient(QObject *parent) : QObject(parent)
 //    connect(worker, &Worker::imageReceived, this, &IGTLinkClient::handleImage);
     connect(worker, &Worker::stopped, this, &IGTLinkClient::receiveStopSignal);
 
-    setup("localhost");
-
     _workerThread.start();
 
 }
 
 IGTLinkClient::~IGTLinkClient()
 {
-
     stopReading();
     _workerThread.quit();
     _workerThread.wait();
-}
-
-void IGTLinkClient::setup(QString hostname, int port)
-{
-    connection = new IgtlConnection(hostname, port);
 }
 
 void IGTLinkClient::startReading()
@@ -53,9 +45,9 @@ void IGTLinkClient::receiveStopSignal(int e)
     emit stopped((ErrorType) e);
 }
 
-void IGTLinkClient::setOutputFile(const char *filename, const char *ilist, const char *tlist, int chS)
+void IGTLinkClient::setOutput(QString filename, QStringList images, QStringList transformations, int imagesInOneFile)
 {
-    worker->setOutputFile(filename, ilist, tlist, chS);
+    worker->setOutput(filename, images, transformations, imagesInOneFile);
 }
 
 void IGTLinkClient::handleTransform(const igtl::TransformMessage::Pointer &transMsg)

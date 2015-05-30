@@ -1,9 +1,9 @@
-#include <QtDebug>
+#include <QDebug>
 #include "worker.h"
 #include "igtlconnection.h"
 #include "igtlinkclient.h"
 
-Worker::Worker(IgtlConnection* conn)
+Worker::Worker(IgtlConnection * conn)
 {
     connection = conn;
 }
@@ -81,15 +81,16 @@ void Worker::flushData(double ts)
 
 }
 
-void Worker::setOutputFile(const char *filename, const char *ilist, const char *tlist, int chS)
+void Worker::setOutput(QString filename, QStringList images, QStringList transformations, int chS)
 {
+    qDebug() << "output file setting:" << filename;
     int i;
     _filename = filename;
     chunkSize = chS;
-    imgNameList = QString(ilist).split(",", QString::SkipEmptyParts);
+    imgNameList = QStringList(images);
     for (i = 0; i < imgNameList.size(); ++i)
         imgMsgList.append(igtl::ImageMessage::New());
-    transNameList = QString(tlist).split(",", QString::SkipEmptyParts);
+    transNameList = QStringList(transformations);
     for (i = 0; i < transNameList.size(); ++i)
         transMsgList.append(igtl::TransformMessage::New());
     imgTS.fill(0.0,imgNameList.size());
@@ -98,6 +99,7 @@ void Worker::setOutputFile(const char *filename, const char *ilist, const char *
 
 void Worker::openHeaderFile()
 {
+    qWarning() << "opening header file";
     headerFile.setFileName(_filename + ".mhd");
     if (!headerFile.open(QIODevice::WriteOnly | QIODevice::Text))
     {
@@ -200,7 +202,13 @@ void Worker::start()
     Terminate = false;
     Lock.unlock();
 
-    connection->openSocket();
+    qWarning() << "Trying to server connect ";
+    resultCode = connection->openSocket();
+    if (resultCode != 0)
+    {
+        qWarning() << "Connection to server failed. Error code: %1" << resultCode;
+        return;
+    }
 
     while (1)
       {

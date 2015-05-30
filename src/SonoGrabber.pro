@@ -8,7 +8,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = mytest
+TARGET = SonoGrabber
 TEMPLATE = app
 
 INCLUDEPATH += ../igtlink/include/igtl
@@ -18,11 +18,15 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     igtlinkclient.cpp \
     worker.cpp \
-    igtlconnection.cpp
+    igtlconnection.cpp \
+    sessionnamegenerator.cpp
 
 HEADERS  += mainwindow.h \
     igtlinkclient.h \
     worker.h \
-    igtlconnection.h
+    igtlconnection.h \
+    sessionnamegenerator.h
 
 FORMS    += mainwindow.ui
+
+DISTFILES += ../sonoGrabber.ini
