@@ -3,7 +3,7 @@
 #include <QDebug>
 #include <QDateTime>
 
-QString SessionNameGenerator::generate(QString dirPath)
+QString SessionNameGenerator::generateSessionDirectory(QString dirPath)
 {
     QDir dir(dirPath);
     QDateTime dateTime = QDateTime::currentDateTime();
@@ -19,4 +19,9 @@ QString SessionNameGenerator::generate(QString dirPath)
         return dateTime.toString("yyyy-MM-dd_hh-mm-ss.zzz");
 
     return target.dirName();
+}
+
+QString SessionNameGenerator::generateRawFileName(int fileNo)
+{
+    return QString("%1.raw").arg(fileNo,3,10,QChar('0'));
 }

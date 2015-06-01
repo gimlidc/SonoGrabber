@@ -2,6 +2,7 @@
 #define WORKER_H
 
 #include <QObject>
+#include <QDir>
 #include <QString>
 #include <QFile>
 #include <QTextStream>
@@ -12,7 +13,7 @@
 #include "igtlTransformMessage.h"
 #include "igtlSocket.h"
 #include "igtlPositionMessage.h"
-#include "igtlconnection.h"
+#include "sessionparams.h"
 
 /**
  * @brief Worker is responsible for socket reading
@@ -27,15 +28,13 @@ class Worker : public QObject
     static bool Terminate;
     static QReadWriteLock Lock;
 
-    IgtlConnection * connection;
-    QString _filename;
+    SessionParams * session;
     QFile rawFile; // File object which handles raw (image) data (.raw)
     QFile headerFile;  // File object which handles the metaheader file (*.mhd)
     QTextStream tstr;
     bool _writeFlag; // Flag to determine if the received stream of messages should be stored in a
     int imageCounter;
     int fileCounter;
-    int chunkSize;
     int size[3];          // image dimension
     QStringList transNameList, imgNameList; // list of transform and image names, which we want to
     QList<igtl::ImageMessage::Pointer> imgMsgList; // temporarily store image and transform message
@@ -53,17 +52,11 @@ class Worker : public QObject
     int ReceiveImage(igtl::Socket *socket, igtl::MessageHeader::Pointer& header);
     void closeFiles();
     void openHeaderFile();
+    int createOutDir();
+    void setOutput(); // method can be called when session is fully defined
 public:
-    Worker(IgtlConnection * connection);
+    Worker(SessionParams * session);
     ~Worker();
-    /**
-     * @brief setOutput configure what and where will be stored
-     * @param dirName specify target directory for data storing. Directory should be empty or non-existent.
-     * @param images specify labels of image data which will be parsed from incoming stream
-     * @param transformations labels of transformation data (for parsing)
-     * @param imagesInOneFile define how many images is stored into one output file
-     */
-    void setOutput(QString dirName, QStringList images, QStringList transformations, int imagesInOneFile);
     /**
      * @brief stop disconnect from server and flush data to HDD
      */

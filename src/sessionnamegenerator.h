@@ -22,7 +22,14 @@ public:
      * @param dirPath target directory, where new subdirectory should be created
      * @return name of a new directory (directory is not created yet)
      */
-    static QString generate(QString dirPath);
+    static QString generateSessionDirectory(QString dirPath);
+
+    /**
+     * @brief generateRawFileName generates new filename which is ordered by fileNo
+     * @param fileNo order of the raw file in the session
+     * @return ordered filename for raw data
+     */
+    static QString generateRawFileName(int fileNo);
 };
 
 #endif // FILENAMEGENERATOR_H

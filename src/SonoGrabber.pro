@@ -18,14 +18,14 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     igtlinkclient.cpp \
     worker.cpp \
-    igtlconnection.cpp \
-    sessionnamegenerator.cpp
+    sessionnamegenerator.cpp \
+    sessionparams.cpp
 
 HEADERS  += mainwindow.h \
     igtlinkclient.h \
     worker.h \
-    igtlconnection.h \
-    sessionnamegenerator.h
+    sessionnamegenerator.h \
+    sessionparams.h
 
 FORMS    += mainwindow.ui
 

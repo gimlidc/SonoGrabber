@@ -1,11 +1,12 @@
 #include <QDebug>
 #include "worker.h"
-#include "igtlconnection.h"
+#include "sessionparams.h"
 #include "igtlinkclient.h"
+#include "sessionnamegenerator.h"
 
-Worker::Worker(IgtlConnection * conn)
+Worker::Worker(SessionParams * conn)
 {
-    connection = conn;
+    session = conn;
 }
 
 Worker::~Worker() {}
@@ -25,11 +26,11 @@ int Worker::saveTransform(const igtl::TransformMessage::Pointer &transMsg)
 int Worker::saveImage(const igtl::ImageMessage::Pointer &imgMsg)
 {
     int r;
-    if ( imageCounter%chunkSize == 0 ) // open new raw image file
+    if ( imageCounter % session->getChunkSize() == 0 ) // open new raw image file
     {
         rawFile.close();
         headerFile.flush();
-        QString s = QString("%1%2.raw").arg(_filename).arg(fileCounter,3,10,QChar('0'));
+        QString s = QString("%1%2.raw").arg(session->getOutDir().absolutePath() + "/").arg(SessionNameGenerator::generateRawFileName(fileCounter));
         rawFile.setFileName(s);
         if (!(r = rawFile.open(QIODevice::WriteOnly)))
         {
@@ -81,32 +82,39 @@ void Worker::flushData(double ts)
 
 }
 
-void Worker::setOutput(QString filename, QStringList images, QStringList transformations, int imagesInOneFile)
+int Worker::createOutDir()
 {
-    qDebug() << "Output directory:" << filename << "Grabbed images:" << images << "Grabbed transformations:" << transformations << "Chunk size:" << imagesInOneFile;
-    int i;
-    _filename = filename;
-    chunkSize = imagesInOneFile;
+    if (!session->getOutDir().exists()) {
+        qWarning() << "Directory exists data can be overwritten!";
+    } else {
+        qDebug() << "Creating target directory: " << session->getOutDir().absolutePath();
+        if (!QDir().mkpath(session->getOutDir().absolutePath())) {
+            return 1;
+        }
+    }
 
-    imgNameList = QStringList(images);
-    for (i = 0; i < imgNameList.size(); ++i)
+    return 0;
+}
+
+void Worker::setOutput()
+{       
+    for (int i = 0; i < session->getImageNames().size(); ++i)
         imgMsgList.append(igtl::ImageMessage::New());
 
-    transNameList = QStringList(transformations);
-    for (i = 0; i < transNameList.size(); ++i)
+    for (int i = 0; i < session->getTransNames().size(); ++i)
         transMsgList.append(igtl::TransformMessage::New());
 
-    imgTS.fill(0.0,imgNameList.size());
-    transTS.fill(0.0,transNameList.size());
+    imgTS.fill(0.0,session->getImageNames().size());
+    transTS.fill(0.0,session->getTransNames().size());
 }
 
 void Worker::openHeaderFile()
 {
     qWarning() << "opening header file";
-    headerFile.setFileName(_filename + ".mhd");
+    headerFile.setFileName(session->getOutDir().absolutePath() + "/header.mhd");
     if (!headerFile.open(QIODevice::WriteOnly | QIODevice::Text))
     {
-        qWarning() << "Cannot open file" << _filename;
+        qWarning() << "Cannot open file" << headerFile.fileName();
         _writeFlag = false;
         return;
     }
@@ -166,7 +174,7 @@ void Worker::writeFooter()
        << "ElementDataFile = "; // LIST" << '\n';
     for (i = 0; i < fileCounter; ++i)
     {
-        tstr << QString("%1%2.raw").arg(_filename).arg(i,3,10,QChar('0')) << ' ';
+        tstr << QString("%1%2.raw").arg(session->getOutDir().absolutePath() + "/").arg(SessionNameGenerator::generateRawFileName(i)) << ' ';
     }
     tstr.flush();
 }
@@ -199,24 +207,23 @@ void Worker::start()
     igtl::TimeStamp::Pointer ts;
     ts = igtl::TimeStamp::New();
 
+    createOutDir();
+
     openHeaderFile();
 
     Lock.lockForWrite();
     Terminate = false;
     Lock.unlock();
 
-    resultCode = connection->openSocket();
-    if (resultCode != 0)
-    {
+    resultCode = session->openSocket();
+    if (resultCode != 0) {
         qWarning() << "Connection to server failed. Error code: %1" << resultCode;
         return;
     }
 
-    while (1)
-      {
+    while (1) {
         Lock.lockForRead();
-        if (Terminate)
-        {
+        if (Terminate) {
             Lock.unlock();
             resultCode = IGTLinkClient::UserInterrupt;
             break;
@@ -227,17 +234,15 @@ void Worker::start()
         headerMsg->InitPack();
 
         // Receive generic header from the socket
-        int r = connection->socket->Receive(headerMsg->GetPackPointer(), headerMsg->GetPackSize());
-        if (r == 0)
-        {
+        int r = session->socket->Receive(headerMsg->GetPackPointer(), headerMsg->GetPackSize());
+        if (r == 0) {
             qWarning() << "Receive error:" << r;
             resultCode = IGTLinkClient::ReceiveError;
             break;
         }
-        if (r != headerMsg->GetPackSize())
-          {
+        if (r != headerMsg->GetPackSize()) {
           continue;
-          }
+        }
 
         // Deserialize the header
         headerMsg->Unpack();
@@ -254,28 +259,20 @@ void Worker::start()
         //          << nanosec;
 
         // Check data type and receive data body
-        if (qstrcmp(headerMsg->GetDeviceType(), "TRANSFORM") == 0)
-          {
-          ReceiveTransform(connection->socket, headerMsg);
-          }
-        else if (qstrcmp(headerMsg->GetDeviceType(), "POSITION") == 0)
-          {
-            ReceivePosition(connection->socket, headerMsg);
-          }
-        else if (qstrcmp(headerMsg->GetDeviceType(), "IMAGE") == 0)
-          {
-            ReceiveImage(connection->socket, headerMsg);
-          }
-        else
-          {
+        if (qstrcmp(headerMsg->GetDeviceType(), "TRANSFORM") == 0) {
+          ReceiveTransform(session->socket, headerMsg);
+        } else if (qstrcmp(headerMsg->GetDeviceType(), "POSITION") == 0) {
+            ReceivePosition(session->socket, headerMsg);
+        } else if (qstrcmp(headerMsg->GetDeviceType(), "IMAGE") == 0) {
+            ReceiveImage(session->socket, headerMsg);
+        } else {
           qWarning() << "Receiving unknown message:" << headerMsg->GetDeviceType();
-          connection->socket->Skip(headerMsg->GetBodySizeToRead(), 0);
-          }
-      }
+          session->socket->Skip(headerMsg->GetBodySizeToRead(), 0);
+        }
+    }
 
     closeFiles();
     emit stopped(resultCode);
-
 }
 
 int Worker::ReceiveTransform(igtl::Socket * socket, igtl::MessageHeader::Pointer& header)
@@ -296,23 +293,22 @@ int Worker::ReceiveTransform(igtl::Socket * socket, igtl::MessageHeader::Pointer
   // If you want to skip CRC check, call Unpack() without argument.
   int c = transMsg->Unpack(1);
 
-  if (c & igtl::MessageHeader::UNPACK_BODY) // if CRC check is OK
-  {
+  if (c & igtl::MessageHeader::UNPACK_BODY) { // if CRC check is OK
       // Allocate a time stamp
       igtl::TimeStamp::Pointer ts;
       ts = igtl::TimeStamp::New();
       transMsg->GetTimeStamp(ts);
 
       i = transNameList.indexOf(transMsg->GetDeviceName());
-      if (i == -1)
-      {
+      if (i == -1) {
           //qDebug() << "Transform ignored:" << transMsg->GetDeviceName();
           return i;
       }
       transTS[i] = ts->GetTimeStamp();
       transMsgList[i] = transMsg;
 
-      if (_writeFlag) flushData(transTS[i]);
+      if (_writeFlag)
+          flushData(transTS[i]);
       emit transformReceived(transMsg);
       return i;
   }
@@ -337,8 +333,7 @@ int Worker::ReceivePosition(igtl::Socket * socket, igtl::MessageHeader::Pointer&
   // If you want to skip CRC check, call Unpack() without argument.
   int c = positionMsg->Unpack(1);
 
-  if (c & igtl::MessageHeader::UNPACK_BODY) // if CRC check is OK
-    {
+  if (c & igtl::MessageHeader::UNPACK_BODY) { // if CRC check is OK
     // Retrive the transform data
     //float position[3];
     //float quaternion[4];
@@ -351,7 +346,7 @@ int Worker::ReceivePosition(igtl::Socket * socket, igtl::MessageHeader::Pointer&
      //         << quaternion[2] << ", " << quaternion[3] << ")" << std::endl << std::endl;
     // emit ******
     return 1;
-    }
+  }
   qWarning() << "CRC check error!";
   return 0;
 }
@@ -374,8 +369,7 @@ int Worker::ReceiveImage(igtl::Socket * socket, igtl::MessageHeader::Pointer& he
   // If you want to skip CRC check, call Unpack() without argument.
   int c = imgMsg->Unpack(1);
 
-  if (c & igtl::MessageHeader::UNPACK_BODY) // if CRC check is OK
-  {
+  if (c & igtl::MessageHeader::UNPACK_BODY) { // if CRC check is OK
       //qDebug() << "Image name:" << imgMsg->GetDeviceName();
       // Allocate a time stamp
       igtl::TimeStamp::Pointer ts;
@@ -383,8 +377,7 @@ int Worker::ReceiveImage(igtl::Socket * socket, igtl::MessageHeader::Pointer& he
       imgMsg->GetTimeStamp(ts);
 
       i = imgNameList.indexOf(imgMsg->GetDeviceName());
-      if (i == -1)
-      {
+      if (i == -1) {
           //qDebug() << "Image ignored:" << imgMsg->GetDeviceName();
           return i;
       }
@@ -397,6 +390,4 @@ int Worker::ReceiveImage(igtl::Socket * socket, igtl::MessageHeader::Pointer& he
   }
   qWarning() << "CRC check error!";
   return 0;
-
 }
-

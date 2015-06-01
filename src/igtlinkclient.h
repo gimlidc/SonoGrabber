@@ -11,7 +11,7 @@
 #include <QSettings>
 
 #include "worker.h"
-#include "igtlconnection.h"
+#include "sessionparams.h"
 #include "igtlOSUtil.h"
 #include "igtlMessageHeader.h"
 #include "igtlTransformMessage.h"
@@ -36,16 +36,8 @@ public:
     {
         UserInterrupt, ReceiveError
     };
-    explicit IGTLinkClient(IgtlConnection * connection, QObject *parent = 0);
+    explicit IGTLinkClient(SessionParams * connection, QObject *parent = 0);
     ~IGTLinkClient();
-    /**
-     * @brief setOutput configure output of the session
-     * @param dirName directory where output will be stored. Directory should be empty or non-existent.
-     * @param images set of image labels parsed from the stream (stored into output)
-     * @param transformations set of transformation labels parsed from the stream
-     * @param imagesInOneFile number of images stored into one file (prevents huge files)
-     */
-    void setOutput(QString dirName, QStringList images, QStringList transformations, int imagesInOneFile);
 public slots:
     void startReading();
     void handleTransform(const igtl::TransformMessage::Pointer& transMsg);

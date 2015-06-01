@@ -7,7 +7,7 @@
 QReadWriteLock Worker::Lock;
 bool Worker::Terminate = true;
 
-IGTLinkClient::IGTLinkClient(IgtlConnection * connection, QObject *parent) : QObject(parent)
+IGTLinkClient::IGTLinkClient(SessionParams * connection, QObject *parent) : QObject(parent)
 {
     worker = new Worker(connection);
     worker->moveToThread(&_workerThread);
@@ -43,11 +43,6 @@ void IGTLinkClient::stopReading()
 void IGTLinkClient::receiveStopSignal(int e)
 {
     emit stopped((ErrorType) e);
-}
-
-void IGTLinkClient::setOutput(QString filename, QStringList images, QStringList transformations, int imagesInOneFile)
-{
-    worker->setOutput(filename, images, transformations, imagesInOneFile);
 }
 
 void IGTLinkClient::handleTransform(const igtl::TransformMessage::Pointer &transMsg)

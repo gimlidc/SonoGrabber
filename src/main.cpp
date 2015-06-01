@@ -39,11 +39,11 @@ int main(int argc, char *argv[])
     w.setWindowTitle(app.applicationName().append(" ").append(app.applicationVersion()));
 
     // Load connection parameters
-    IgtlConnection connection(settings.value("plusServer/host","localhost").toString(),
+    SessionParams session(settings.value("plusServer/host","localhost").toString(),
                  settings.value("plusServer/port", "18944").toInt(), 0);
 
     // Create client for server connection (in separate thread)
-    IGTLinkClient client(&connection);
+    IGTLinkClient client(&session);
 
     // connect client actions with UI
     QObject::connect(&w,&MainWindow::startListening,&client,&IGTLinkClient::startReading);
@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
     w.setOutputDir(dirName);
 
     // configure grabber output
-    client.setOutput(dirName,
+    session.setOutput(dirName,
                      settings.value("image/names", "Image_Probe").toStringList(),
                      settings.value("transformations/names", "ProbeToTracker,ReferenceToTracker").toStringList(),
                      settings.value("output/imageCount", "1000").toInt());
