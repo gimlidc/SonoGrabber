@@ -47,6 +47,7 @@
 
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
+#pragma comment(lib, "Ws2_32.lib")
 #else
 #include <sys/time.h>
 #endif

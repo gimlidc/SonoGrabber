@@ -7,3 +7,4 @@
 /src/SonoGrabber.pro.user
 !/igtlink
 /igtlink/lib
+/igtlink/include/igtl/igtlConfigure.h
