@@ -235,7 +235,7 @@ void Worker::start()
             break;
         }
         if (r != headerMsg->GetPackSize()) {
-          continue;
+            continue;
         }
 
         // Deserialize the header
@@ -254,7 +254,7 @@ void Worker::start()
 
         // Check data type and receive data body
         if (qstrcmp(headerMsg->GetDeviceType(), "TRANSFORM") == 0) {
-          ReceiveTransform(session->socket, headerMsg);
+            ReceiveTransform(session->socket, headerMsg);
         } else if (qstrcmp(headerMsg->GetDeviceType(), "POSITION") == 0) {
             ReceivePosition(session->socket, headerMsg);
         } else if (qstrcmp(headerMsg->GetDeviceType(), "IMAGE") == 0) {
@@ -266,6 +266,7 @@ void Worker::start()
     }
 
     closeFiles();
+    session->closeSocket();
     emit stopped(resultCode);
 }
 
