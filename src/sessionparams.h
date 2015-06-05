@@ -33,7 +33,7 @@ public:
      */
     void setOutput(QString dirName, QStringList images, QStringList transformations, int imagesInOneFile);
     /**
-     * @brief getChunkSize
+     * @brief getChunkSize defines size of file size in number of images stored in
      * @return number of images stored in one file for this session. Return -1 if not set.
      */
     int getChunkSize();

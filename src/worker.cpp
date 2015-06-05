@@ -26,14 +26,12 @@ int Worker::saveTransform(const igtl::TransformMessage::Pointer &transMsg)
 int Worker::saveImage(const igtl::ImageMessage::Pointer &imgMsg)
 {
     int r;
-    if ( imageCounter % session->getChunkSize() == 0 ) // open new raw image file
-    {
+    if ( imageCounter % session->getChunkSize() == 0 ) {// open new raw image file
         rawFile.close();
         headerFile.flush();
         QString s = QString("%1%2.raw").arg(session->getOutDir().absolutePath() + "/").arg(SessionNameGenerator::generateRawFileName(fileCounter));
         rawFile.setFileName(s);
-        if (!(r = rawFile.open(QIODevice::WriteOnly)))
-        {
+        if (!(r = rawFile.open(QIODevice::WriteOnly))) {
             qWarning() << "Cannot open raw file.";
             _writeFlag = false;
             return r;
@@ -43,8 +41,7 @@ int Worker::saveImage(const igtl::ImageMessage::Pointer &imgMsg)
 
     //r = rawFile.write(qCompress((const uchar *) imgMsg->GetScalarPointer(),imgMsg->GetImageSize(),9));
     r = rawFile.write((char *) imgMsg->GetScalarPointer(),imgMsg->GetImageSize());
-    if (r == -1)
-    {
+    if (r == -1) {
         qWarning() << "Cannot write to raw image file";
         _writeFlag = false;
         return r;
@@ -57,19 +54,16 @@ void Worker::flushData(double ts)
 {
     int i;
     // check if the time stamps are equal then save data to the file
-    if (imgTS.count(ts)+transTS.count(ts) == imgTS.size()+transTS.size())
-    {
+    if (imgTS.count(ts)+transTS.count(ts) == imgTS.size()+transTS.size()) {
         //qDebug() << "save";
         if (imgTS.count() == 0) // !!! At least one image
              return;
-        if (!imageCounter) // fist image has arrived - generate header
-        {
+        if (!imageCounter) { // fist image has arrived - generate header
             writeHeader(imgMsgList[0]);
         }
         QString s = QString("Seq_Frame%1_").arg(imageCounter,4,10,QChar('0'));
         tstr << s << "Timestamp = " << ts << '\n';
-        for (i = 0; i < transTS.size(); ++i)
-        {
+        for (i = 0; i < transTS.size(); ++i) {
             tstr << s << transMsgList[i]->GetDeviceName() << "Transform = ";
             saveTransform(transMsgList[i]);
             tstr << s << transMsgList[i]->GetDeviceName() << "TransformStatus = OK\n";
