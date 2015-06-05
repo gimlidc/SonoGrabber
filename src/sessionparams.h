@@ -10,15 +10,37 @@
 class SessionParams : public QObject
 {
     Q_OBJECT
+    /** Plus server hostname */
     QString *_hostname;
+    /** Plus server port */
     int _port;
+    /** Directory where data files will be stored */
     QDir outDir;
+    /** Configuration of parser - defines which images and transformations from stream will be parsed */
     QStringList images, transformations;
+    /** Number of images stored in one file */
     int chunkSize;
+    /** Number of already closed files. */
+    int fileCounter;
+    /** File object which handles raw (image) data (.raw) */
+    QFile rawFile;
+    /** File object which handles the metaheader file (*.mhd) */
+    QFile headerFile;
 
 public:
     SessionParams(QString hostname, const int port, QObject *parent = 0);
     ~SessionParams();
+    /**
+     * @brief getHeaderFileName header file contains information about whole directory {@see #outDir}
+     * @return full path to header file
+     */
+    QString getHeaderFileName();
+    /**
+     * @brief getRawFileName raw file contains images
+     * @param fileNo order of file in this session
+     * @return full path to raw file
+     */
+    QString getRawFileName(int fileNo);
     /**
      * @brief setOutputDir configure target directory for session saving
      * @param dirName full path of target directory

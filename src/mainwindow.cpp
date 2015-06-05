@@ -4,11 +4,12 @@
 
 #include <QDebug>
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(SessionParams * session, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    params = session;
 }
 
 MainWindow::~MainWindow()
@@ -33,7 +34,9 @@ void MainWindow::setOutputDir(QString dirPath, QString sessionName)
 void MainWindow::toggleRun(bool buttonPressed)
 {
     if (buttonPressed) {
-        ui->pushButtonRun->setText("stop");
+        ui->pushButtonRun->setText("stop");        
+        params->setOutputDir(ui->lineEdit->text());
+        qDebug() << "Setting output dir: " << params->getOutDir().absolutePath();
         emit startListening();
     }
     else {

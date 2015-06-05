@@ -30,6 +30,13 @@ public:
      * @return ordered filename for raw data
      */
     static QString generateRawFileName(int fileNo);
+
+    /**
+     * @brief generateTransformFileName generates new filename ordered by fileNo
+     * @param fileNo order of the transformation file in session
+     * @return ordered filename for transformations
+     */
+    static QString generateTransformFileName(int fileNo);
 };
 
 #endif // FILENAMEGENERATOR_H

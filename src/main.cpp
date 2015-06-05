@@ -34,10 +34,6 @@ int main(int argc, char *argv[])
         qDebug() << "configuration file not found, using default values";
     QSettings settings(parser.value(configFilePath), QSettings::IniFormat);
 
-    // Create gui
-    MainWindow w;
-    w.setWindowTitle(app.applicationName().append(" ").append(app.applicationVersion()));
-
     // Load connection parameters
     SessionParams session(settings.value("plusServer/host","localhost").toString(),
                  settings.value("plusServer/port", "18944").toInt(), 0);
@@ -45,19 +41,23 @@ int main(int argc, char *argv[])
     // Create client for server connection (in separate thread)
     IGTLinkClient client(&session);
 
-    // connect client actions with UI
-    QObject::connect(&w,&MainWindow::startListening,&client,&IGTLinkClient::startReading);
-    QObject::connect(&w,&MainWindow::stopListening,&client,&IGTLinkClient::stopReading);
-
     // session directory
     QString dirName = settings.value("output/dir", QDir::tempPath()).toString();
-    w.setOutputDir(dirName);
 
     // configure grabber output
     session.setOutput(dirName,
                      settings.value("image/names", "Image_Probe").toStringList(),
                      settings.value("transformations/names", "ProbeToTracker,ReferenceToTracker").toStringList(),
                      settings.value("output/imageCount", "1000").toInt());
+
+    // Create gui
+    MainWindow w(&session);
+    w.setOutputDir(dirName);
+    w.setWindowTitle(app.applicationName().append(" ").append(app.applicationVersion()));
+
+    // connect client actions with UI
+    QObject::connect(&w,&MainWindow::startListening,&client,&IGTLinkClient::startReading);
+    QObject::connect(&w,&MainWindow::stopListening,&client,&IGTLinkClient::stopReading);
 
     w.show();
     return app.exec();

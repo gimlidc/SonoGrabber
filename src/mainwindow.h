@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "sessionparams.h"
 
 namespace Ui {
 class MainWindow;
@@ -12,7 +13,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(SessionParams * params, QWidget *parent = 0);
     ~MainWindow();
 
     void setOutputDir(QString dirPath, QString sessionName = "");
@@ -24,6 +25,7 @@ signals:
 private:
     Ui::MainWindow *ui;
     QString dirPath;
+    SessionParams * params;
     void newSession();
 };
 

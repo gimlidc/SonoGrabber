@@ -1,5 +1,6 @@
 #include "sessionparams.h"
 #include "igtlClientSocket.h"
+#include "sessionnamegenerator.h"
 #include <QDebug>
 
 SessionParams::SessionParams(QString hostname, const int port, QObject *parent) : QObject(parent)
@@ -58,6 +59,16 @@ QStringList SessionParams::getTransNames()
 int SessionParams::getPort()
 {
     return _port;
+}
+
+QString SessionParams::getHeaderFileName()
+{
+    return outDir.absolutePath() + "/header.mhd";
+}
+
+QString SessionParams::getRawFileName(int fileNo)
+{
+    return outDir.absolutePath() + "/" + SessionNameGenerator::generateRawFileName(fileNo);
 }
 
 int SessionParams::openSocket()

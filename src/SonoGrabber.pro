@@ -11,8 +11,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = SonoGrabber
 TEMPLATE = app
 
-INCLUDEPATH += ../igtlink/include/igtl
-LIBS += "-L../igtlink/lib/igtl" -lOpenIGTLink
+INCLUDEPATH += $$PWD/../igtlink/include/igtl
+LIBS += "-L$$PWD/../igtlink/lib/igtl" -lOpenIGTLink
 
 SOURCES += main.cpp\
         mainwindow.cpp \

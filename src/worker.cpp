@@ -26,11 +26,11 @@ int Worker::saveTransform(const igtl::TransformMessage::Pointer &transMsg)
 int Worker::saveImage(const igtl::ImageMessage::Pointer &imgMsg)
 {
     int r;
-    if ( imageCounter % session->getChunkSize() == 0 ) {// open new raw image file
+    if ((imageCounter == 0 && session->getChunkSize() == 0)
+        || imageCounter % session->getChunkSize() == 0 ) {// open new raw image file
         rawFile.close();
         headerFile.flush();
-        QString s = QString("%1%2.raw").arg(session->getOutDir().absolutePath() + "/").arg(SessionNameGenerator::generateRawFileName(fileCounter));
-        rawFile.setFileName(s);
+        rawFile.setFileName(session->getRawFileName(fileCounter));
         if (!(r = rawFile.open(QIODevice::WriteOnly))) {
             qWarning() << "Cannot open raw file.";
             _writeFlag = false;
@@ -54,14 +54,14 @@ void Worker::flushData(double ts)
 {
     int i;
     // check if the time stamps are equal then save data to the file
-    if (imgTS.count(ts)+transTS.count(ts) == imgTS.size()+transTS.size()) {
+    if (imgTS.count(ts) + transTS.count(ts) == imgTS.size() + transTS.size()) {
         //qDebug() << "save";
         if (imgTS.count() == 0) // !!! At least one image
              return;
-        if (!imageCounter) { // fist image has arrived - generate header
+        if (!imageCounter) { // first image has arrived - generate header
             writeHeader(imgMsgList[0]);
         }
-        QString s = QString("Seq_Frame%1_").arg(imageCounter,4,10,QChar('0'));
+        QString s = SessionNameGenerator::generateTransformFileName(imageCounter);
         tstr << s << "Timestamp = " << ts << '\n';
         for (i = 0; i < transTS.size(); ++i) {
             tstr << s << transMsgList[i]->GetDeviceName() << "Transform = ";
@@ -78,8 +78,8 @@ void Worker::flushData(double ts)
 
 int Worker::createOutDir()
 {
-    if (!session->getOutDir().exists()) {
-        qWarning() << "Directory exists data can be overwritten!";
+    if (session->getOutDir().exists()) {
+        qWarning() << "Directory exists data can be overwritten: " << session->getOutDir().absolutePath();
     } else {
         qDebug() << "Creating target directory: " << session->getOutDir().absolutePath();
         if (!QDir().mkpath(session->getOutDir().absolutePath())) {
@@ -105,12 +105,13 @@ void Worker::setOutput()
 void Worker::openHeaderFile()
 {
     qWarning() << "opening header file";
-    headerFile.setFileName(session->getOutDir().absolutePath() + "/header.mhd");
-    if (!headerFile.open(QIODevice::WriteOnly | QIODevice::Text))
-    {
+    headerFile.setFileName(session->getHeaderFileName());
+    if (!headerFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
         qWarning() << "Cannot open file" << headerFile.fileName();
         _writeFlag = false;
         return;
+    } else {
+        qDebug() << "Header file opened: " << session->getHeaderFileName();
     }
     _writeFlag = true;
     tstr.setDevice(&headerFile);
@@ -119,7 +120,6 @@ void Worker::openHeaderFile()
     imageCounter = 0;
     fileCounter = 0;
 }
-
 
 void Worker::closeFiles()
 {
@@ -168,7 +168,7 @@ void Worker::writeFooter()
        << "ElementDataFile = "; // LIST" << '\n';
     for (i = 0; i < fileCounter; ++i)
     {
-        tstr << QString("%1%2.raw").arg(session->getOutDir().absolutePath() + "/").arg(SessionNameGenerator::generateRawFileName(i)) << ' ';
+        tstr << session->getRawFileName(i) << ' ';
     }
     tstr.flush();
 }
@@ -213,7 +213,11 @@ void Worker::start()
     if (resultCode != 0) {
         qWarning() << "Connection to server failed. Error code: %1" << resultCode;
         return;
+    } else {
+        qDebug() << "Socket opened. Reading data loop ...";
     }
+
+    setOutput();
 
     while (1) {
         Lock.lockForRead();
@@ -260,8 +264,8 @@ void Worker::start()
         } else if (qstrcmp(headerMsg->GetDeviceType(), "IMAGE") == 0) {
             ReceiveImage(session->socket, headerMsg);
         } else {
-          qWarning() << "Receiving unknown message:" << headerMsg->GetDeviceType();
-          session->socket->Skip(headerMsg->GetBodySizeToRead(), 0);
+            qWarning() << "Receiving unknown message:" << headerMsg->GetDeviceType();
+            session->socket->Skip(headerMsg->GetBodySizeToRead(), 0);
         }
     }
 
@@ -294,7 +298,7 @@ int Worker::ReceiveTransform(igtl::Socket * socket, igtl::MessageHeader::Pointer
       ts = igtl::TimeStamp::New();
       transMsg->GetTimeStamp(ts);
 
-      i = transNameList.indexOf(transMsg->GetDeviceName());
+      i = session->getTransNames().indexOf(transMsg->GetDeviceName());
       if (i == -1) {
           //qDebug() << "Transform ignored:" << transMsg->GetDeviceName();
           return i;
@@ -371,15 +375,20 @@ int Worker::ReceiveImage(igtl::Socket * socket, igtl::MessageHeader::Pointer& he
       ts = igtl::TimeStamp::New();
       imgMsg->GetTimeStamp(ts);
 
-      i = imgNameList.indexOf(imgMsg->GetDeviceName());
+      i = session->getImageNames().indexOf(imgMsg->GetDeviceName());
       if (i == -1) {
-          //qDebug() << "Image ignored:" << imgMsg->GetDeviceName();
+          qDebug() << "Image ignored:" << imgMsg->GetDeviceName();
           return i;
       }
       qDebug() << 1/(ts->GetTimeStamp()-imgTS[i]);
       imgTS[i] = ts->GetTimeStamp();
+      qDebug() << "storing image message";
       imgMsgList[i] = imgMsg;
-      if (_writeFlag) flushData(imgTS[i]);
+      qDebug() << "flushing data";
+      if (_writeFlag) {
+          flushData(imgTS[i]);
+      }
+      qDebug() << "callback for image to process";
       emit imageReceived(imgMsg);
       return i;
   }

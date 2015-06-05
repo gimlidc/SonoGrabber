@@ -36,7 +36,6 @@ class Worker : public QObject
     int imageCounter;
     int fileCounter;
     int size[3];          // image dimension
-    QStringList transNameList, imgNameList; // list of transform and image names, which we want to
     QList<igtl::ImageMessage::Pointer> imgMsgList; // temporarily store image and transform message
     QList<igtl::TransformMessage::Pointer> transMsgList;
     QVector<double> imgTS;
