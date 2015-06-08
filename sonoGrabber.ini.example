@@ -1,7 +1,11 @@
 [plusServer]
-host=192.168.11.20
-port=18944
+host=147.231.13.102
+port=80
 [image]
-crop=[0,0,640,480]
+names=Image_Identity
+crops=[0,0,640,480]
+[transformations]
+names=ProbeToTracker,ReferenceToTracker,StylusToTracker
 [output]
-dir=/Users/gimli/Temp/SonoGrabberOut/
+dir=/Users/gimli/Temp/SonoGrabberOut
+imageCount=0
