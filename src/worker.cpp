@@ -26,8 +26,8 @@ int Worker::saveTransform(const igtl::TransformMessage::Pointer &transMsg)
 int Worker::saveImage(const igtl::ImageMessage::Pointer &imgMsg)
 {
     int r;
-    if ((imageCounter == 0 && session->getChunkSize() == 0)
-        || imageCounter % session->getChunkSize() == 0 ) {// open new raw image file
+    if ((session->getChunkSize() == 0 && imageCounter == 0)
+        || (session->getChunkSize() != 0 && imageCounter % session->getChunkSize() == 0)) {// open new raw image file
         rawFile.close();
         headerFile.flush();
         rawFile.setFileName(session->getRawFileName(fileCounter));
@@ -382,13 +382,10 @@ int Worker::ReceiveImage(igtl::Socket * socket, igtl::MessageHeader::Pointer& he
       }
       qDebug() << 1/(ts->GetTimeStamp()-imgTS[i]);
       imgTS[i] = ts->GetTimeStamp();
-      qDebug() << "storing image message";
       imgMsgList[i] = imgMsg;
-      qDebug() << "flushing data";
       if (_writeFlag) {
           flushData(imgTS[i]);
       }
-      qDebug() << "callback for image to process";
       emit imageReceived(imgMsg);
       return i;
   }
