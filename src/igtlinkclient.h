@@ -7,6 +7,7 @@
 #include <QFile>
 #include <QStringList>
 #include <QVector>
+#include <QByteArray>
 #include <QTextStream>
 #include <QSettings>
 
@@ -48,6 +49,7 @@ private slots:
 signals:
     void startWorker();
     void stopped(ErrorType);
+    void notifyNewImage(int width, int height, const uchar * intensities);
 };
 
 #endif // IGTLINKCLIENT_H

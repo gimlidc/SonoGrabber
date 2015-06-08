@@ -59,6 +59,8 @@ int main(int argc, char *argv[])
     QObject::connect(&w,&MainWindow::startListening,&client,&IGTLinkClient::startReading);
     QObject::connect(&w,&MainWindow::stopListening,&client,&IGTLinkClient::stopReading);
 
+    QObject::connect(&client, &IGTLinkClient::notifyNewImage, &w, &MainWindow::showImage);
+
     w.show();
     return app.exec();
 }

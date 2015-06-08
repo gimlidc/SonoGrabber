@@ -3,6 +3,8 @@
 #include "sessionnamegenerator.h"
 
 #include <QDebug>
+#include <QVector>
+#include <QRgb>
 
 MainWindow::MainWindow(SessionParams * session, QWidget *parent) :
     QMainWindow(parent),
@@ -10,6 +12,10 @@ MainWindow::MainWindow(SessionParams * session, QWidget *parent) :
 {
     ui->setupUi(this);
     params = session;
+
+    for (int i = 0; i < 256; i++) {
+        grayScaleColorTable.push_back(QColor(i, i, i).rgb());
+    }
 }
 
 MainWindow::~MainWindow()
@@ -44,4 +50,20 @@ void MainWindow::toggleRun(bool buttonPressed)
         ui->pushButtonRun->setText("run ");
         newSession();
     }
+}
+
+void MainWindow::showImage(int width, int height, const uchar* buffer)
+{
+    if (newImage.width() != width || newImage.height() != height) {
+        newImage = QImage(buffer, width, height, width, QImage::Format_Indexed8);
+        newImage.setColorTable(MainWindow::grayScaleColorTable);
+    } else {
+        for(int y = 0; y < height; y++)
+            for(int x = 0; x < width; x++) {
+                newImage.setPixel(x, y, buffer[x + y * width]);
+            }
+    }
+    ui->sonoImage->setPixmap(QPixmap::fromImage(newImage));
+    ui->sonoImage->adjustSize();
+    ui->sonoImage->repaint();
 }

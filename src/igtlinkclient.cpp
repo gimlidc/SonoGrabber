@@ -2,6 +2,7 @@
 #include <QtDebug>
 #include <QByteArray>
 #include <QMatrix4x4>
+#include <QPixmap>
 
 
 QReadWriteLock Worker::Lock;
@@ -16,7 +17,7 @@ IGTLinkClient::IGTLinkClient(SessionParams * connection, QObject *parent) : QObj
     connect(&_workerThread, &QThread::finished, worker, &QObject::deleteLater);
     connect(this, &IGTLinkClient::startWorker, worker, &Worker::start);
 //    connect(worker, &Worker::transformReceived, this, &IGTLinkClient::handleTransform);
-//    connect(worker, &Worker::imageReceived, this, &IGTLinkClient::handleImage);
+    connect(worker, &Worker::imageReceived, this, &IGTLinkClient::handleImage);
     connect(worker, &Worker::stopped, this, &IGTLinkClient::receiveStopSignal);
 
     _workerThread.start();
@@ -53,6 +54,13 @@ void IGTLinkClient::handleTransform(const igtl::TransformMessage::Pointer &trans
 
 void IGTLinkClient::handleImage(const igtl::ImageMessage::Pointer &imgMsg)
 {
-    //qDebug() << "Image received.";
-    //qDebug() << imgMsg->GetDeviceName();
+    qDebug() << "Image received. Whole size with header: " << imgMsg->GetBodySizeToRead();
+    int resolution[3];
+    imgMsg->GetDimensions(resolution);
+    qDebug() << "Image dimensions:" << resolution[0] << "x" << resolution[1] << "x" << resolution[2];
+    int size = imgMsg->GetImageSize();
+
+    uchar * buffer = (uchar *)imgMsg->GetPackBodyPointer() + imgMsg->GetPackBodySize() - size;
+
+    emit notifyNewImage(resolution[0], resolution[1], buffer);
 }
