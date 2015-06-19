@@ -7,6 +7,7 @@
 #include <QLineEdit>
 #include <QCommandLineParser>
 #include <QDir>
+#include <QRect>
 
 int main(int argc, char *argv[])
 {   
@@ -38,17 +39,18 @@ int main(int argc, char *argv[])
     SessionParams session(settings.value("plusServer/host","localhost").toString(),
                  settings.value("plusServer/port", "18944").toInt(), 0);
 
-    // Create client for server connection (in separate thread)
-    IGTLinkClient client(&session);
-
     // session directory
     QString dirName = settings.value("output/dir", QDir::tempPath()).toString();
 
     // configure grabber output
     session.setOutput(dirName,
-                     settings.value("image/names", "Image_Probe").toStringList(),
+                     settings.value("image/name", "Image_Probe").toStringList(),
+                     settings.value("image/crop", QRect(0, 0, 0, 0)).value<QRect>(),
                      settings.value("transformations/names", "ProbeToTracker,ReferenceToTracker").toStringList(),
                      settings.value("output/imageCount", "1000").toInt());
+
+    // Create client for server connection (in separate thread)
+    IGTLinkClient client(&session);
 
     // Create gui
     MainWindow w(&session);
@@ -58,8 +60,7 @@ int main(int argc, char *argv[])
     // connect client actions with UI
     QObject::connect(&w,&MainWindow::startListening,&client,&IGTLinkClient::startReading);
     QObject::connect(&w,&MainWindow::stopListening,&client,&IGTLinkClient::stopReading);
-
-    QObject::connect(&client, &IGTLinkClient::notifyNewImage, &w, &MainWindow::showImage);
+    QObject::connect(&client, &IGTLinkClient::imageReceived, &w, &MainWindow::showImage);
 
     w.show();
     return app.exec();

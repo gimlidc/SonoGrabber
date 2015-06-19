@@ -26,7 +26,7 @@ QString SessionNameGenerator::generateRawFileName(int fileNo)
     return QString("%1.raw").arg(fileNo,3,10,QChar('0'));
 }
 
-QString SessionNameGenerator::generateTransformFileName(int fileNo)
+QString SessionNameGenerator::generateTransformPrefix(int imageNo)
 {
-    return QString("Seq_Frame%1_").arg(fileNo,4,10,QChar('0'));
+    return QString("Seq_Frame%1_").arg(imageNo,4,10,QChar('0'));
 }

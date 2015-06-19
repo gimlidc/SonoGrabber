@@ -6,6 +6,7 @@
 #include <QObject>
 #include <QString>
 #include <QDir>
+#include <QRect>
 
 class SessionParams : public QObject
 {
@@ -26,21 +27,14 @@ class SessionParams : public QObject
     QFile rawFile;
     /** File object which handles the metaheader file (*.mhd) */
     QFile headerFile;
+    /** Cropping of the image */
+    QRect crop;
+    /** Freeze mark in the image at this position */
+    QRect freeze;
 
 public:
     SessionParams(QString hostname, const int port, QObject *parent = 0);
     ~SessionParams();
-    /**
-     * @brief getHeaderFileName header file contains information about whole directory {@see #outDir}
-     * @return full path to header file
-     */
-    QString getHeaderFileName();
-    /**
-     * @brief getRawFileName raw file contains images
-     * @param fileNo order of file in this session
-     * @return full path to raw file
-     */
-    QString getRawFileName(int fileNo);
     /**
      * @brief setOutputDir configure target directory for session saving
      * @param dirName full path of target directory
@@ -53,7 +47,7 @@ public:
      * @param transformations labels of transformation data (for parsing)
      * @param imagesInOneFile define how many images is stored into one output file
      */
-    void setOutput(QString dirName, QStringList images, QStringList transformations, int imagesInOneFile);
+    void setOutput(QString dirName, QStringList images, QRect crop, QStringList transformations, int imagesInOneFile);
     /**
      * @brief getChunkSize defines size of file size in number of images stored in
      * @return number of images stored in one file for this session. Return -1 if not set.
@@ -74,6 +68,16 @@ public:
      * @return names of images which will be parsed in the session
      */
     QStringList getImageNames();
+    /**
+     * @brief getCrop image subsection
+     * @return crop area of the image
+     */
+    QRect getCrop();
+    /**
+     * @brief shouldCrop return if cropping is set
+     * @return true if cropping was set and is valid otherwise false
+     */
+    bool shouldCrop(QSize imgSize);
     /**
      * @brief getTransNames
      * @return names of transformations which will be parsed in the session

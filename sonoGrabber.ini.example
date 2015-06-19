@@ -3,7 +3,7 @@ host=147.231.13.102
 port=80
 [image]
 names=Image_Identity
-crops=[0,0,640,480]
+crops= @Rect(0 0 640 480), @Rect(1 2 640 480)
 [transformations]
 names=ProbeToTracker,ReferenceToTracker,StylusToTracker
 [output]

@@ -2,6 +2,7 @@
 #include "worker.h"
 #include "sessionparams.h"
 #include "igtlinkclient.h"
+#include "imageprocessor.h"
 #include "sessionnamegenerator.h"
 
 Worker::Worker(SessionParams * conn)
@@ -9,85 +10,39 @@ Worker::Worker(SessionParams * conn)
     session = conn;
 }
 
-Worker::~Worker() {}
-
-int Worker::saveTransform(const igtl::TransformMessage::Pointer &transMsg)
-{
-   igtl::Matrix4x4 matrix;
-
-   transMsg->GetMatrix(matrix);
-   tstr   << matrix[0][0] << ' ' << matrix[0][1] << ' ' << matrix[0][2] << ' ' << matrix[0][3] << ' '
-        << matrix[1][0] << ' ' << matrix[1][1] << ' ' << matrix[1][2] << ' ' << matrix[1][3] << ' '
-        << matrix[2][0] << ' ' << matrix[2][1] << ' ' << matrix[2][2] << ' ' << matrix[2][3] << ' '
-        << matrix[3][0] << ' ' << matrix[3][1] << ' ' << matrix[3][2] << ' ' << matrix[3][3] << '\n';
-   return 1;
-}
-
-int Worker::saveImage(const igtl::ImageMessage::Pointer &imgMsg)
-{
-    int r;
-    if ((session->getChunkSize() == 0 && imageCounter == 0)
-        || (session->getChunkSize() != 0 && imageCounter % session->getChunkSize() == 0)) {// open new raw image file
-        rawFile.close();
-        headerFile.flush();
-        rawFile.setFileName(session->getRawFileName(fileCounter));
-        if (!(r = rawFile.open(QIODevice::WriteOnly))) {
-            qWarning() << "Cannot open raw file.";
-            _writeFlag = false;
-            return r;
-        }
-        fileCounter++;
-    }
-
-    //r = rawFile.write(qCompress((const uchar *) imgMsg->GetScalarPointer(),imgMsg->GetImageSize(),9));
-    r = rawFile.write((char *) imgMsg->GetScalarPointer(),imgMsg->GetImageSize());
-    if (r == -1) {
-        qWarning() << "Cannot write to raw image file";
-        _writeFlag = false;
-        return r;
-    }
-    imageCounter++;
-    return 1;
+Worker::~Worker() {
 }
 
 void Worker::flushData(double ts)
 {
-    int i;
     // check if the time stamps are equal then save data to the file
     if (imgTS.count(ts) + transTS.count(ts) == imgTS.size() + transTS.size()) {
         //qDebug() << "save";
         if (imgTS.count() == 0) // !!! At least one image
              return;
-        if (!imageCounter) { // first image has arrived - generate header
-            writeHeader(imgMsgList[0]);
+        writer->writeHeader(imgMsgList[0]);
+        writer->startSequence(ts);
+        for (int i = 0; i < transTS.size(); ++i) {
+            writer->writeTransform(transMsgList[i]);
         }
-        QString s = SessionNameGenerator::generateTransformFileName(imageCounter);
-        tstr << s << "Timestamp = " << ts << '\n';
-        for (i = 0; i < transTS.size(); ++i) {
-            tstr << s << transMsgList[i]->GetDeviceName() << "Transform = ";
-            saveTransform(transMsgList[i]);
-            tstr << s << transMsgList[i]->GetDeviceName() << "TransformStatus = OK\n";
+        int size[3];
+        imgMsgList[0]->GetDimensions(size);
+        QSize dimensions(size[0], size[1]);
 
+        if (session->shouldCrop(dimensions)) {
+            char * imgBuffer = (char *)malloc(session->getCrop().width() * session->getCrop().height() * sizeof(uchar));
+            ImageProcessor::cropImage((char *)imgMsgList[0]->GetScalarPointer(), dimensions, session->getCrop(), imgBuffer);
+            QString state = "CROPPED";
+            writer->writeImage(imgBuffer, session->getCrop().size());
+            emit imageReceived(imgBuffer, session->getCrop().size(), state);
+        } else {
+            writer->writeImage((char *) imgMsgList[0]->GetScalarPointer(), dimensions);
+            emit imageReceived((char *) imgMsgList[0]->GetScalarPointer(), dimensions, "OK");
         }
-        saveImage(imgMsgList[0]);
-        tstr << s << "ImageStatus = OK\n";
-        qDebug() << imageCounter;
+
+        writer->closeSequence();
     }
 
-}
-
-int Worker::createOutDir()
-{
-    if (session->getOutDir().exists()) {
-        qWarning() << "Directory exists data can be overwritten: " << session->getOutDir().absolutePath();
-    } else {
-        qDebug() << "Creating target directory: " << session->getOutDir().absolutePath();
-        if (!QDir().mkpath(session->getOutDir().absolutePath())) {
-            return 1;
-        }
-    }
-
-    return 0;
 }
 
 void Worker::setOutput()
@@ -100,77 +55,6 @@ void Worker::setOutput()
 
     imgTS.fill(0.0,session->getImageNames().size());
     transTS.fill(0.0,session->getTransNames().size());
-}
-
-void Worker::openHeaderFile()
-{
-    qWarning() << "opening header file";
-    headerFile.setFileName(session->getHeaderFileName());
-    if (!headerFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qWarning() << "Cannot open file" << headerFile.fileName();
-        _writeFlag = false;
-        return;
-    } else {
-        qDebug() << "Header file opened: " << session->getHeaderFileName();
-    }
-    _writeFlag = true;
-    tstr.setDevice(&headerFile);
-    tstr.setRealNumberPrecision(16);
-
-    imageCounter = 0;
-    fileCounter = 0;
-}
-
-void Worker::closeFiles()
-{
-    if(_writeFlag)
-    {
-        writeFooter();
-    }
-    _writeFlag = false;
-    rawFile.close();
-    headerFile.close();
-}
-
-void Worker::writeHeader(const igtl::ImageMessage::Pointer &imgMsg)
-{
-    // Retrive the image data
-    float spacing[3];       // spacing (mm/pixel)
-    int   svsize[3];        // sub-volume size
-    int   svoffset[3];      // sub-volume offset
-    int   scalarType;       // scalar type
-
-    scalarType = imgMsg->GetScalarType();
-    imgMsg->GetDimensions(size);
-    imgMsg->GetSpacing(spacing);
-    imgMsg->GetSubVolume(svsize, svoffset);
-
-    tstr << "ObjectType = Image\n"
-       << "NDims = 3\n"
-       << "AnatomicalOrientation = RAI\n"
-       << "BinaryData = True\n"
-       << "BinaryDataByteOrderMSB = False\n"
-       << "CenterOfRotation = 0 0 0\n"
-       << "CompressedData = False\n"
-       << "ElementNumberOfChannels = 1\n"
-       << "Offset = 0 0 0\n"
-       << "TransformMatrix = 1 0 0 0 1 0 0 0 1\n"
-       << "UltrasoundImageOrientation = MF\n"
-       << "UltrasoundImageType = BRIGHTNESS\n"
-       << "ElementType = MET_UCHAR\n"
-       << "ElementSpacing = 1 1 1\n"; //<< "ElementSpacing = " << spacing[0] << ' ' << spacing[1] << ' ' << spacing[2] << '\n'
-}
-
-void Worker::writeFooter()
-{
-    int i;
-    tstr << "DimSize = " << size[0] << ' ' << size[1] << ' ' << imageCounter << '\n'
-       << "ElementDataFile = "; // LIST" << '\n';
-    for (i = 0; i < fileCounter; ++i)
-    {
-        tstr << session->getRawFileName(i) << ' ';
-    }
-    tstr.flush();
 }
 
 void Worker::stop()
@@ -201,9 +85,10 @@ void Worker::start()
     igtl::TimeStamp::Pointer ts;
     ts = igtl::TimeStamp::New();
 
-    createOutDir();
+    writer = new Writer(session->getOutDir(), session->getChunkSize());
+    writer->createOutDir();
 
-    openHeaderFile();
+    writer->openHeaderFile();
 
     Lock.lockForWrite();
     Terminate = false;
@@ -256,6 +141,8 @@ void Worker::start()
         //          << sec << "." //<< std::setw(9) << std::setfill('0')
         //          << nanosec;
 
+        //qWarning() << "Receiving message:" << headerMsg->GetDeviceType();
+
         // Check data type and receive data body
         if (qstrcmp(headerMsg->GetDeviceType(), "TRANSFORM") == 0) {
             ReceiveTransform(session->socket, headerMsg);
@@ -269,16 +156,14 @@ void Worker::start()
         }
     }
 
-    closeFiles();
+    writer->closeFiles();
+    free(writer);
     session->closeSocket();
     emit stopped(resultCode);
 }
 
 int Worker::ReceiveTransform(igtl::Socket * socket, igtl::MessageHeader::Pointer& header)
 {
-  int i;
-  //qDebug() << "Receiving TRANSFORM data type.";
-
   // Create a message buffer to receive transform data
   igtl::TransformMessage::Pointer transMsg;
   transMsg = igtl::TransformMessage::New();
@@ -298,7 +183,7 @@ int Worker::ReceiveTransform(igtl::Socket * socket, igtl::MessageHeader::Pointer
       ts = igtl::TimeStamp::New();
       transMsg->GetTimeStamp(ts);
 
-      i = session->getTransNames().indexOf(transMsg->GetDeviceName());
+      int i = session->getTransNames().indexOf(transMsg->GetDeviceName());
       if (i == -1) {
           //qDebug() << "Transform ignored:" << transMsg->GetDeviceName();
           return i;
@@ -306,8 +191,7 @@ int Worker::ReceiveTransform(igtl::Socket * socket, igtl::MessageHeader::Pointer
       transTS[i] = ts->GetTimeStamp();
       transMsgList[i] = transMsg;
 
-      if (_writeFlag)
-          flushData(transTS[i]);
+      flushData(transTS[i]);
       emit transformReceived(transMsg);
       return i;
   }
@@ -383,10 +267,8 @@ int Worker::ReceiveImage(igtl::Socket * socket, igtl::MessageHeader::Pointer& he
       qDebug() << 1/(ts->GetTimeStamp()-imgTS[i]);
       imgTS[i] = ts->GetTimeStamp();
       imgMsgList[i] = imgMsg;
-      if (_writeFlag) {
-          flushData(imgTS[i]);
-      }
-      emit imageReceived(imgMsg);
+
+      flushData(imgTS[i]);
       return i;
   }
   qWarning() << "CRC check error!";

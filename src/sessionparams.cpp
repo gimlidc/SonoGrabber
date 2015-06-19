@@ -22,12 +22,13 @@ void SessionParams::setOutputDir(QString targetDirectory)
     outDir = QDir(targetDirectory);
 }
 
-void SessionParams::setOutput(QString targetDirectory, QStringList imgList, QStringList transList, int imagesInOneFile)
+void SessionParams::setOutput(QString targetDirectory, QStringList imgList, QRect cropping, QStringList transList, int imagesInOneFile)
 {
     qDebug() << "Output directory:" << targetDirectory << "Grabbed images:" << imgList << "Grabbed transformations:" << transList << "Chunk size:" << imagesInOneFile;
     setOutputDir(targetDirectory);
     chunkSize = imagesInOneFile;
     images = QStringList(imgList);
+    crop = QRect(cropping);
     transformations = QStringList(transList);
 }
 
@@ -51,6 +52,28 @@ QStringList SessionParams::getImageNames()
     return images;
 }
 
+QRect SessionParams::getCrop()
+{
+    return crop;
+}
+
+bool SessionParams::shouldCrop(QSize imgSize)
+{
+    if (crop.width() == 0 || crop.height() == 0) {
+        // invalid cropping was set
+        return false;
+    }
+    if (crop.x() + crop.width() > imgSize.width()) {
+        // Crop rectangle is bigger than image
+        return false;
+    }
+    if (crop.y() + crop.height() > imgSize.height()) {
+        // Crop rectangle is bigger than image
+        return false;
+    }
+    return true;
+}
+
 QStringList SessionParams::getTransNames()
 {
     return transformations;
@@ -59,16 +82,6 @@ QStringList SessionParams::getTransNames()
 int SessionParams::getPort()
 {
     return _port;
-}
-
-QString SessionParams::getHeaderFileName()
-{
-    return outDir.absolutePath() + "/header.mhd";
-}
-
-QString SessionParams::getRawFileName(int fileNo)
-{
-    return outDir.absolutePath() + "/" + SessionNameGenerator::generateRawFileName(fileNo);
 }
 
 int SessionParams::openSocket()

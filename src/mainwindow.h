@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QPixmap>
+#include <QImage>
 #include <QByteArray>
 #include "sessionparams.h"
 
@@ -22,7 +22,7 @@ public:
 
 public slots:
     void toggleRun(bool t);
-    void showImage(int width, int height, const uchar * buffer);
+    void showImage(QImage newImage, QString state);
 signals:
     void startListening();
     void stopListening();
@@ -30,8 +30,6 @@ private:
     Ui::MainWindow *ui;
     QString dirPath;
     SessionParams * params;
-    QImage newImage;
-    QVector<QRgb> grayScaleColorTable;
     void newSession();
 };
 

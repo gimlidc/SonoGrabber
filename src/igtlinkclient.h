@@ -10,6 +10,8 @@
 #include <QByteArray>
 #include <QTextStream>
 #include <QSettings>
+#include <QRgb>
+#include <QImage>
 
 #include "worker.h"
 #include "sessionparams.h"
@@ -26,6 +28,7 @@ class IGTLinkClient : public QObject
     Q_OBJECT
     QThread _workerThread;
     Worker* worker;
+    QVector<QRgb> grayScaleColorTable;
 protected:
     igtl::ClientSocket::Pointer _socket;
 
@@ -38,18 +41,17 @@ public:
         UserInterrupt, ReceiveError
     };
     explicit IGTLinkClient(SessionParams * connection, QObject *parent = 0);
-    ~IGTLinkClient();
+    ~IGTLinkClient();    
 public slots:
     void startReading();
-    void handleTransform(const igtl::TransformMessage::Pointer& transMsg);
-    void handleImage(const igtl::ImageMessage::Pointer& imgMsg);
     void stopReading();
+    void showImage(char * imageBuffer, QSize imgSize, QString state);
 private slots:
     void receiveStopSignal(int e);
 signals:
     void startWorker();
     void stopped(ErrorType);
-    void notifyNewImage(int width, int height, const uchar * intensities);
+    void imageReceived(QImage newImage, QString state);
 };
 
 #endif // IGTLINKCLIENT_H

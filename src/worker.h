@@ -14,6 +14,7 @@
 #include "igtlSocket.h"
 #include "igtlPositionMessage.h"
 #include "sessionparams.h"
+#include "writer.h"
 
 /**
  * @brief Worker is responsible for socket reading
@@ -29,29 +30,16 @@ class Worker : public QObject
     static QReadWriteLock Lock;
 
     SessionParams * session;
-    QFile rawFile; // File object which handles raw (image) data (.raw)
-    QFile headerFile;  // File object which handles the metaheader file (*.mhd)
-    QTextStream tstr;
-    bool _writeFlag; // Flag to determine if the received stream of messages should be stored in a
-    int imageCounter;
-    int fileCounter;
-    int size[3];          // image dimension
+    Writer * writer;
     QList<igtl::ImageMessage::Pointer> imgMsgList; // temporarily store image and transform message
     QList<igtl::TransformMessage::Pointer> transMsgList;
     QVector<double> imgTS;
     QVector<double> transTS;
 
-    void writeHeader(const igtl::ImageMessage::Pointer &imgMsg);
-    void writeFooter();
-    int saveImage(const igtl::ImageMessage::Pointer &imgMsg);
-    int saveTransform(const igtl::TransformMessage::Pointer &transMsg);
-    void flushData(double ts);
     int ReceiveTransform(igtl::Socket *socket, igtl::MessageHeader::Pointer& header);
     int ReceivePosition(igtl::Socket *socket, igtl::MessageHeader::Pointer& header);
     int ReceiveImage(igtl::Socket *socket, igtl::MessageHeader::Pointer& header);
-    void closeFiles();
-    void openHeaderFile();
-    int createOutDir();
+    void flushData(double ts);
     void setOutput(); // method can be called when session is fully defined
 public:
     Worker(SessionParams * session);
@@ -84,8 +72,9 @@ signals:
     /**
      * @brief imageReceived when image is received signal is emmited
      * @param imgMsg parsed image
+     * @param state contains info about image - if it is frozen value is set to "Frozen" after call
      */
-    void imageReceived(const igtl::ImageMessage::Pointer& imgMsg);
+    void imageReceived(char * imageBuffer, QSize imgSize, QString state);
     /**
      * @brief stopped is emmited when worker is stopped (connection closed).
      */

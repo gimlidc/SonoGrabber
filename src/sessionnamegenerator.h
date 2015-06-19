@@ -32,11 +32,11 @@ public:
     static QString generateRawFileName(int fileNo);
 
     /**
-     * @brief generateTransformFileName generates new filename ordered by fileNo
-     * @param fileNo order of the transformation file in session
-     * @return ordered filename for transformations
+     * @brief generateTransformName generates new name of transform
+     * @param imageNo order of the transformation
+     * @return ordered transformation name
      */
-    static QString generateTransformFileName(int fileNo);
+    static QString generateTransformPrefix(int imageNo);
 };
 
 #endif // FILENAMEGENERATOR_H
