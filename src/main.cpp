@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
                      settings.value("output/imageCount", "1000").toInt());
 
     // Create client for server connection (in separate thread)
-    IGTLinkClient client(&session);
+    IGTLinkClient client(&session, settings.value("gui/refreshRateMs", 200).value<qint64>());
 
     // Create gui
     MainWindow w(&session);

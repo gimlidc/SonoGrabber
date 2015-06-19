@@ -8,11 +8,12 @@
 #include <QVector>
 #include <QRgb>
 #include <QImage>
+#include <QDateTime>
 
 QReadWriteLock Worker::Lock;
 bool Worker::Terminate = true;
 
-IGTLinkClient::IGTLinkClient(SessionParams * connection, QObject *parent) : QObject(parent)
+IGTLinkClient::IGTLinkClient(SessionParams * connection, qint64 refreshRate, QObject *parent) : QObject(parent)
 {
     worker = new Worker(connection);
     worker->moveToThread(&_workerThread);
@@ -21,6 +22,8 @@ IGTLinkClient::IGTLinkClient(SessionParams * connection, QObject *parent) : QObj
     connect(&_workerThread, &QThread::finished, worker, &QObject::deleteLater);
     connect(this, &IGTLinkClient::startWorker, worker, &Worker::start);
 //    connect(worker, &Worker::transformReceived, this, &IGTLinkClient::handleTransform);
+    lastRefreshTime = QDateTime::currentMSecsSinceEpoch();
+    guiRefreshRateMs = refreshRate;
     connect(worker, &Worker::imageReceived, this, &IGTLinkClient::showImage);
     connect(worker, &Worker::stopped, this, &IGTLinkClient::receiveStopSignal);
 
@@ -55,8 +58,13 @@ void IGTLinkClient::receiveStopSignal(int e)
 
 void IGTLinkClient::showImage(char * imageBuffer, QSize imgSize, QString state)
 {
+    if (QDateTime::currentMSecsSinceEpoch() < lastRefreshTime + guiRefreshRateMs) {
+        return;
+    }
+
     QImage newImage((uchar *) imageBuffer, imgSize.width(), imgSize.height(), imgSize.width(), QImage::Format_Indexed8);
     newImage.setColorTable(grayScaleColorTable);
     free(imageBuffer);
     emit imageReceived(newImage, state);
+    lastRefreshTime = QDateTime::currentMSecsSinceEpoch();
 }

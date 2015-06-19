@@ -30,7 +30,7 @@ class SessionParams : public QObject
     /** Cropping of the image */
     QRect crop;
     /** Freeze mark in the image at this position */
-    QRect freeze;
+    QRect freeze;    
 
 public:
     SessionParams(QString hostname, const int port, QObject *parent = 0);

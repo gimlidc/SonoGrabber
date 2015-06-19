@@ -29,6 +29,8 @@ class IGTLinkClient : public QObject
     QThread _workerThread;
     Worker* worker;
     QVector<QRgb> grayScaleColorTable;
+    qint64 lastRefreshTime;
+    qint64 guiRefreshRateMs;
 protected:
     igtl::ClientSocket::Pointer _socket;
 
@@ -40,7 +42,7 @@ public:
     {
         UserInterrupt, ReceiveError
     };
-    explicit IGTLinkClient(SessionParams * connection, QObject *parent = 0);
+    explicit IGTLinkClient(SessionParams * connection, qint64 refreshRate = 200, QObject *parent = 0);
     ~IGTLinkClient();    
 public slots:
     void startReading();
