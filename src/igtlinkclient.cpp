@@ -55,5 +55,8 @@ void IGTLinkClient::receiveStopSignal(int e)
 
 void IGTLinkClient::showImage(char * imageBuffer, QSize imgSize, QString state)
 {
-    //emit imageReceived(newImage, state);
+    QImage newImage((uchar *) imageBuffer, imgSize.width(), imgSize.height(), imgSize.width(), QImage::Format_Indexed8);
+    newImage.setColorTable(grayScaleColorTable);
+    free(imageBuffer);
+    emit imageReceived(newImage, state);
 }

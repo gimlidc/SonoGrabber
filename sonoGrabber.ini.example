@@ -2,10 +2,11 @@
 host=147.231.13.102
 port=80
 [image]
-names=Image_Identity
-crops= @Rect(0 0 640 480), @Rect(1 2 640 480)
+name=Image_Tracker
+crop=@Rect(165 100 465 355)
+freezeArea=@Rect(560 567 32 20)
 [transformations]
-names=ProbeToTracker,ReferenceToTracker,StylusToTracker
+names=ProbeToTracker,ReferenceToTracker
 [output]
 dir=/Users/gimli/Temp/SonoGrabberOut
 imageCount=0
