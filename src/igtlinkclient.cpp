@@ -59,6 +59,7 @@ void IGTLinkClient::receiveStopSignal(int e)
 void IGTLinkClient::showImage(char * imageBuffer, QSize imgSize, QString state)
 {
     if (QDateTime::currentMSecsSinceEpoch() < lastRefreshTime + guiRefreshRateMs) {
+        free(imageBuffer);
         return;
     }
 
