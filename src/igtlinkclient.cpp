@@ -27,6 +27,7 @@ IGTLinkClient::IGTLinkClient(SessionParams * connection, qint64 refreshRate, QOb
     connect(worker, &Worker::imageReceived, this, &IGTLinkClient::showImage);
     connect(worker, &Worker::stopped, this, &IGTLinkClient::receiveStopSignal);
 
+    firstImage = true;
     for (int i = 0; i < 256; i++) {
         grayScaleColorTable.push_back(QColor(i, i, i).rgb());
     }
@@ -63,12 +64,15 @@ void IGTLinkClient::showImage(char * imageBuffer, QSize imgSize, QString state)
         return;
     }
 
-    uchar * imageBufferCopy = malloc(sizeof(uchar) * imgSize.width() * imgSize.height());
+    if (firstImage) {
+        imageBufferCopy = (uchar *)malloc(sizeof(uchar) * imgSize.width() * imgSize.height());
+        newImage = QImage(imgSize, QImage::Format_Indexed8);
+        newImage.setColorTable(grayScaleColorTable);
+        firstImage = false;
+    }
     memcpy(imageBufferCopy, imageBuffer, imgSize.width() * imgSize.height());
     free(imageBuffer);
-
-    QImage newImage((uchar *) imageBufferCopy, imgSize.width(), imgSize.height(), imgSize.width(), QImage::Format_Indexed8);
-    newImage.setColorTable(grayScaleColorTable);
+    newImage.fromData(imageBufferCopy, imgSize.width() * imgSize.height());
     emit imageReceived(newImage, state);
     lastRefreshTime = QDateTime::currentMSecsSinceEpoch();
 }

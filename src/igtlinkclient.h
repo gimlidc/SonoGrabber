@@ -31,6 +31,9 @@ class IGTLinkClient : public QObject
     QVector<QRgb> grayScaleColorTable;
     qint64 lastRefreshTime;
     qint64 guiRefreshRateMs;
+    bool firstImage;
+    uchar * imageBufferCopy;
+    QImage newImage;
 protected:
     igtl::ClientSocket::Pointer _socket;
 
