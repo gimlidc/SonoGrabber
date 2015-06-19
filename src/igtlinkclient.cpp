@@ -63,9 +63,12 @@ void IGTLinkClient::showImage(char * imageBuffer, QSize imgSize, QString state)
         return;
     }
 
-    QImage newImage((uchar *) imageBuffer, imgSize.width(), imgSize.height(), imgSize.width(), QImage::Format_Indexed8);
-    newImage.setColorTable(grayScaleColorTable);
+    uchar * imageBufferCopy = malloc(sizeof(uchar) * imgSize.width() * imgSize.height());
+    memcpy(imageBufferCopy, imageBuffer, imgSize.width() * imgSize.height());
     free(imageBuffer);
+
+    QImage newImage((uchar *) imageBufferCopy, imgSize.width(), imgSize.height(), imgSize.width(), QImage::Format_Indexed8);
+    newImage.setColorTable(grayScaleColorTable);
     emit imageReceived(newImage, state);
     lastRefreshTime = QDateTime::currentMSecsSinceEpoch();
 }
