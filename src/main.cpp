@@ -49,7 +49,8 @@ int main(int argc, char *argv[])
                      settings.value("image/name", "Image_Probe").toStringList(),
                      settings.value("image/crop", QRect(0, 0, 0, 0)).value<QRect>(),
                      settings.value("transformations/names", "ProbeToTracker,ReferenceToTracker").toStringList(),
-                     settings.value("output/imageCount", "1000").toInt());
+                     settings.value("output/imageCount", "1000").toInt(),
+                     settings.value("output/fps", 100).toInt());
 
     // Create client for server connection (in separate thread)
     IGTLinkClient client(&session, settings.value("gui/refreshRateMs", 200).value<qint64>());

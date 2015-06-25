@@ -9,6 +9,7 @@ Worker::Worker(SessionParams * conn)
 {
     session = conn;
     frozenImageStored = false;
+    lastStoredTS = 0;
 }
 
 Worker::~Worker() {
@@ -38,14 +39,17 @@ void Worker::flushData(double ts)
 {
     // check if the time stamps are equal then save data to the file
     if (imgTS.count(ts) + transTS.count(ts) == imgTS.size() + transTS.size()) {
+        // there we control maximal frame rate
+        if (lastStoredTS != 0 && (lastStoredTS + 1.0 / session->getFps() > ts)) {
+            // skipping frames
+            return;
+        }
+
+        lastStoredTS = ts;
         //qDebug() << "save";
         if (imgTS.count() == 0) // !!! At least one image
              return;
-        writer->writeHeader(imgMsgList[0]);
-        writer->startSequence(ts);
-        for (int i = 0; i < transTS.size(); ++i) {
-            writer->writeTransform(transMsgList[i]);
-        }
+
         int size[3];
         imgMsgList[0]->GetDimensions(size);
         QSize dimensions(size[0], size[1]);
@@ -53,16 +57,25 @@ void Worker::flushData(double ts)
         bool isFrozen = ImageProcessor::isFrozen((char *)imgMsgList[0]->GetScalarPointer(), dimensions, session->getFreeze());
 
         if (isFrozen && frozenImageStored) {
+            // frozen image already stored
             return;
         }
 
-        qDebug() << isFrozen << "stored: " << frozenImageStored;
+        if (isFrozen) {
+            writer->writeFrozenIndex();
+        }
+
+        writer->writeHeader(imgMsgList[0]);
+        writer->startSequence(ts);
+        qDebug() << "writing:" << transTS.size() << "transformations";
+        for (int i = 0; i < transTS.size(); ++i) {
+            writer->writeTransform(transMsgList[i]);
+        }
 
         if (session->shouldCrop(dimensions)) {
             char * imgBuffer = (char *)malloc(session->getCrop().width() * session->getCrop().height() * sizeof(uchar));
             ImageProcessor::cropImage((char *)imgMsgList[0]->GetScalarPointer(), dimensions, session->getCrop(), imgBuffer);
             writeAndNotify(imgBuffer, session->getCrop().size(), isFrozen, true);
-
         } else {
             writeAndNotify((char *) imgMsgList[0]->GetScalarPointer(), dimensions, isFrozen, false);
         }

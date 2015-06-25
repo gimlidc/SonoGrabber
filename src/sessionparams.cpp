@@ -32,7 +32,12 @@ void SessionParams::setOutputDir(QString targetDirectory)
     outDir = QDir(targetDirectory);
 }
 
-void SessionParams::setOutput(QString targetDirectory, QStringList imgList, QRect cropping, QStringList transList, int imagesInOneFile)
+void SessionParams::setOutput(QString targetDirectory,
+                              QStringList imgList,
+                              QRect cropping,
+                              QStringList transList,
+                              int imagesInOneFile,
+                              int frameRate)
 {
     qDebug() << "Output directory:" << targetDirectory << "Grabbed images:" << imgList << "Grabbed transformations:" << transList << "Chunk size:" << imagesInOneFile;
     setOutputDir(targetDirectory);
@@ -40,6 +45,7 @@ void SessionParams::setOutput(QString targetDirectory, QStringList imgList, QRec
     images = QStringList(imgList);
     crop = QRect(cropping);
     transformations = QStringList(transList);
+    fps = frameRate;
 }
 
 int SessionParams::getChunkSize()
@@ -55,6 +61,11 @@ QString SessionParams::getHostname()
 QDir SessionParams::getOutDir()
 {
     return outDir;
+}
+
+int SessionParams::getFps()
+{
+    return fps;
 }
 
 QStringList SessionParams::getImageNames()

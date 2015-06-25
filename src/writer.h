@@ -16,6 +16,8 @@ class Writer
     QFile rawFile;
     /** File object which handles the metaheader file (*.mhd) */
     QFile headerFile;
+    /** File contains indices of images frozen (interesting places) */
+    QFile frozenSeqFile;
     /** number of files used for images */
     int fileCounter;
     /** number of currently stored images (in last file) */
@@ -40,6 +42,7 @@ public:
     void writeTransform(const igtl::TransformMessage::Pointer &transMsg);
     void closeSequence();
     void writeFooter();
+    void writeFrozenIndex();
     int createOutDir();
 };
 

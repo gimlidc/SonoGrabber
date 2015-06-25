@@ -10,6 +10,7 @@ Writer::Writer(QDir targetDir, int chunkSize)
     imageCounter = 0;
     fileCounter = 0;
     rawFile.setFileName(dir.absolutePath() + "/" + SessionNameGenerator::generateRawFileName(fileCounter));
+    frozenSeqFile.setFileName(dir.absolutePath() + "/" + "frozen.txt");
     this->chunkSize = chunkSize;
 }
 
@@ -48,6 +49,7 @@ void Writer::closeFiles()
 {
     writeFooter();
     rawFile.close();
+    frozenSeqFile.close();
     headerFile.close();
 }
 
@@ -143,4 +145,17 @@ void Writer::writeFooter()
         tstr << SessionNameGenerator::generateRawFileName(i) << ' ';
     }
     tstr.flush();
+}
+
+void Writer::writeFrozenIndex()
+{
+    if (!frozenSeqFile.isOpen()) {
+        if (!frozenSeqFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            qWarning() << "Cannot open file" << frozenSeqFile.fileName();
+            return;
+        }
+    }
+
+    frozenSeqFile.write(QString::number(imageCounter).append("\n").toLatin1());
+    frozenSeqFile.flush();
 }

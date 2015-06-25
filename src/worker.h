@@ -35,6 +35,7 @@ class Worker : public QObject
     QList<igtl::TransformMessage::Pointer> transMsgList;
     QVector<double> imgTS;
     QVector<double> transTS;
+    double lastStoredTS;
     bool frozenImageStored;
 
     int ReceiveTransform(igtl::Socket *socket, igtl::MessageHeader::Pointer& header);

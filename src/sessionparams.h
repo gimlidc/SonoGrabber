@@ -23,6 +23,8 @@ class SessionParams : public QObject
     int chunkSize;
     /** Number of already closed files. */
     int fileCounter;
+    /** Maximum frames per second stored in file */
+    int fps;
     /** File object which handles raw (image) data (.raw) */
     QFile rawFile;
     /** File object which handles the metaheader file (*.mhd) */
@@ -30,7 +32,7 @@ class SessionParams : public QObject
     /** Cropping of the image */
     QRect crop;
     /** Freeze mark in the image at this position */
-    QRect freeze;    
+    QRect freeze;
 
 public:
     SessionParams(QString hostname, const int port, QObject *parent = 0);
@@ -47,8 +49,9 @@ public:
      * @param images specify labels of image data which will be parsed from incoming stream
      * @param transformations labels of transformation data (for parsing)
      * @param imagesInOneFile define how many images is stored into one output file
+     * @param frameRate maximum frame rate for image storage
      */
-    void setOutput(QString dirName, QStringList images, QRect crop, QStringList transformations, int imagesInOneFile);
+    void setOutput(QString dirName, QStringList images, QRect crop, QStringList transformations, int imagesInOneFile, int frameRate);
     /**
      * @brief getChunkSize defines size of file size in number of images stored in
      * @return number of images stored in one file for this session. Return -1 if not set.
@@ -64,6 +67,12 @@ public:
      * @return output directory for this session or tmp dir if session is not correctly configured.
      */
     QDir getOutDir();
+    /**
+     * @brief getFps frames per second is more than original pictures (some are the same). This
+     * will hard reduce count of stored images.
+     * @return maximum frame rate for store
+     */
+    int getFps();
     /**
      * @brief getImageNames
      * @return names of images which will be parsed in the session
