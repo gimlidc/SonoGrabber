@@ -8,9 +8,30 @@
 Worker::Worker(SessionParams * conn)
 {
     session = conn;
+    frozenImageStored = false;
 }
 
 Worker::~Worker() {
+}
+
+void Worker::writeAndNotify(char * imgBuffer, QSize dimensions, bool isFrozen, bool isCropped)
+{
+    QString state;
+
+    if (isFrozen) {
+        state = "FROZEN";
+    } else if (isCropped) {
+        state = "CROPPED";
+    } else {
+        state = "OK";
+    }
+
+    if (!isFrozen || !frozenImageStored) {
+        writer->writeImage(imgBuffer, dimensions);
+        frozenImageStored = isFrozen;
+        emit imageReceived(imgBuffer, dimensions, state);
+    }
+
 }
 
 void Worker::flushData(double ts)
@@ -29,15 +50,21 @@ void Worker::flushData(double ts)
         imgMsgList[0]->GetDimensions(size);
         QSize dimensions(size[0], size[1]);
 
+        bool isFrozen = ImageProcessor::isFrozen((char *)imgMsgList[0]->GetScalarPointer(), dimensions, session->getFreeze());
+
+        if (isFrozen && frozenImageStored) {
+            return;
+        }
+
+        qDebug() << isFrozen << "stored: " << frozenImageStored;
+
         if (session->shouldCrop(dimensions)) {
             char * imgBuffer = (char *)malloc(session->getCrop().width() * session->getCrop().height() * sizeof(uchar));
             ImageProcessor::cropImage((char *)imgMsgList[0]->GetScalarPointer(), dimensions, session->getCrop(), imgBuffer);
-            QString state = "CROPPED";
-            writer->writeImage(imgBuffer, session->getCrop().size());
-            emit imageReceived(imgBuffer, session->getCrop().size(), state);
+            writeAndNotify(imgBuffer, session->getCrop().size(), isFrozen, true);
+
         } else {
-            writer->writeImage((char *) imgMsgList[0]->GetScalarPointer(), dimensions);
-            emit imageReceived((char *) imgMsgList[0]->GetScalarPointer(), dimensions, "OK");
+            writeAndNotify((char *) imgMsgList[0]->GetScalarPointer(), dimensions, isFrozen, false);
         }
 
         writer->closeSequence();

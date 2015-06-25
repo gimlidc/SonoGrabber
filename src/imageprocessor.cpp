@@ -1,4 +1,5 @@
 #include "imageprocessor.h"
+#include <QDebug>
 
 int ImageProcessor::cropImage(char* original, QSize size, QRect rect, char * target)
 {
@@ -24,7 +25,11 @@ bool ImageProcessor::isFrozen(char * original, QSize size, QRect freezeMark)
     }
 
     // here do some computation
+    int sum = 0;
+    for(int i = 0; i < freezeMark.width() * freezeMark.height(); i++) {
+        sum += freeze[i];
+    }
 
     free(freeze);
-    return false;
+    return (sum < -10000);
 }

@@ -39,6 +39,8 @@ int main(int argc, char *argv[])
     SessionParams session(settings.value("plusServer/host","localhost").toString(),
                  settings.value("plusServer/port", "18944").toInt(), 0);
 
+    session.setFreezePosition(settings.value("image/freezeArea", QRect(0,0,0,0)).value<QRect>());
+
     // session directory
     QString dirName = settings.value("output/dir", QDir::tempPath()).toString();
 

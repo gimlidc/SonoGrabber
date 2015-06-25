@@ -17,6 +17,16 @@ SessionParams::~SessionParams()
     delete _hostname;
 }
 
+void SessionParams::setFreezePosition(QRect freezeMarkPosition)
+{
+    freeze = freezeMarkPosition;
+    if (!freeze.x() && !freeze.y() && !freeze.width() && !freeze.height()) {
+        qWarning() << "Freeze mark position not set. Freeze detection will be disabled!";
+    } else {
+        qDebug() << "Freeze mark at:" << freeze;
+    }
+}
+
 void SessionParams::setOutputDir(QString targetDirectory)
 {
     outDir = QDir(targetDirectory);
@@ -55,6 +65,11 @@ QStringList SessionParams::getImageNames()
 QRect SessionParams::getCrop()
 {
     return crop;
+}
+
+QRect SessionParams::getFreeze()
+{
+    return freeze;
 }
 
 bool SessionParams::shouldCrop(QSize imgSize)

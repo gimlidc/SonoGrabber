@@ -35,6 +35,7 @@ class SessionParams : public QObject
 public:
     SessionParams(QString hostname, const int port, QObject *parent = 0);
     ~SessionParams();
+    void setFreezePosition(QRect freezeMarkPosition);
     /**
      * @brief setOutputDir configure target directory for session saving
      * @param dirName full path of target directory
@@ -73,6 +74,11 @@ public:
      * @return crop area of the image
      */
     QRect getCrop();
+    /**
+     * @brief getFreeze position of freeze mark in picture
+     * @return rectangle where freeze mark appears in coordinates of full picture
+     */
+    QRect getFreeze();
     /**
      * @brief shouldCrop return if cropping is set
      * @return true if cropping was set and is valid otherwise false

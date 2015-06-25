@@ -59,8 +59,9 @@ void IGTLinkClient::receiveStopSignal(int e)
 
 void IGTLinkClient::showImage(char * imageBuffer, QSize imgSize, QString state)
 {
-    if (QDateTime::currentMSecsSinceEpoch() < lastRefreshTime + guiRefreshRateMs) {
-        free(imageBuffer);
+    if (QDateTime::currentMSecsSinceEpoch() < lastRefreshTime + guiRefreshRateMs && state != "FROZEN") {
+        if (state == "CROPPED")
+            free(imageBuffer);
         return;
     }
 
@@ -71,7 +72,8 @@ void IGTLinkClient::showImage(char * imageBuffer, QSize imgSize, QString state)
         firstImage = false;
     }
     memcpy(imageBufferCopy, imageBuffer, imgSize.width() * imgSize.height());
-    free(imageBuffer);
+    if (state == "CROPPED")
+        free(imageBuffer);
     newImage = QImage::QImage(imageBufferCopy, imgSize.width(), imgSize.height(), imgSize.width(), QImage::Format_Indexed8);
     //newImage.fromData(imageBufferCopy, imgSize.width() * imgSize.height());
     emit imageReceived(newImage, state);

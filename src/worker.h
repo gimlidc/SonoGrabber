@@ -35,11 +35,13 @@ class Worker : public QObject
     QList<igtl::TransformMessage::Pointer> transMsgList;
     QVector<double> imgTS;
     QVector<double> transTS;
+    bool frozenImageStored;
 
     int ReceiveTransform(igtl::Socket *socket, igtl::MessageHeader::Pointer& header);
     int ReceivePosition(igtl::Socket *socket, igtl::MessageHeader::Pointer& header);
     int ReceiveImage(igtl::Socket *socket, igtl::MessageHeader::Pointer& header);
     void flushData(double ts);
+    void writeAndNotify(char * imgBuffer, QSize dimensions, bool isFrozen, bool isCropped);
     void setOutput(); // method can be called when session is fully defined
 public:
     Worker(SessionParams * session);
