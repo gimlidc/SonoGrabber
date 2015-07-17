@@ -75,6 +75,20 @@ void Writer::writeTransform(const igtl::TransformMessage::Pointer &transMsg)
          << transMsg->GetDeviceName() << "TransformStatus = OK\n";
 }
 
+void Writer::writeTransform(const char *name, const igtl::Matrix4x4 matrix)
+{
+    tstr << SessionNameGenerator::generateTransformPrefix(imageCounter) << name
+         << "Transform = ";
+
+    tstr << matrix[0][0] << ' ' << matrix[0][1] << ' ' << matrix[0][2] << ' ' << matrix[0][3] << ' '
+         << matrix[1][0] << ' ' << matrix[1][1] << ' ' << matrix[1][2] << ' ' << matrix[1][3] << ' '
+         << matrix[2][0] << ' ' << matrix[2][1] << ' ' << matrix[2][2] << ' ' << matrix[2][3] << ' '
+         << matrix[3][0] << ' ' << matrix[3][1] << ' ' << matrix[3][2] << ' ' << matrix[3][3] << '\n';
+
+    tstr << SessionNameGenerator::generateTransformPrefix(imageCounter)
+         << name << "TransformStatus = OK\n";
+}
+
 void Writer::writeImage(char* buffer, QSize imgSize)
 {
     if (!imageCounter) {
@@ -123,6 +137,10 @@ void Writer::writeHeader(const igtl::ImageMessage::Pointer &imgMsg)
 
     tstr << "ObjectType = Image\n"
        << "NDims = 3\n"
+       << "DimSize = "; // << size[0] << ' ' << size[1] << ' ';
+    tstr.flush();
+    indexOfDimZ = tstr.pos();
+    tstr << "                         \n"
        << "AnatomicalOrientation = RAI\n"
        << "BinaryData = True\n"
        << "BinaryDataByteOrderMSB = False\n"
@@ -139,11 +157,13 @@ void Writer::writeHeader(const igtl::ImageMessage::Pointer &imgMsg)
 
 void Writer::writeFooter()
 {
-    tstr << "DimSize = " << size[0] << ' ' << size[1] << ' ' << imageCounter << '\n'
-       << "ElementDataFile = "; // LIST" << '\n';
+    //tstr << "DimSize = " << size[0] << ' ' << size[1] << ' ' << imageCounter << '\n'
+    tstr << "ElementDataFile = "; // LIST" << '\n';
     for (int i = 0; i <= fileCounter; ++i) {
         tstr << SessionNameGenerator::generateRawFileName(i) << ' ';
     }
+    tstr.seek(indexOfDimZ);
+    tstr  << size[0] << ' ' << size[1] << ' ' << imageCounter;
     tstr.flush();
 }
 

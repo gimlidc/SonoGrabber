@@ -35,6 +35,35 @@ void Worker::writeAndNotify(char * imgBuffer, QSize dimensions, bool isFrozen, b
 
 }
 
+void Worker::writeTransformCropped(const igtl::TransformMessage::Pointer &transMsg)
+{
+
+    int i = session->getTransNames().indexOf(transMsg->GetDeviceName());
+    if (i==0) {
+        igtl::TransformMessage::Pointer tMsg;
+        tMsg = igtl::TransformMessage::New();
+        igtl::Matrix4x4 m;
+        transMsg->GetMatrix(m);
+        tMsg->SetMatrix(m);
+        QString s = transMsg->GetDeviceName();
+        int ind = s.indexOf("To");
+        igtl::Matrix4x4 matrix = {{1, 0, 0, 0},{0, 1, 0, 0},{0, 0, 1, 0},{0, 0, 0, 1}};
+        matrix[0][3] = session->getCrop().x();
+        matrix[1][3] = session->getCrop().y();
+
+
+        // Write original transformation with modified name Full<Name>
+        tMsg->SetDeviceName(QString("Full").append(s).toLatin1());
+        writer->writeTransform(tMsg);
+
+        // Write croping trans.
+        tMsg->SetDeviceName(QString("ToFull").prepend(s.left(ind)).append(s.left(ind)).toLatin1());
+        tMsg->SetMatrix(matrix);
+        writer->writeTransform(tMsg);
+    } else
+        writer->writeTransform(transMsg);
+}
+
 void Worker::flushData(double ts)
 {
     // check if the time stamps are equal then save data to the file
@@ -56,7 +85,7 @@ void Worker::flushData(double ts)
 
         bool isFrozen = ImageProcessor::isFrozen((char *)imgMsgList[0]->GetScalarPointer(), dimensions, session->getFreeze());
 
-        if (isFrozen && frozenImageStored) {
+        if (isFrozen && (writer->getImageCounter()<1 ||  frozenImageStored) ) {
             // frozen image already stored
             return;
         }
@@ -69,7 +98,8 @@ void Worker::flushData(double ts)
         writer->startSequence(ts);
         qDebug() << "writing:" << transTS.size() << "transformations";
         for (int i = 0; i < transTS.size(); ++i) {
-            writer->writeTransform(transMsgList[i]);
+            writeTransformCropped(transMsgList[i]);
+            //qDebug() << transMsgList[i]->GetDeviceName();
         }
 
         if (session->shouldCrop(dimensions)) {

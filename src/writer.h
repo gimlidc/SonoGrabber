@@ -28,6 +28,8 @@ class Writer
     int size[3];
     /** Header file stream */
     QTextStream tstr;
+    /** position in the output data file where the number of frames must be entered */
+    qint64 indexOfDimZ;
 
 public:
     Writer(QDir targetDir, int chunkSize);
@@ -40,10 +42,12 @@ public:
     void writeHeader(const igtl::ImageMessage::Pointer &imgMsg);
     void startSequence(double timestamp);
     void writeTransform(const igtl::TransformMessage::Pointer &transMsg);
+    void writeTransform(const char* name, const igtl::Matrix4x4 matrix);
     void closeSequence();
     void writeFooter();
     void writeFrozenIndex();
     int createOutDir();
+    int getImageCounter() {return imageCounter; }
 };
 
 #endif // WIRTER_H

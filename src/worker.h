@@ -41,6 +41,7 @@ class Worker : public QObject
     int ReceiveTransform(igtl::Socket *socket, igtl::MessageHeader::Pointer& header);
     int ReceivePosition(igtl::Socket *socket, igtl::MessageHeader::Pointer& header);
     int ReceiveImage(igtl::Socket *socket, igtl::MessageHeader::Pointer& header);
+    void writeTransformCropped(const igtl::TransformMessage::Pointer &transMsg);
     void flushData(double ts);
     void writeAndNotify(char * imgBuffer, QSize dimensions, bool isFrozen, bool isCropped);
     void setOutput(); // method can be called when session is fully defined
