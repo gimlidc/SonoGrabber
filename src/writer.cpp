@@ -158,6 +158,9 @@ void Writer::writeHeader(const igtl::ImageMessage::Pointer &imgMsg)
 void Writer::writeFooter()
 {
     //tstr << "DimSize = " << size[0] << ' ' << size[1] << ' ' << imageCounter << '\n'
+    if (imageCounter == 0) { // header not written
+        return;
+    }
     tstr << "ElementDataFile = "; // LIST" << '\n';
     for (int i = 0; i <= fileCounter; ++i) {
         tstr << SessionNameGenerator::generateRawFileName(i) << ' ';

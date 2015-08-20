@@ -25,6 +25,8 @@ class SessionParams : public QObject
     int fileCounter;
     /** Maximum frames per second stored in file */
     int fps;
+    /** Filename index */
+    int filenameIndex;
     /** File object which handles raw (image) data (.raw) */
     QFile rawFile;
     /** File object which handles the metaheader file (*.mhd) */
@@ -51,7 +53,7 @@ public:
      * @param imagesInOneFile define how many images is stored into one output file
      * @param frameRate maximum frame rate for image storage
      */
-    void setOutput(QString dirName, QStringList images, QRect crop, QStringList transformations, int imagesInOneFile, int frameRate);
+    void setOutput(QString dirName, QStringList images, QRect crop, QStringList transformations, int imagesInOneFile, int frameRate, int initialFileIndex);
     /**
      * @brief getChunkSize defines size of file size in number of images stored in
      * @return number of images stored in one file for this session. Return -1 if not set.
@@ -73,6 +75,22 @@ public:
      * @return maximum frame rate for store
      */
     int getFps();
+    /**
+     * @brief getFilenameIndex
+     * @return integer index of the next file into which we store the output
+     */
+    int getFilenameIndex();
+    /**
+     * @brief setFilenameIndex
+     * @param i index
+     * @return index
+     */
+    int setFilenameIndex(int i);
+    /**
+     * @brief incFilenameIndex
+     * @return increase filename index
+     */
+    int incFilenameIndex();
     /**
      * @brief getImageNames
      * @return names of images which will be parsed in the session

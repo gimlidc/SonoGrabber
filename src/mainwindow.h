@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QImage>
 #include <QByteArray>
+#include <QTimer>
 #include "sessionparams.h"
 
 namespace Ui {
@@ -18,11 +19,14 @@ public:
     explicit MainWindow(SessionParams * params, QWidget *parent = 0);
     ~MainWindow();
 
-    void setOutputDir(QString dirPath, QString sessionName = "");
+    void setOutputDir(QString dirPath);
 
 public slots:
     void toggleRun(bool t);
-    void showImage(QImage newImage, QString state);
+    void showImage(QImage newImage);
+    void changeState(QString state);
+    void updateTime();
+    void listeningStopped(int e);
 signals:
     void startListening();
     void stopListening();
@@ -30,6 +34,7 @@ private:
     Ui::MainWindow *ui;
     QString dirPath;
     SessionParams * params;
+    QTimer *timer;
     void newSession();
 };
 

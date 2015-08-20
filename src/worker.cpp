@@ -15,22 +15,40 @@ Worker::Worker(SessionParams * conn)
 Worker::~Worker() {
 }
 
-void Worker::writeAndNotify(char * imgBuffer, QSize dimensions, bool isFrozen, bool isCropped)
+const QString& Worker::getCurrentState()
+{
+    return currentState;
+}
+
+const QString& Worker::setState(const QString &state)
+{
+    if (state != currentState) {
+        currentState = state;
+        emit imageReceived(NULL, QSize(), currentState);
+    }
+    return currentState;
+}
+
+const QString& Worker::updateState(bool isFrozen, bool isCropped)
 {
     QString state;
 
     if (isFrozen) {
-        state = "FROZEN";
+       state = "FROZEN";
     } else if (isCropped) {
-        state = "CROPPED";
+       state = "CROPPED";
     } else {
-        state = "OK";
+       state = "OK";
     }
+    return setState(state);
+}
 
+void Worker::writeAndNotify(char * imgBuffer, QSize dimensions, bool isFrozen)
+{
     if (!isFrozen || !frozenImageStored) {
         writer->writeImage(imgBuffer, dimensions);
         frozenImageStored = isFrozen;
-        emit imageReceived(imgBuffer, dimensions, state);
+        emit imageReceived(imgBuffer, dimensions, getCurrentState());
     }
 
 }
@@ -65,31 +83,63 @@ void Worker::writeTransformCropped(const igtl::TransformMessage::Pointer &transM
 }
 
 void Worker::flushData(double ts)
-{
+{   
     // check if the time stamps are equal then save data to the file
     if (imgTS.count(ts) + transTS.count(ts) == imgTS.size() + transTS.size()) {
         // there we control maximal frame rate
-        if (lastStoredTS != 0 && (lastStoredTS + 1.0 / session->getFps() > ts)) {
+        if (lastStoredTS != 0 && (lastStoredTS + 1.0 / session->getFps() >= ts)) {
             // skipping frames
             return;
         }
 
         lastStoredTS = ts;
+        // To have actual fps  equal to session->getFps() we must do it as given below
+        // lastStoredTS = lastStoredTS + 1.0 / session->getFps();
+        // if ( (lastStoredTS + 1.0 / session->getFps() ) < ts)
+        //    lastStoredTS = ts;
+
         //qDebug() << "save";
         if (imgTS.count() == 0) // !!! At least one image
              return;
 
         int size[3];
+        char * imgBuffer;
+        bool isCropped;
         imgMsgList[0]->GetDimensions(size);
         QSize dimensions(size[0], size[1]);
+        QSize area;
 
         bool isFrozen = ImageProcessor::isFrozen((char *)imgMsgList[0]->GetScalarPointer(), dimensions, session->getFreeze());
 
-        if (isFrozen && (writer->getImageCounter()<1 ||  frozenImageStored) ) {
+        if (session->shouldCrop(dimensions)) {
+            isCropped = true;
+            area = session->getCrop().size();
+        }
+        else {
+            isCropped = false;
+            area = dimensions;
+        }
+
+        updateState(isFrozen,isCropped);
+
+
+        if (isFrozen && frozenImageStored) {
             // frozen image already stored
             return;
         }
 
+        if (isCropped) {
+            imgBuffer = (char *)malloc(session->getCrop().width() * session->getCrop().height() * sizeof(uchar));
+            ImageProcessor::cropImage((char *)imgMsgList[0]->GetScalarPointer(), dimensions, session->getCrop(), imgBuffer);
+        } else {
+            imgBuffer = (char *) imgMsgList[0]->GetScalarPointer();
+        }
+
+        if (isFrozen && writer->getImageCounter()<1) {
+            frozenImageStored = isFrozen;
+            emit imageReceived(imgBuffer, area, getCurrentState());
+            return;
+        }
         if (isFrozen) {
             writer->writeFrozenIndex();
         }
@@ -102,17 +152,9 @@ void Worker::flushData(double ts)
             //qDebug() << transMsgList[i]->GetDeviceName();
         }
 
-        if (session->shouldCrop(dimensions)) {
-            char * imgBuffer = (char *)malloc(session->getCrop().width() * session->getCrop().height() * sizeof(uchar));
-            ImageProcessor::cropImage((char *)imgMsgList[0]->GetScalarPointer(), dimensions, session->getCrop(), imgBuffer);
-            writeAndNotify(imgBuffer, session->getCrop().size(), isFrozen, true);
-        } else {
-            writeAndNotify((char *) imgMsgList[0]->GetScalarPointer(), dimensions, isFrozen, false);
-        }
-
+        writeAndNotify(imgBuffer, area, isFrozen);
         writer->closeSequence();
     }
-
 }
 
 void Worker::setOutput()
@@ -146,9 +188,20 @@ int Worker::isRunning()
 void Worker::start()
 {
     int resultCode;
+    currentState="";
+    frozenImageStored = false;
     // Create a message buffer to receive header
     igtl::MessageHeader::Pointer headerMsg;
     headerMsg = igtl::MessageHeader::New();
+
+    resultCode = session->openSocket();
+    if (resultCode != 0) {
+        qWarning() << "Connection to server failed. Error code: " << resultCode;
+        emit stopped(IGTLinkClient::SocketOpenError);
+        return;
+    } else {
+        qDebug() << "Socket opened. Reading data loop ...";
+    }
 
     //------------------------------------------------------------
     // Allocate a time stamp
@@ -163,14 +216,6 @@ void Worker::start()
     Lock.lockForWrite();
     Terminate = false;
     Lock.unlock();
-
-    resultCode = session->openSocket();
-    if (resultCode != 0) {
-        qWarning() << "Connection to server failed. Error code: %1" << resultCode;
-        return;
-    } else {
-        qDebug() << "Socket opened. Reading data loop ...";
-    }
 
     setOutput();
 
@@ -334,9 +379,15 @@ int Worker::ReceiveImage(igtl::Socket * socket, igtl::MessageHeader::Pointer& he
           qDebug() << "Image ignored:" << imgMsg->GetDeviceName();
           return i;
       }
-      qDebug() << 1/(ts->GetTimeStamp()-imgTS[i]);
+      // qDebug() << 1/(ts->GetTimeStamp()-imgTS[i]);
       imgTS[i] = ts->GetTimeStamp();
       imgMsgList[i] = imgMsg;
+
+      // check if we have received all requested transformations
+      // if not emit message "OUT OF RANGE"
+      if ( transTS.size() > 0 )
+          if ( transTS.count(transTS[0]) < transTS.size() )
+              setState("OUT OF RANGE");
 
       flushData(imgTS[i]);
       return i;

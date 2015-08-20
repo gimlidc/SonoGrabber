@@ -10,6 +10,7 @@ SessionParams::SessionParams(QString hostname, const int port, QObject *parent) 
     socket = igtl::ClientSocket::New();
     chunkSize = -1;
     outDir = QDir().tempPath();
+    filenameIndex = 1;
 }
 
 SessionParams::~SessionParams()
@@ -37,7 +38,8 @@ void SessionParams::setOutput(QString targetDirectory,
                               QRect cropping,
                               QStringList transList,
                               int imagesInOneFile,
-                              int frameRate)
+                              int frameRate,
+                              int initialFileIndex)
 {
     qDebug() << "Output directory:" << targetDirectory << "Grabbed images:" << imgList << "Grabbed transformations:" << transList << "Chunk size:" << imagesInOneFile;
     setOutputDir(targetDirectory);
@@ -46,6 +48,7 @@ void SessionParams::setOutput(QString targetDirectory,
     crop = QRect(cropping);
     transformations = QStringList(transList);
     fps = frameRate;
+    filenameIndex = initialFileIndex;
 }
 
 int SessionParams::getChunkSize()
@@ -66,6 +69,21 @@ QDir SessionParams::getOutDir()
 int SessionParams::getFps()
 {
     return fps;
+}
+
+int SessionParams::getFilenameIndex()
+{
+    return filenameIndex;
+}
+
+int SessionParams::setFilenameIndex(int i)
+{
+    return filenameIndex = i;
+}
+
+int SessionParams::incFilenameIndex()
+{
+    return ++filenameIndex;
 }
 
 QStringList SessionParams::getImageNames()

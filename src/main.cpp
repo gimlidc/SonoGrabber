@@ -46,11 +46,12 @@ int main(int argc, char *argv[])
 
     // configure grabber output
     session.setOutput(dirName,
-                     settings.value("image/name", "Image_Probe").toStringList(),
-                     settings.value("image/crop", QRect(0, 0, 0, 0)).value<QRect>(),
-                     settings.value("transformations/names", "ProbeToTracker,ReferenceToTracker").toStringList(),
-                     settings.value("output/imageCount", "1000").toInt(),
-                     settings.value("output/fps", 100).toInt());
+                      settings.value("image/name", "Image_Probe").toStringList(),
+                      settings.value("image/crop", QRect(0, 0, 0, 0)).value<QRect>(),
+                      settings.value("transformations/names", "ProbeToTracker,ReferenceToTracker").toStringList(),
+                      settings.value("output/imageCount", "1000").toInt(),
+                      settings.value("output/fps", 100).toInt(),
+                      settings.value("output/filenameIndex", "1").toInt() );
 
     // Create client for server connection (in separate thread)
     IGTLinkClient client(&session, settings.value("gui/refreshRateMs", 200).value<qint64>());
@@ -64,6 +65,8 @@ int main(int argc, char *argv[])
     QObject::connect(&w,&MainWindow::startListening,&client,&IGTLinkClient::startReading);
     QObject::connect(&w,&MainWindow::stopListening,&client,&IGTLinkClient::stopReading);
     QObject::connect(&client, &IGTLinkClient::imageReceived, &w, &MainWindow::showImage);
+    QObject::connect(&client, &IGTLinkClient::stateChanged, &w, &MainWindow::changeState);
+    QObject::connect(&client, &IGTLinkClient::stopped, &w, &MainWindow::listeningStopped);
 
     w.show();
     return app.exec();

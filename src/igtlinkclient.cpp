@@ -64,6 +64,10 @@ void IGTLinkClient::showImage(char * imageBuffer, QSize imgSize, QString state)
             free(imageBuffer);
         return;
     }
+    if (imageBuffer == NULL) {
+        emit stateChanged(state);
+        return;
+    }
 
     if (firstImage) {
         imageBufferCopy = (uchar *)malloc(sizeof(uchar) * imgSize.width() * imgSize.height());
@@ -76,6 +80,6 @@ void IGTLinkClient::showImage(char * imageBuffer, QSize imgSize, QString state)
         free(imageBuffer);
     newImage = QImage::QImage(imageBufferCopy, imgSize.width(), imgSize.height(), imgSize.width(), QImage::Format_Indexed8);
     //newImage.fromData(imageBufferCopy, imgSize.width() * imgSize.height());
-    emit imageReceived(newImage, state);
+    emit imageReceived(newImage);
     lastRefreshTime = QDateTime::currentMSecsSinceEpoch();
 }

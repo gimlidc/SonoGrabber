@@ -43,7 +43,7 @@ public:
      */
     enum ErrorType
     {
-        UserInterrupt, ReceiveError
+        UserInterrupt, ReceiveError, SocketOpenError
     };
     explicit IGTLinkClient(SessionParams * connection, qint64 refreshRate = 200, QObject *parent = 0);
     ~IGTLinkClient();    
@@ -56,7 +56,8 @@ private slots:
 signals:
     void startWorker();
     void stopped(ErrorType);
-    void imageReceived(QImage newImage, QString state);
+    void imageReceived(QImage newImage);
+    void stateChanged(QString state);
 };
 
 #endif // IGTLINKCLIENT_H
