@@ -26,10 +26,20 @@ bool ImageProcessor::isFrozen(char * original, QSize size, QRect freezeMark)
 
     // here do some computation
     int sum = 0;
-    for(int i = 0; i < freezeMark.width() * freezeMark.height(); i++) {
-        sum += freeze[i];
+    // Gimli's old code
+    // for(int i = 0; i < freezeMark.width() * freezeMark.height(); i++) {
+    //    sum += freeze[i];
+    //}
+    char *b, *t;
+    for(int i = 1; i < freezeMark.height(); i++) {
+        t = freeze+i*freezeMark.width();
+        b = freeze+(i-1)*freezeMark.width();
+        for(int j = 0; j < freezeMark.width(); j++) {
+            sum += abs((int)(*t++) - (int)(*b++))>0;
+        }
     }
 
     free(freeze);
-    return (sum < -10000);
+    //return (sum < -10000);
+    return (sum > freezeMark.width()-1);
 }
