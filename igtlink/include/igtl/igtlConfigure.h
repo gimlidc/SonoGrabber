@@ -18,9 +18,9 @@
 #define __IGTL_CONFIGURE_H
 
 /* #undef OpenIGTLink_PLATFORM_MACOSX */
-#define OpenIGTLink_PLATFORM_LINUX 
+/* #define OpenIGTLink_PLATFORM_LINUX */
 /* #undef OpenIGTLink_PLATFORM_SUNOS */
-/* #undef OpenIGTLink_PLATFORM_WIN32 */
+#define OpenIGTLink_PLATFORM_WIN32
 #ifdef OpenIGTLink_PLATFORM_WIN32
   #ifndef _WIN32
     #define _WIN32
@@ -31,8 +31,8 @@
   #define IGTLCommon_EXPORTS
 #endif
 
-#define OpenIGTLink_USE_PTHREADS
-/* #undef OpenIGTLink_USE_WIN32_THREADS */
+/* #define OpenIGTLink_USE_PTHREADS */
+#define OpenIGTLink_USE_WIN32_THREADS
 /* #undef OpenIGTLink_USE_SPROC */
 #define OpenIGTLink_HAVE_GETSOCKNAME_WITH_SOCKLEN_T
 #define OpenIGTLink_HAVE_STRNLEN
