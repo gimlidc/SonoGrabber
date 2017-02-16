@@ -36,6 +36,7 @@ private:
     SessionParams * params;
     QTimer *timer;
     void newSession();
+    void showDiag();
 };
 
 #endif // MAINWINDOW_H

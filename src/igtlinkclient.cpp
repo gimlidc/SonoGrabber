@@ -78,7 +78,7 @@ void IGTLinkClient::showImage(char * imageBuffer, QSize imgSize, QString state)
     memcpy(imageBufferCopy, imageBuffer, imgSize.width() * imgSize.height());
     if (state == "CROPPED")
         free(imageBuffer);
-    newImage = QImage::QImage(imageBufferCopy, imgSize.width(), imgSize.height(), imgSize.width(), QImage::Format_Indexed8);
+    newImage = QImage(imageBufferCopy, imgSize.width(), imgSize.height(), imgSize.width(), QImage::Format_Indexed8);
     //newImage.fromData(imageBufferCopy, imgSize.width() * imgSize.height());
     emit imageReceived(newImage);
     lastRefreshTime = QDateTime::currentMSecsSinceEpoch();

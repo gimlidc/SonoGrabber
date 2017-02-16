@@ -11,8 +11,9 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = SonoGrabber
 TEMPLATE = app
 
-INCLUDEPATH += $$PWD/../igtlink/include/igtl
-LIBS += "-L$$PWD/../igtlink/lib/igtl" -lOpenIGTLink
+INCLUDEPATH += $$PWD/../../../../../usr/local/include/igtl
+#INCLUDEPATH += $$PWD/../igtlink/include/igtl
+LIBS += "-L$$PWD/../../../../../usr/local/lib/igtl" -lOpenIGTLink
 
 SOURCES += main.cpp\
         mainwindow.cpp \
@@ -33,4 +34,21 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui
 
-DISTFILES += ../sonoGrabber.ini
+DISTFILES += ../sonoGrabber.ini \
+    images/drawing.png
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../../usr/local/lib/igtl/release/ -lOpenIGTLink
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../../../usr/local/lib/igtl/debug/ -lOpenIGTLink
+else:unix: LIBS += -L$$PWD/../../../../../usr/local/lib/igtl/ -lOpenIGTLink
+
+INCLUDEPATH += $$PWD/../../../../../usr/local/lib/igtl
+DEPENDPATH += $$PWD/../../../../../usr/local/lib/igtl
+
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../../../usr/local/lib/igtl/release/libOpenIGTLink.a
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../../../usr/local/lib/igtl/debug/libOpenIGTLink.a
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../../../usr/local/lib/igtl/release/OpenIGTLink.lib
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../../../usr/local/lib/igtl/debug/OpenIGTLink.lib
+else:unix: PRE_TARGETDEPS += $$PWD/../../../../../usr/local/lib/igtl/libOpenIGTLink.a
+
+RESOURCES += \
+    images.qrc

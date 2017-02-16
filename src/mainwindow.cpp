@@ -16,6 +16,7 @@ MainWindow::MainWindow(SessionParams * session, QWidget *parent) :
     timer->start();
     ui->lineEdit_3->setStyleSheet("color: red");
     ui->lineEdit_3->setValidator(new QIntValidator(0,1e10,this));
+    showDiag();
 }
 
 MainWindow::~MainWindow()
@@ -64,6 +65,14 @@ void MainWindow::toggleRun(bool buttonPressed)
         ui->lineEdit_3->setText(QString::number(params->getFilenameIndex()));
         ui->sonoImage->setPixmap(QPixmap());
     }
+}
+
+void MainWindow::showDiag()
+{
+    QImage image("/home/schier/Eclise/SonoGrabber/src/images/drawing.png");
+  ui->diagram->setPixmap(QPixmap::fromImage(image));
+  ui->diagram->adjustSize();
+  ui->diagram->repaint();
 }
 
 void MainWindow::listeningStopped(int e)
