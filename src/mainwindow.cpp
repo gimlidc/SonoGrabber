@@ -3,6 +3,11 @@
 #include "sessionnamegenerator.h"
 #include "igtlinkclient.h"
 #include <QDebug>
+#include <QPixmap>
+#include <QGraphicsView>
+#include <QGraphicsScene>
+#include <QtSvg/QGraphicsSvgItem>
+#include <QtSvg/QSvgWidget>
 
 MainWindow::MainWindow(SessionParams * session, QWidget *parent) :
     QMainWindow(parent),
@@ -16,7 +21,10 @@ MainWindow::MainWindow(SessionParams * session, QWidget *parent) :
     timer->start();
     ui->lineEdit_3->setStyleSheet("color: red");
     ui->lineEdit_3->setValidator(new QIntValidator(0,1e10,this));
-    showDiag();
+    image = new QSvgWidget();
+    image->load((const QString &)"/home/schier/qt-test/Image/place tracker.svg");
+    ui->startBox->addWidget(image);
+    image->show();
 }
 
 MainWindow::~MainWindow()
@@ -43,6 +51,11 @@ void MainWindow::setOutputDir(QString dirPath)
     ui->lineEdit_3->setText(QString::number(params->getFilenameIndex()));
 }
 
+void MainWindow::setStartImage(const QString &fileName)
+{
+    image->load(fileName);
+}
+
 void MainWindow::toggleRun(bool buttonPressed)
 {
     if (buttonPressed) {
@@ -67,13 +80,6 @@ void MainWindow::toggleRun(bool buttonPressed)
     }
 }
 
-void MainWindow::showDiag()
-{
-    QImage image("/home/schier/Eclise/SonoGrabber/src/images/drawing.png");
-  ui->diagram->setPixmap(QPixmap::fromImage(image));
-  ui->diagram->adjustSize();
-  ui->diagram->repaint();
-}
 
 void MainWindow::listeningStopped(int e)
 {
@@ -100,6 +106,15 @@ void MainWindow::showImage(QImage newImage)
     ui->sonoImage->setPixmap(QPixmap::fromImage(newImage));
     ui->sonoImage->adjustSize();
     ui->sonoImage->repaint();
+}
+
+void MainWindow::startImage()
+{
+//    QSvgWidget *image = new QSvgWidget("/home/schier/qt-test/Image/place tracker.svg");
+    QSvgWidget *image = new QSvgWidget("/home/schier/qt-test/Image/place tracker.svg");
+    ui->startBox->addWidget(image);
+    image->show();
+
 }
 
 void MainWindow::changeState(QString state)

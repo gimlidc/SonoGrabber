@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui svg
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -22,7 +22,8 @@ SOURCES += main.cpp\
     sessionnamegenerator.cpp \
     sessionparams.cpp \
     imageprocessor.cpp \
-    writer.cpp
+    writer.cpp \
+    startimagewindow.cpp
 
 HEADERS  += mainwindow.h \
     igtlinkclient.h \
@@ -30,7 +31,8 @@ HEADERS  += mainwindow.h \
     sessionnamegenerator.h \
     sessionparams.h \
     imageprocessor.h \
-    writer.h
+    writer.h \
+    startimagewindow.h
 
 FORMS    += mainwindow.ui
 
