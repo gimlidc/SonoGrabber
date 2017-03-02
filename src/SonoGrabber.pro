@@ -11,7 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = SonoGrabber
 TEMPLATE = app
 
-INCLUDEPATH += $$PWD/../../../../../usr/local/include/igtl
+INCLUDEPATH += $$PWD/../../../../../usr/local/include/igtl /home/schier/OpenIGTLink/Source /home/schier/OpenIGTLink/Source/igtlutil
 #INCLUDEPATH += $$PWD/../igtlink/include/igtl
 LIBS += "-L$$PWD/../../../../../usr/local/lib/igtl" -lOpenIGTLink
 
@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     sessionparams.cpp \
     imageprocessor.cpp \
     writer.cpp \
-    startimagewindow.cpp
+    startimagewindow.cpp \
+    breastselector.cpp
 
 HEADERS  += mainwindow.h \
     igtlinkclient.h \
@@ -32,7 +33,8 @@ HEADERS  += mainwindow.h \
     sessionparams.h \
     imageprocessor.h \
     writer.h \
-    startimagewindow.h
+    startimagewindow.h \
+    breastselector.h
 
 FORMS    += mainwindow.ui
 

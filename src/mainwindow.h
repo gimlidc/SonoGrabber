@@ -6,6 +6,7 @@
 #include <QByteArray>
 #include <QTimer>
 #include <QtSvg/QSvgWidget>
+#include "breastselector.h"
 #include "sessionparams.h"
 
 namespace Ui {
@@ -32,8 +33,8 @@ public slots:
     void listeningStopped(int e);
     void startImage();
 
-//protected:
-//    void mousePressEvent(QMouseEvent *event) override;
+protected:
+    void mousePressEvent(QMouseEvent *event);
 
 signals:
     void startListening();
@@ -43,9 +44,12 @@ private:
     QString dirPath;
     SessionParams * params;
     QTimer *timer;
-    QSvgWidget *image;
+    QSvgWidget *image, *imageL, *imageR;
+    int step = 0;
     void newSession();
     void showDiag();
+    BreastSelector *breastSelector;
+//    void selectBreast();
 };
 
 #endif // MAINWINDOW_H

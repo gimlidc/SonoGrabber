@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "breastselector.h"
 #include "ui_mainwindow.h"
 #include "sessionnamegenerator.h"
 #include "igtlinkclient.h"
@@ -6,6 +7,7 @@
 #include <QPixmap>
 #include <QGraphicsView>
 #include <QGraphicsScene>
+#include <QStackedWidget>
 #include <QtSvg/QGraphicsSvgItem>
 #include <QtSvg/QSvgWidget>
 
@@ -25,6 +27,7 @@ MainWindow::MainWindow(SessionParams * session, QWidget *parent) :
     image->load((const QString &)"/home/schier/qt-test/Image/place tracker.svg");
     ui->startBox->addWidget(image);
     image->show();
+    breastSelector = new BreastSelector();
 }
 
 MainWindow::~MainWindow()
@@ -110,12 +113,39 @@ void MainWindow::showImage(QImage newImage)
 
 void MainWindow::startImage()
 {
-//    QSvgWidget *image = new QSvgWidget("/home/schier/qt-test/Image/place tracker.svg");
     QSvgWidget *image = new QSvgWidget("/home/schier/qt-test/Image/place tracker.svg");
     ui->startBox->addWidget(image);
     image->show();
 
 }
+
+void MainWindow::mousePressEvent(QMouseEvent *event)
+{
+    if (event) {
+        if (step==0) {
+ //           *breastSelector = new BreastSelector();
+            ui->startBox->replaceWidget(image, breastSelector->getWidget());
+            delete image;
+        } else if (step==1) {
+            ui->startBox->replaceWidget(image, breastSelector->getWidget());
+//            delete image;
+        }
+        step++;
+    }
+}
+
+//void MainWindow::selectBreast()
+//{
+//    QSvgWidget *imageL = new QSvgWidget("/home/schier/qt-test/Image/sel_right.svg");
+//    QSvgWidget *imageR = new QSvgWidget("/home/schier/qt-test/Image/sel_right.svg");
+//    QStackedWidget *imageLR = new QStackedWidget;
+//    imageLR->addWidget(imageL);
+//    imageLR->addWidget(imageR);
+//    ui->labelStartTitle->setText("Vyberte prs");
+//    ui->startBox->replaceWidget(image, imageLR);
+//    delete image;
+////    ui->startBox->addWidget(imageLR);
+//}
 
 void MainWindow::changeState(QString state)
 {
