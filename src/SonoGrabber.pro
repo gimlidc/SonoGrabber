@@ -24,7 +24,8 @@ SOURCES += main.cpp\
     imageprocessor.cpp \
     writer.cpp \
     startimagewindow.cpp \
-    breastselector.cpp
+#    breastselector.cpp \
+    startsequence.cpp
 
 HEADERS  += mainwindow.h \
     igtlinkclient.h \
@@ -34,9 +35,11 @@ HEADERS  += mainwindow.h \
     imageprocessor.h \
     writer.h \
     startimagewindow.h \
-    breastselector.h
+#    breastselector.h \
+    startsequence.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    startsequence.ui
 
 DISTFILES += ../sonoGrabber.ini \
     images/drawing.png

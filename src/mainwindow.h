@@ -6,7 +6,7 @@
 #include <QByteArray>
 #include <QTimer>
 #include <QtSvg/QSvgWidget>
-#include "breastselector.h"
+//#include "breastselector.h"
 #include "sessionparams.h"
 
 namespace Ui {
@@ -23,7 +23,7 @@ public:
 
     void setOutputDir(QString dirPath);
 
-    void setStartImage(const QString &fileName);
+//    void setStartImage(const QString &fileName);
 
 public slots:
     void toggleRun(bool t);
@@ -31,10 +31,10 @@ public slots:
     void changeState(QString state);
     void updateTime();
     void listeningStopped(int e);
-    void startImage();
+//    void startImage();
 
-protected:
-    void mousePressEvent(QMouseEvent *event);
+//protected:
+//    void mousePressEvent(QMouseEvent *event);
 
 signals:
     void startListening();
@@ -44,11 +44,10 @@ private:
     QString dirPath;
     SessionParams * params;
     QTimer *timer;
-    QSvgWidget *image, *imageL, *imageR;
     int step = 0;
     void newSession();
     void showDiag();
-    BreastSelector *breastSelector;
+//    BreastSelector *breastSelector;
 //    void selectBreast();
 };
 

@@ -20,6 +20,7 @@ protected:
 
 private:
     QStackedWidget *imageLR;
+    QSvgWidget *image, *imageL, *imageR;
 };
 
 #endif // BREASTSELECTOR_H

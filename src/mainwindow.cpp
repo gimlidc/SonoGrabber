@@ -1,8 +1,9 @@
 #include "mainwindow.h"
-#include "breastselector.h"
+//#include "breastselector.h"
 #include "ui_mainwindow.h"
 #include "sessionnamegenerator.h"
 #include "igtlinkclient.h"
+#include "startsequence.h"
 #include <QDebug>
 #include <QPixmap>
 #include <QGraphicsView>
@@ -23,11 +24,15 @@ MainWindow::MainWindow(SessionParams * session, QWidget *parent) :
     timer->start();
     ui->lineEdit_3->setStyleSheet("color: red");
     ui->lineEdit_3->setValidator(new QIntValidator(0,1e10,this));
-    image = new QSvgWidget();
-    image->load((const QString &)"/home/schier/qt-test/Image/place tracker.svg");
-    ui->startBox->addWidget(image);
-    image->show();
-    breastSelector = new BreastSelector();
+    StartSequence *startSequence = new StartSequence();
+    ui->mainWindow->addWidget(startSequence);
+    startSequence->show();
+
+//    image = new QSvgWidget();
+//    image->load((const QString &)"/home/schier/qt-test/Image/place tracker.svg");
+//    ui->startBox->addWidget(image);
+//    image->show();
+//    breastSelector = new BreastSelector();
 }
 
 MainWindow::~MainWindow()
@@ -54,10 +59,6 @@ void MainWindow::setOutputDir(QString dirPath)
     ui->lineEdit_3->setText(QString::number(params->getFilenameIndex()));
 }
 
-void MainWindow::setStartImage(const QString &fileName)
-{
-    image->load(fileName);
-}
 
 void MainWindow::toggleRun(bool buttonPressed)
 {
@@ -111,28 +112,14 @@ void MainWindow::showImage(QImage newImage)
     ui->sonoImage->repaint();
 }
 
-void MainWindow::startImage()
-{
-    QSvgWidget *image = new QSvgWidget("/home/schier/qt-test/Image/place tracker.svg");
-    ui->startBox->addWidget(image);
-    image->show();
+//void MainWindow::startImage()
+//{
+//    QSvgWidget *image = new QSvgWidget("/home/schier/qt-test/Image/place tracker.svg");
+//    ui->startBox->addWidget(image);
+//    image->show();
 
-}
+//}
 
-void MainWindow::mousePressEvent(QMouseEvent *event)
-{
-    if (event) {
-        if (step==0) {
- //           *breastSelector = new BreastSelector();
-            ui->startBox->replaceWidget(image, breastSelector->getWidget());
-            delete image;
-        } else if (step==1) {
-            ui->startBox->replaceWidget(image, breastSelector->getWidget());
-//            delete image;
-        }
-        step++;
-    }
-}
 
 //void MainWindow::selectBreast()
 //{
