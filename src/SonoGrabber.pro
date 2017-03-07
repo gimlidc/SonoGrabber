@@ -40,8 +40,7 @@ HEADERS  += mainwindow.h \
 FORMS    += mainwindow.ui \
     startsequence.ui
 
-DISTFILES += ../sonoGrabber.ini \
-    images/drawing.png
+DISTFILES += ../sonoGrabber.ini
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../../usr/local/lib/igtl/release/ -lOpenIGTLink
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../../../usr/local/lib/igtl/debug/ -lOpenIGTLink
