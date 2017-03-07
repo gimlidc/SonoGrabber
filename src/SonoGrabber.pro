@@ -23,7 +23,6 @@ SOURCES += main.cpp\
     sessionparams.cpp \
     imageprocessor.cpp \
     writer.cpp \
-    startimagewindow.cpp \
 #    breastselector.cpp \
     startsequence.cpp
 

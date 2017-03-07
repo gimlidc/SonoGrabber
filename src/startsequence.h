@@ -22,9 +22,17 @@ protected:
     void paintEvent(QPaintEvent *) override;
 
 private:
+    enum class Side{
+        LEFT,
+        RIGHT
+    } side;
+
     Ui::StartSequence *ui;
     QStackedWidget *imageLR;
     QSvgWidget *image, *imageL, *imageR;
+    QSvgWidget* getImageUnderBreast(Side side);
+    QSvgWidget* getImageArmpit(Side side);
+
 };
 
 #endif // STARTSEQUENCE_H
