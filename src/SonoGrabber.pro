@@ -24,7 +24,8 @@ SOURCES += main.cpp\
     imageprocessor.cpp \
     writer.cpp \
 #    breastselector.cpp \
-    startsequence.cpp
+    startsequence.cpp \
+    position.cpp
 
 HEADERS  += mainwindow.h \
     igtlinkclient.h \
@@ -35,7 +36,8 @@ HEADERS  += mainwindow.h \
     writer.h \
     startimagewindow.h \
 #    breastselector.h \
-    startsequence.h
+    startsequence.h \
+    position.h
 
 FORMS    += mainwindow.ui \
     startsequence.ui

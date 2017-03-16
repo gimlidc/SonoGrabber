@@ -4,6 +4,7 @@
 #include <QSettings>
 
 #include "igtlinkclient.h"
+#include "position.h"
 #include <QLineEdit>
 #include <QCommandLineParser>
 #include <QDir>
@@ -67,6 +68,7 @@ int main(int argc, char *argv[])
     QObject::connect(&client, &IGTLinkClient::imageReceived, &w, &MainWindow::showImage);
     QObject::connect(&client, &IGTLinkClient::stateChanged, &w, &MainWindow::changeState);
     QObject::connect(&client, &IGTLinkClient::stopped, &w, &MainWindow::listeningStopped);
+
 
     w.show();
     return app.exec();
