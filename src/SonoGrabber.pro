@@ -18,7 +18,8 @@ IGTL_BUILD = $$IGTL/Build
 #LIBS += "-L$$PWD/../igtlink/lib/igtl" -lOpenIGTLink
 
 INCLUDEPATH += $$IGTL/Source $$IGTL/Source/igtlutil $$IGTL_BUILD $$PWD/../igtlink/include/igtl
-LIBS += "-L$$IGTL_BUILD/bin" -lOpenIGTLink -lws2_32
+win32-g++:LIBS += "-L$$IGTL_BUILD/bin" -lOpenIGTLink -lws2_32
+else:unix:LIBS += "-L$$IGTL_BUILD/bin" -lOpenIGTLink
 
 SOURCES += main.cpp\
         mainwindow.cpp \
@@ -58,7 +59,7 @@ win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$IGTL_BUILD/bin/lib
 else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$IGTL_BUILD/bin/libOpenIGTLink.a
 #else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../../../usr/local/lib/igtl/release/OpenIGTLink.lib
 #else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../../../usr/local/lib/igtl/debug/OpenIGTLink.lib
-#else:unix: PRE_TARGETDEPS += $$PWD/../../../../../usr/local/lib/igtl/libOpenIGTLink.a
+else:unix: PRE_TARGETDEPS += $$PWD/../../../../../usr/local/lib/igtl/libOpenIGTLink.a
 
 
 DISTFILES += ../sonoGrabber.ini
