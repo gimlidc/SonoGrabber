@@ -53,6 +53,7 @@ public slots:
     void startReading();
     void stopReading();
     void showImage(char * imageBuffer, QSize imgSize, QString state);
+    void receivePos(QVector4D pos);
 private slots:
     void receiveStopSignal(int e);
 signals:

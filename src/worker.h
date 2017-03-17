@@ -2,11 +2,14 @@
 #define WORKER_H
 
 #include <QObject>
+#include <QMatrix4x4>
+#include <QVector4D>
 #include <QDir>
 #include <QString>
 #include <QFile>
 #include <QTextStream>
 #include <QList>
+#include <QMap>
 #include <QVector>
 #include <QReadWriteLock>
 #include "igtlImageMessage.h"
@@ -87,9 +90,13 @@ signals:
      * @brief stopped is emmited when worker is stopped (connection closed).
      */
     void stopped(int);
+    void position(QVector4D pos);
 private:
-    QList<QMatrix4x4> transform;
-    void probePos(const igtl::TransformMessage::Pointer &transMsg);
+    bool frozenLastStatus;
+    QVector4D pos;
+    QMap<QString, QMatrix4x4> transforms;
+//    QList<QMatrix4x4> transform;
+    void probePos(const igtl::TransformMessage::Pointer &transMsg, double ts);
 };
 
 #endif // WORKER_H

@@ -2,8 +2,10 @@
 #include "mainwindow.h"
 #include "imageprocessor.h"
 #include <QtDebug>
+#include <QDebug>
 #include <QByteArray>
 #include <QMatrix4x4>
+#include <QVector4D>
 #include <QPixmap>
 #include <QVector>
 #include <QRgb>
@@ -27,6 +29,7 @@ IGTLinkClient::IGTLinkClient(SessionParams * connection, qint64 refreshRate, QOb
     guiRefreshRateMs = refreshRate;
     connect(worker, &Worker::imageReceived, this, &IGTLinkClient::showImage);
     connect(worker, &Worker::stopped, this, &IGTLinkClient::receiveStopSignal);
+    connect(worker, &Worker::position, this, &IGTLinkClient::receivePos);
 
     firstImage = true;
     for (int i = 0; i < 256; i++) {
@@ -83,4 +86,9 @@ void IGTLinkClient::showImage(char * imageBuffer, QSize imgSize, QString state)
     //newImage.fromData(imageBufferCopy, imgSize.width() * imgSize.height());
     emit imageReceived(newImage);
     lastRefreshTime = QDateTime::currentMSecsSinceEpoch();
+}
+
+void IGTLinkClient::receivePos(QVector4D pos)
+{
+    qDebug() << "Position: z" << pos.z() << ", x: " << pos.x() << ", y: " << pos.y();
 }

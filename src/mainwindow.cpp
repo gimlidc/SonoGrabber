@@ -106,7 +106,7 @@ void MainWindow::listeningStopped(int e)
 
 void MainWindow::showImage(QImage newImage)
 {
-    qDebug() << "drawing";
+//    qDebug() << "drawing";
     ui->sonoImage->setPixmap(QPixmap::fromImage(newImage));
     ui->sonoImage->adjustSize();
     ui->sonoImage->repaint();

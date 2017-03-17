@@ -18,8 +18,7 @@ IGTL_BUILD = $$IGTL/Build
 #LIBS += "-L$$PWD/../igtlink/lib/igtl" -lOpenIGTLink
 
 INCLUDEPATH += $$IGTL/Source $$IGTL/Source/igtlutil $$IGTL_BUILD $$PWD/../igtlink/include/igtl
-win32-g++:LIBS += "-L$$IGTL_BUILD/bin" -lOpenIGTLink -lws2_32
-else:unix:LIBS += "-L$$IGTL_BUILD/bin" -lOpenIGTLink
+#LIBS += "-L$$IGTL_BUILD/bin" -lOpenIGTLink -lws2_32
 
 SOURCES += main.cpp\
         mainwindow.cpp \

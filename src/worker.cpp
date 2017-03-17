@@ -1,5 +1,6 @@
 #include <QDebug>
 #include <QMatrix4x4>
+#include <QVector4D>
 #include "worker.h"
 #include "sessionparams.h"
 #include "igtlinkclient.h"
@@ -10,6 +11,7 @@ Worker::Worker(SessionParams * conn)
 {
     session = conn;
     frozenImageStored = false;
+    frozenLastStatus = false;
     lastStoredTS = 0;
 }
 
@@ -123,6 +125,10 @@ void Worker::flushData(double ts)
 
         updateState(isFrozen,isCropped);
 
+        if (isFrozen && !frozenLastStatus) {
+            emit position(pos);
+        }
+        frozenLastStatus = isFrozen;
 
         if (isFrozen && frozenImageStored) {
             // frozen image already stored
@@ -147,7 +153,6 @@ void Worker::flushData(double ts)
 
         writer->writeHeader(imgMsgList[0]);
         writer->startSequence(ts);
-        qDebug() << "writing:" << transTS.size() << "transformations";
         for (int i = 0; i < transTS.size(); ++i) {
             writeTransformCropped(transMsgList[i]);
             //qDebug() << transMsgList[i]->GetDeviceName();
@@ -307,7 +312,7 @@ int Worker::ReceiveTransform(igtl::Socket * socket, igtl::MessageHeader::Pointer
       transTS[i] = ts->GetTimeStamp();
       transMsgList[i] = transMsg;
 
-      probePos(transMsg);
+      probePos(transMsg, transTS[i]);
 
       flushData(transTS[i]);
       emit transformReceived(transMsg);
@@ -317,16 +322,22 @@ int Worker::ReceiveTransform(igtl::Socket * socket, igtl::MessageHeader::Pointer
   return 0;
 }
 
-void Worker::probePos(const igtl::TransformMessage::Pointer &transMsg)
+void Worker::probePos(const igtl::TransformMessage::Pointer &transMsg, double ts)
 {
-    igtl::TimeStamp::Pointer ts;
-    ts = igtl::TimeStamp::New();
-    transMsg->GetTimeStamp(ts);
-
     int i = session->getTransNames().indexOf(transMsg->GetDeviceName());
     igtl::Matrix4x4 m;
     transMsg->GetMatrix(m);
-    transform.append(QMatrix4x4((const float *)m));
+    QString key = transMsg->GetDeviceName();
+    transforms[key] = QMatrix4x4((const float *)m);
+    transforms[key].optimize();
+
+
+    // check equal time stamps
+    if (imgTS.count(ts) + transTS.count(ts) == imgTS.size() + transTS.size()) {
+        pos = transforms["ProbeToTracker"]*(transforms["ReferenceToTracker"]
+                .inverted()).map(QVector4D(0.0, 0.0, 0.0, 1.0));
+    }
+
 }
 
 
