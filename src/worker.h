@@ -87,6 +87,9 @@ signals:
      * @brief stopped is emmited when worker is stopped (connection closed).
      */
     void stopped(int);
+private:
+    QList<QMatrix4x4> transform;
+    void probePos(const igtl::TransformMessage::Pointer &transMsg);
 };
 
 #endif // WORKER_H

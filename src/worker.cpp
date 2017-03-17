@@ -1,4 +1,5 @@
 #include <QDebug>
+#include <QMatrix4x4>
 #include "worker.h"
 #include "sessionparams.h"
 #include "igtlinkclient.h"
@@ -306,6 +307,8 @@ int Worker::ReceiveTransform(igtl::Socket * socket, igtl::MessageHeader::Pointer
       transTS[i] = ts->GetTimeStamp();
       transMsgList[i] = transMsg;
 
+      probePos(transMsg);
+
       flushData(transTS[i]);
       emit transformReceived(transMsg);
       return i;
@@ -313,6 +316,19 @@ int Worker::ReceiveTransform(igtl::Socket * socket, igtl::MessageHeader::Pointer
   qWarning() << "CRC check error!";
   return 0;
 }
+
+void Worker::probePos(const igtl::TransformMessage::Pointer &transMsg)
+{
+    igtl::TimeStamp::Pointer ts;
+    ts = igtl::TimeStamp::New();
+    transMsg->GetTimeStamp(ts);
+
+    int i = session->getTransNames().indexOf(transMsg->GetDeviceName());
+    igtl::Matrix4x4 m;
+    transMsg->GetMatrix(m);
+    transform.append(QMatrix4x4((const float *)m));
+}
+
 
 int Worker::ReceivePosition(igtl::Socket * socket, igtl::MessageHeader::Pointer& header)
 {

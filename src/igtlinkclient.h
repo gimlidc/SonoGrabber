@@ -13,7 +13,6 @@
 #include <QRgb>
 #include <QImage>
 
-#include "position.h"
 #include "worker.h"
 #include "sessionparams.h"
 #include "igtlOSUtil.h"
@@ -49,8 +48,6 @@ public:
     explicit IGTLinkClient(SessionParams * connection, qint64 refreshRate = 200, QObject *parent = 0);
     ~IGTLinkClient();
 
-private:
-    Position * pos;
 
 public slots:
     void startReading();

@@ -1,5 +1,4 @@
 #include "igtlinkclient.h"
-#include "position.h"
 #include "mainwindow.h"
 #include "imageprocessor.h"
 #include <QtDebug>
@@ -18,9 +17,6 @@ IGTLinkClient::IGTLinkClient(SessionParams * connection, qint64 refreshRate, QOb
 {
     worker = new Worker(connection);
     worker->moveToThread(&_workerThread);
-    pos = new Position(connection);
-
-//    pos = new Position(connection);
 
     qRegisterMetaType<igtl::TransformMessage::Pointer>("igtl::TransformMessage::Pointer");
     qRegisterMetaType<igtl::ImageMessage::Pointer>("igtl::ImageMessage::Pointer");
@@ -31,7 +27,6 @@ IGTLinkClient::IGTLinkClient(SessionParams * connection, qint64 refreshRate, QOb
     guiRefreshRateMs = refreshRate;
     connect(worker, &Worker::imageReceived, this, &IGTLinkClient::showImage);
     connect(worker, &Worker::stopped, this, &IGTLinkClient::receiveStopSignal);
-    connect(worker, &Worker::transformReceived, pos, &Position::receiveTransform);
 
     firstImage = true;
     for (int i = 0; i < 256; i++) {
