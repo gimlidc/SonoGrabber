@@ -125,7 +125,7 @@ void Worker::flushData(double ts)
 
         updateState(isFrozen,isCropped);
 
-        if (isFrozen && !frozenLastStatus) {
+        if (isFrozen && !frozenLastStatus && writer->getImageCounter()>0) {
             emit position(pos);
         }
         frozenLastStatus = isFrozen;
@@ -334,8 +334,8 @@ void Worker::probePos(const igtl::TransformMessage::Pointer &transMsg, double ts
 
     // check equal time stamps
     if (imgTS.count(ts) + transTS.count(ts) == imgTS.size() + transTS.size()) {
-        pos = transforms["ProbeToTracker"]*(transforms["ReferenceToTracker"]
-                .inverted()).map(QVector4D(0.0, 0.0, 0.0, 1.0));
+        pos = transforms["ReferenceToTracker"].inverted()*transforms["ProbeToTracker"]
+                *transforms["ImageToProbe"].map(QVector4D(0.0, 0.0, 0.0, 1.0));
     }
 
 }

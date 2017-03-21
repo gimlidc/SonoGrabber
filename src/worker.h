@@ -92,7 +92,7 @@ signals:
     void stopped(int);
     void position(QVector4D pos);
 private:
-    bool frozenLastStatus;
+    bool frozenLastStatus = true;
     QVector4D pos;
     QMap<QString, QMatrix4x4> transforms;
 //    QList<QMatrix4x4> transform;
