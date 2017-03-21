@@ -65,9 +65,32 @@ QSvgWidget* StartSequence::getImageArmpit(Side side)
     return new QSvgWidget(path);
 }
 
-void StartSequence::mousePressEvent(QMouseEvent *event)
+StartSequence::Side StartSequence::getSide()
+{
+    return Side::LEFT;
+}
+
+void StartSequence::setImage1(Side side)
+{
+    ui->heading->setText("Označte kalibrační bod\npod prsem");
+    img = getImageUnderBreast(side);
+    ui->startBox->replaceWidget(imageLR, img);
+    delete imageLR;
+}
+
+void StartSequence::setImage2(Side side)
 {
     QSvgWidget *img2;
+
+    ui->heading->setText("Označte kalibrační bod\nv podpaží");
+    img2 = img;
+    img = getImageArmpit(side);
+    ui->startBox->replaceWidget(img2, img);
+    delete img2;
+}
+
+void StartSequence::mousePressEvent(QMouseEvent *event)
+{
     if (event) {
         int w = imageLR->width();
         switch (step) {
@@ -78,23 +101,36 @@ void StartSequence::mousePressEvent(QMouseEvent *event)
             }
             else
                 side = Side::RIGHT;
-            ui->heading->setText("Označte kalibrační bod\npod prsem");
-            img = getImageUnderBreast(side);
-            ui->startBox->replaceWidget(imageLR, img);
-            delete imageLR;
+            setImage1(side);
             break;
         case 1:
-            ui->heading->setText("Označte kalibrační bod\nv podpaží");
-            img2 = img;
-            img = getImageArmpit(side);
-            ui->startBox->replaceWidget(img2, img);
-            delete img2;
+            setImage2(side);
             break;
         default:
             break;
         }
         step++;
     }
+}
+
+void StartSequence::getPos(QVector4D pos)
+{
+    switch (step) {
+    case 0:
+        disconnect(timer, SIGNAL(timeout()), this, SLOT(update()));
+        if (pos.z()<0)
+            side = Side::LEFT;
+        else
+            side = Side::RIGHT;
+        setImage1(side);
+        break;
+    case 1:
+        setImage2(side);
+        break;
+    default:
+        break;
+    }
+    step++;
 }
 
 void StartSequence::paintEvent(QPaintEvent *)

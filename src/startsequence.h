@@ -2,6 +2,7 @@
 #define STARTSEQUENCE_H
 
 #include <QWidget>
+#include <QVector4D>
 #include <QSvgWidget>
 #include <QStackedWidget>
 
@@ -32,6 +33,13 @@ private:
     QSvgWidget *image, *imageL, *imageR;
     QSvgWidget* getImageUnderBreast(Side side);
     QSvgWidget* getImageArmpit(Side side);
+    void setImage1(Side side);
+    void setImage2(Side side);
+
+    Side getSide();
+
+public slots:
+    void getPos(QVector4D pos);
 
 };
 
