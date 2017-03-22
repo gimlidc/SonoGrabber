@@ -37,6 +37,8 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
     QObject::connect(client, &IGTLinkClient::stateChanged, this, &MainWindow::changeState);
     QObject::connect(client, &IGTLinkClient::stopped, this, &MainWindow::listeningStopped);
     QObject::connect(client, &IGTLinkClient::position, startSequence, &StartSequence::getPos);
+    QObject::connect(startSequence, &StartSequence::terminateStartSequence, this,
+                     &MainWindow::sequenceTerminator);
 
 
 //    image = new QSvgWidget();
@@ -75,6 +77,11 @@ void MainWindow::setOutputDir(QString dirPath)
     ui->lineEdit_3->setText(QString::number(params->getFilenameIndex()));
 }
 
+void MainWindow::sequenceTerminator()
+{
+    delete startSequence;
+}
+
 
 void MainWindow::toggleRun(bool buttonPressed)
 {
@@ -87,6 +94,12 @@ void MainWindow::toggleRun(bool buttonPressed)
         newSession();
         qDebug() << "Setting output dir: " << params->getOutDir().absolutePath();
         emit startListening();
+        if (!startSequence) {
+            startSequence = new StartSequence();
+            ui->mainWindow->addWidget(startSequence);
+            startSequence->show();
+            connect(this, &MainWindow::position, startSequence, &StartSequence::getPos);
+        }
     }
     else {
         emit stopListening();

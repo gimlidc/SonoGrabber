@@ -38,6 +38,9 @@ private:
 
     Side getSide();
 
+signals:
+    void terminateStartSequence();
+
 public slots:
     void getPos(QVector4D pos);
 

@@ -29,7 +29,7 @@ IGTLinkClient::IGTLinkClient(SessionParams * connection, qint64 refreshRate, QOb
     guiRefreshRateMs = refreshRate;
     connect(worker, &Worker::imageReceived, this, &IGTLinkClient::showImage);
     connect(worker, &Worker::stopped, this, &IGTLinkClient::receiveStopSignal);
-    connect(worker, &Worker::position, this, &IGTLinkClient::receivePos);
+    connect(worker, &Worker::position, this, &IGTLinkClient::receivePos);    
 
     firstImage = true;
     for (int i = 0; i < 256; i++) {

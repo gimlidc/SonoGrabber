@@ -106,6 +106,8 @@ void StartSequence::mousePressEvent(QMouseEvent *event)
         case 1:
             setImage2(side);
             break;
+        case 2:
+            emit terminateStartSequence();
         default:
             break;
         }
@@ -127,6 +129,7 @@ void StartSequence::getPos(QVector4D pos)
     case 1:
         setImage2(side);
         break;
+    case 2: emit terminateStartSequence();
     default:
         break;
     }
