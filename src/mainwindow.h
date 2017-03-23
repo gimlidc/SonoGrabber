@@ -6,8 +6,11 @@
 #include <QByteArray>
 #include <QTimer>
 #include <QtSvg/QSvgWidget>
+#include <QVector4D>
 //#include "breastselector.h"
 #include "sessionparams.h"
+#include "startsequence.h"
+#include "igtlinkclient.h"
 
 namespace Ui {
 class MainWindow;
@@ -18,7 +21,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(SessionParams * params, QWidget *parent = 0);
+    explicit MainWindow(SessionParams * params, IGTLinkClient * client, QWidget *parent = 0);
     ~MainWindow();
 
     void setOutputDir(QString dirPath);
@@ -31,7 +34,9 @@ public slots:
     void changeState(QString state);
     void updateTime();
     void listeningStopped(int e);
-//    void startImage();
+    void receivePos(QVector4D pos);    
+    void sequenceTerminator();
+//    void startImage();    
 
 //protected:
 //    void mousePressEvent(QMouseEvent *event);
@@ -39,6 +44,8 @@ public slots:
 signals:
     void startListening();
     void stopListening();
+    void position(QVector4D pos);
+
 private:
     Ui::MainWindow *ui;
     QString dirPath;
@@ -47,6 +54,10 @@ private:
     int step = 0;
     void newSession();
     void showDiag();
+    IGTLinkClient * client;
+
+    StartSequence *startSequence;
+
 //    BreastSelector *breastSelector;
 //    void selectBreast();
 };

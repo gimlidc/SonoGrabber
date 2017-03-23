@@ -58,17 +58,9 @@ int main(int argc, char *argv[])
     IGTLinkClient client(&session, settings.value("gui/refreshRateMs", 200).value<qint64>());
 
     // Create gui
-    MainWindow w(&session);
+    MainWindow w(&session, &client);
     w.setOutputDir(dirName);
     w.setWindowTitle(app.applicationName().append(" ").append(app.applicationVersion()));
-
-    // connect client actions with UI
-    QObject::connect(&w,&MainWindow::startListening,&client,&IGTLinkClient::startReading);
-    QObject::connect(&w,&MainWindow::stopListening,&client,&IGTLinkClient::stopReading);
-    QObject::connect(&client, &IGTLinkClient::imageReceived, &w, &MainWindow::showImage);
-    QObject::connect(&client, &IGTLinkClient::stateChanged, &w, &MainWindow::changeState);
-    QObject::connect(&client, &IGTLinkClient::stopped, &w, &MainWindow::listeningStopped);
-
 
     w.show();
     return app.exec();

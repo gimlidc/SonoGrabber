@@ -23,6 +23,7 @@
 #include "igtlClientSocket.h"
 #include "igtlStatusMessage.h"
 
+
 class IGTLinkClient : public QObject
 {
     Q_OBJECT
@@ -61,6 +62,7 @@ signals:
     void stopped(ErrorType);
     void imageReceived(QImage newImage);
     void stateChanged(QString state);
+    void position(QVector4D pos);
 };
 
 #endif // IGTLINKCLIENT_H

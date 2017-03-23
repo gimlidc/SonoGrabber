@@ -3,7 +3,6 @@
 #include "ui_mainwindow.h"
 #include "sessionnamegenerator.h"
 #include "igtlinkclient.h"
-#include "startsequence.h"
 #include <QDebug>
 #include <QPixmap>
 #include <QGraphicsView>
@@ -12,7 +11,7 @@
 #include <QtSvg/QGraphicsSvgItem>
 #include <QtSvg/QSvgWidget>
 
-MainWindow::MainWindow(SessionParams * session, QWidget *parent) :
+MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
@@ -24,9 +23,23 @@ MainWindow::MainWindow(SessionParams * session, QWidget *parent) :
     timer->start();
     ui->lineEdit_3->setStyleSheet("color: red");
     ui->lineEdit_3->setValidator(new QIntValidator(0,1e10,this));
-    StartSequence *startSequence = new StartSequence();
-    ui->mainWindow->addWidget(startSequence);
+
+    startSequence = new StartSequence();
     startSequence->show();
+    ui->mainWindow->addWidget(startSequence);
+    connect(this, &MainWindow::position, startSequence, &StartSequence::getPos);
+    this->client = client;
+
+    // connect client actions with UI
+    QObject::connect(this,&MainWindow::startListening,client,&IGTLinkClient::startReading);
+    QObject::connect(this,&MainWindow::stopListening,client,&IGTLinkClient::stopReading);
+    QObject::connect(client, &IGTLinkClient::imageReceived, this, &MainWindow::showImage);
+    QObject::connect(client, &IGTLinkClient::stateChanged, this, &MainWindow::changeState);
+    QObject::connect(client, &IGTLinkClient::stopped, this, &MainWindow::listeningStopped);
+    QObject::connect(client, &IGTLinkClient::position, startSequence, &StartSequence::getPos);
+    QObject::connect(startSequence, &StartSequence::terminateStartSequence, this,
+                     &MainWindow::sequenceTerminator);
+
 
 //    image = new QSvgWidget();
 //    image->load((const QString &)"/home/schier/qt-test/Image/place tracker.svg");
@@ -52,11 +65,21 @@ void MainWindow::newSession()
 
 }
 
+void MainWindow::receivePos(QVector4D pos)
+{
+    emit position(pos);
+}
+
 void MainWindow::setOutputDir(QString dirPath)
 {
     this->dirPath = dirPath;
     ui->lineEdit->setText(this->dirPath);
     ui->lineEdit_3->setText(QString::number(params->getFilenameIndex()));
+}
+
+void MainWindow::sequenceTerminator()
+{
+    delete startSequence;
 }
 
 
@@ -81,6 +104,20 @@ void MainWindow::toggleRun(bool buttonPressed)
         ui->lineEdit_3->setEnabled(true);
         ui->lineEdit_3->setText(QString::number(params->getFilenameIndex()));
         ui->sonoImage->setPixmap(QPixmap());
+        bool seq = this->findChild<QWidget *>("StartSequence");
+        if (!(this->findChild<QWidget *>("StartSequence")))
+        {
+            startSequence = new StartSequence();
+            ui->mainWindow->addWidget(startSequence);
+            startSequence->show();
+            QObject::connect(client, &IGTLinkClient::position, startSequence, &StartSequence::getPos);
+            QObject::connect(startSequence, &StartSequence::terminateStartSequence, this,
+                             &MainWindow::sequenceTerminator);
+        }
+        else
+        {
+            startSequence->reset();
+        }
     }
 }
 

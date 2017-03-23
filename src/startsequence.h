@@ -2,6 +2,7 @@
 #define STARTSEQUENCE_H
 
 #include <QWidget>
+#include <QVector4D>
 #include <QSvgWidget>
 #include <QStackedWidget>
 
@@ -15,6 +16,7 @@ class StartSequence : public QWidget
 
 public:
     explicit StartSequence(QWidget *parent = 0);
+    void reset();
     ~StartSequence();
 
 protected:
@@ -32,6 +34,18 @@ private:
     QSvgWidget *image, *imageL, *imageR;
     QSvgWidget* getImageUnderBreast(Side side);
     QSvgWidget* getImageArmpit(Side side);
+    void setImage1(Side side);
+    void setImage2(Side side);
+
+    void initImage(bool reset);
+
+    Side getSide();
+
+signals:
+    void terminateStartSequence();
+
+public slots:
+    void getPos(QVector4D pos);
 
 };
 
