@@ -94,12 +94,6 @@ void MainWindow::toggleRun(bool buttonPressed)
         newSession();
         qDebug() << "Setting output dir: " << params->getOutDir().absolutePath();
         emit startListening();
-        if (!startSequence) {
-            startSequence = new StartSequence();
-            ui->mainWindow->addWidget(startSequence);
-            startSequence->show();
-            connect(this, &MainWindow::position, startSequence, &StartSequence::getPos);
-        }
     }
     else {
         emit stopListening();
@@ -110,6 +104,20 @@ void MainWindow::toggleRun(bool buttonPressed)
         ui->lineEdit_3->setEnabled(true);
         ui->lineEdit_3->setText(QString::number(params->getFilenameIndex()));
         ui->sonoImage->setPixmap(QPixmap());
+        bool seq = this->findChild<QWidget *>("StartSequence");
+        if (!(this->findChild<QWidget *>("StartSequence")))
+        {
+            startSequence = new StartSequence();
+            ui->mainWindow->addWidget(startSequence);
+            startSequence->show();
+            QObject::connect(client, &IGTLinkClient::position, startSequence, &StartSequence::getPos);
+            QObject::connect(startSequence, &StartSequence::terminateStartSequence, this,
+                             &MainWindow::sequenceTerminator);
+        }
+        else
+        {
+            startSequence->reset();
+        }
     }
 }
 

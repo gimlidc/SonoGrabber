@@ -16,6 +16,7 @@ class StartSequence : public QWidget
 
 public:
     explicit StartSequence(QWidget *parent = 0);
+    void reset();
     ~StartSequence();
 
 protected:
@@ -35,6 +36,8 @@ private:
     QSvgWidget* getImageArmpit(Side side);
     void setImage1(Side side);
     void setImage2(Side side);
+
+    void initImage(bool reset);
 
     Side getSide();
 
