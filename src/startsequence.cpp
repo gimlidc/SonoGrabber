@@ -104,7 +104,7 @@ QSvgWidget* StartSequence::getImageArmpit(Side side)
     return new QSvgWidget(path);
 }
 
-StartSequence::Side StartSequence::getSide()
+Side StartSequence::getSide()
 {
     return Side::LEFT;
 }

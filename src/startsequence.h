@@ -5,6 +5,7 @@
 #include <QVector4D>
 #include <QSvgWidget>
 #include <QStackedWidget>
+#include "side.h"
 
 namespace Ui {
 class StartSequence;
@@ -24,10 +25,7 @@ protected:
     void paintEvent(QPaintEvent *) override;
 
 private:
-    enum class Side{
-        LEFT,
-        RIGHT
-    } side;
+    Side side;
 
     Ui::StartSequence *ui;
     QStackedWidget *imageLR;
