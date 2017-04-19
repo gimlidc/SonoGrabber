@@ -140,6 +140,7 @@ void StartSequence::mousePressEvent(QMouseEvent *event)
             }
             else
                 side = Side::RIGHT;
+            emit sideSig(side);
             setImage1(side);
             break;
         case 1:

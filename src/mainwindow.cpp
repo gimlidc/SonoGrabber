@@ -3,6 +3,7 @@
 #include "ui_mainwindow.h"
 #include "sessionnamegenerator.h"
 #include "igtlinkclient.h"
+#include "side.h"
 #include <QDebug>
 #include <QPixmap>
 #include <QGraphicsView>
@@ -11,11 +12,17 @@
 #include <QtSvg/QGraphicsSvgItem>
 #include <QtSvg/QSvgWidget>
 
+
 MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+//    bgraph = new BreastGraph(Side::LEFT, 0);
+//    bgraph->update();
+//    bgraph->show();
+
     params = session;
     timer = new QTimer(this);
     timer->setInterval(1000);
@@ -39,6 +46,7 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
     QObject::connect(client, &IGTLinkClient::position, startSequence, &StartSequence::getPos);
     QObject::connect(startSequence, &StartSequence::terminateStartSequence, this,
                      &MainWindow::sequenceTerminator);
+    QObject::connect(startSequence, &StartSequence::sideSig, this, &MainWindow::setBreastGraph);
 
 
 //    image = new QSvgWidget();
@@ -65,6 +73,18 @@ void MainWindow::newSession()
 
 }
 
+void MainWindow::setBreastGraph(Side side)
+{
+    bgraph = new BreastGraph(side, 0);
+}
+
+void MainWindow::showBreastGraph()
+{
+    bgraph->update();
+    bgraph->show();
+}
+
+
 void MainWindow::receivePos(QVector4D pos)
 {
     emit position(pos);
@@ -80,6 +100,7 @@ void MainWindow::setOutputDir(QString dirPath)
 void MainWindow::sequenceTerminator()
 {
     delete startSequence;
+    showBreastGraph();
 }
 
 

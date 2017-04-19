@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Creator: fig2dev Version 3.2.6 -->
+
+<!-- CreationDate: Thu Mar  2 19:25:00 2017 -->
+
+<!-- Magnification: 1.050 -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="220.98mm"
+   height="177.8mm"
+   viewBox="437 1477 10465 8372"
+   version="1.1"
+   id="svg50"
+   sodipodi:docname="armpit_left.svg"
+   inkscape:version="0.92.1 r">
+  <metadata
+     id="metadata56">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs54" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1627"
+     inkscape:window-height="925"
+     id="namedview52"
+     showgrid="false"
+     inkscape:zoom="1"
+     inkscape:cx="270.09999"
+     inkscape:cy="256"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg50"
+     units="mm"
+     inkscape:document-units="mm"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:snap-bbox="true"
+     inkscape:snap-nodes="false"
+     inkscape:object-nodes="false"
+     inkscape:bbox-nodes="true"
+     inkscape:bbox-paths="true">
+    <sodipodi:guide
+       position="-538.78711,224.25"
+       orientation="0,835.19998"
+       id="guide117"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="9021.5516,8695.9167"
+       orientation="-672.00001,0"
+       id="guide119"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="-2568.6362,4746.625"
+       orientation="0,-835.19998"
+       id="guide121"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="1428.4123,8795.5833"
+       orientation="672.00001,0"
+       id="guide123"
+       inkscape:locked="false" />
+  </sodipodi:namedview>
+  <rect
+     id="rect2"
+     style="fill:#008000;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
+     rx="0"
+     height="708"
+     width="1417"
+     y="4251"
+     x="4960" />
+  <rect
+     id="rect4"
+     style="fill:#008000;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
+     rx="0"
+     height="1181"
+     width="472"
+     y="3307"
+     x="5433" />
+  <text
+     style="font-style:normal;font-weight:normal;font-size:202px;font-family:Helvetica;text-anchor:middle;fill:#000000;stroke-width:0.025in"
+     id="text6"
+     font-size="202"
+     font-weight="normal"
+     font-style="normal"
+     y="4724"
+     x="5196"
+     xml:space="preserve">R</text>
+  <text
+     style="font-style:normal;font-weight:normal;font-size:202px;font-family:Helvetica;text-anchor:middle;fill:#000000;stroke-width:0.025in"
+     id="text8"
+     font-size="202"
+     font-weight="normal"
+     font-style="normal"
+     y="4724"
+     x="6141"
+     xml:space="preserve">L</text>
+  <path
+     inkscape:connector-curvature="0"
+     id="path10"
+     d="m 5196,7464 a 1889.5,1889.5 0 0 1 -3779,0"
+     style="fill:none;stroke:#000000;stroke-width:32;stroke-linecap:butt" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path12"
+     d="m 9921,7464 a 1890,1890 0 0 1 -3780,0"
+     style="fill:none;stroke:#000000;stroke-width:32;stroke-linecap:butt" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path14"
+     d="m 1417,7464 a 1757,1757 0 0 1 236,-945"
+     style="fill:none;stroke:#000000;stroke-width:32;stroke-linecap:butt" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path16"
+     d="M 9921,7464 A 1757,1757 0 0 0 9685,6519"
+     style="fill:none;stroke:#000000;stroke-width:32;stroke-linecap:butt" />
+  <circle
+     id="circle18"
+     style="fill:none;stroke:#000000;stroke-width:32"
+     r="389"
+     cy="7464"
+     cx="3307" />
+  <circle
+     id="circle20"
+     style="fill:none;stroke:#000000;stroke-width:32"
+     r="389"
+     cy="7464"
+     cx="8031" />
+  <circle
+     id="circle22"
+     style="fill:#008000;stroke:#008000;stroke-width:32"
+     r="188"
+     cy="7464"
+     cx="8031" />
+  <circle
+     id="circle24"
+     style="fill:none;stroke:#000000;stroke-width:32"
+     r="188"
+     cy="7464"
+     cx="3307" />
+  <polyline
+     id="polyline28"
+     style="fill:none;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
+     points="472,2834 3307,2173 " />
+  <polyline
+     id="polyline30"
+     style="fill:none;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
+     points="10868,2834 8033,2173 " />
+  <polyline
+     id="polyline32"
+     style="fill:none;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
+     points="1470,3051 5196,3968 " />
+  <polyline
+     id="polyline34"
+     style="fill:none;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
+     points="9927,3057 6141,3968 " />
+  <polyline
+     id="polyline36"
+     style="fill:none;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:bevel"
+     points="8031,2173 8028,2172 8019,2169 8007,2162 7987,2155 7962,2143 7931,2131 7899,2117 7864,2102 7830,2088 7798,2073 7766,2059 7738,2046 7712,2034 7688,2022 7666,2011 7645,2000 7626,1989 7608,1979 7590,1968 7571,1955 7552,1943 7533,1930 7516,1917 7497,1903 7479,1888 7461,1872 7443,1858 7425,1842 7408,1826 7393,1812 7378,1796 7364,1781 7351,1767 7338,1754 7328,1741 7316,1729 7307,1716 7295,1700 7283,1686 7273,1670 7261,1654 7251,1636 7239,1617 7227,1596 7215,1575 7204,1554 7194,1537 7187,1524 7183,1516 7181,1512 7181,1511 " />
+  <polyline
+     id="polyline38"
+     style="fill:none;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:bevel"
+     points="3259,2173 3262,2172 3271,2169 3283,2162 3303,2155 3329,2143 3359,2131 3392,2117 3426,2102 3460,2088 3492,2073 3524,2059 3552,2046 3579,2034 3603,2022 3625,2011 3646,2000 3665,1989 3682,1979 3700,1968 3719,1955 3738,1943 3757,1930 3775,1917 3794,1903 3812,1888 3829,1872 3847,1858 3865,1842 3882,1826 3898,1812 3912,1796 3926,1781 3940,1767 3952,1754 3963,1741 3974,1729 3984,1716 3995,1700 4007,1686 4017,1670 4029,1654 4039,1636 4051,1617 4064,1596 4075,1575 4087,1554 4096,1537 4103,1524 4108,1516 4110,1512 4110,1511 " />
+  <polyline
+     id="polyline40"
+     style="fill:none;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:bevel"
+     points="1653,6519 1655,6516 1659,6510 1666,6499 1676,6482 1688,6462 1702,6439 1717,6415 1732,6390 1745,6366 1758,6343 1770,6321 1780,6300 1790,6280 1798,6261 1805,6242 1813,6223 1819,6204 1824,6184 1829,6164 1835,6143 1840,6121 1844,6099 1848,6075 1853,6051 1856,6027 1858,6003 1860,5979 1862,5955 1863,5932 1863,5910 1863,5889 1863,5870 1862,5851 1860,5835 1858,5819 1855,5801 1851,5785 1846,5770 1841,5755 1836,5740 1828,5727 1821,5714 1813,5702 1804,5691 1796,5681 1786,5672 1777,5664 1767,5656 1758,5649 1749,5643 1740,5637 1729,5631 1717,5626 1704,5620 1692,5615 1677,5611 1661,5608 1646,5605 1628,5603 1610,5601 1591,5601 1572,5601 1552,5602 1532,5603 1511,5606 1496,5608 1480,5611 1462,5614 1444,5618 1425,5623 1405,5628 1383,5634 1362,5640 1339,5648 1316,5656 1292,5665 1269,5674 1245,5683 1220,5694 1197,5704 1174,5715 1152,5727 1130,5738 1108,5751 1086,5763 1068,5775 1049,5786 1032,5798 1013,5812 993,5826 972,5841 950,5858 927,5877 902,5896 876,5918 848,5940 819,5964 790,5989 761,6014 731,6038 704,6062 680,6083 659,6102 641,6117 628,6128 620,6135 616,6139 614,6141 " />
+  <polyline
+     id="polyline42"
+     style="fill:none;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:bevel"
+     points="9685,6519 9682,6516 9678,6510 9672,6499 9661,6482 9650,6462 9635,6439 9620,6415 9606,6390 9592,6366 9580,6343 9568,6321 9558,6300 9548,6280 9540,6261 9532,6242 9525,6223 9520,6204 9513,6184 9508,6164 9503,6143 9498,6121 9493,6099 9489,6075 9485,6051 9482,6027 9480,6003 9478,5979 9476,5955 9475,5932 9475,5910 9475,5889 9475,5870 9476,5851 9478,5835 9480,5819 9483,5801 9486,5785 9491,5770 9497,5755 9502,5740 9509,5727 9517,5714 9525,5702 9533,5691 9542,5681 9551,5672 9561,5664 9570,5656 9580,5649 9589,5643 9598,5637 9609,5631 9620,5626 9633,5620 9646,5615 9660,5611 9676,5608 9692,5605 9710,5603 9728,5601 9746,5601 9765,5601 9785,5602 9805,5603 9826,5606 9842,5608 9858,5611 9876,5614 9893,5618 9912,5623 9932,5628 9954,5634 9975,5640 9998,5648 10022,5656 10046,5665 10069,5674 10093,5683 10117,5694 10140,5704 10163,5715 10185,5727 10207,5738 10229,5751 10251,5763 10269,5775 10288,5786 10306,5798 10325,5812 10345,5826 10366,5841 10388,5858 10411,5877 10435,5896 10461,5918 10490,5940 10518,5964 10548,5989 10577,6014 10606,6038 10634,6062 10658,6083 10679,6102 10697,6117 10709,6128 10718,6135 10722,6139 10724,6141 " />
+  <polyline
+     id="polyline44"
+     style="fill:none;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:bevel"
+     points="1370,6992 1370,6988 1369,6983 1366,6972 1364,6956 1361,6934 1357,6906 1352,6874 1346,6838 1341,6802 1335,6764 1330,6725 1324,6688 1319,6653 1314,6619 1310,6587 1306,6558 1301,6530 1298,6503 1295,6478 1292,6454 1289,6431 1286,6408 1283,6386 1280,6361 1277,6337 1274,6311 1272,6285 1269,6258 1266,6229 1262,6199 1259,6167 1256,6133 1253,6097 1250,6059 1247,6020 1243,5982 1239,5944 1236,5908 1234,5878 1231,5853 1230,5834 1229,5821 1228,5814 1228,5811 " />
+  <polyline
+     id="polyline46"
+     style="fill:none;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:bevel"
+     points="9980,6992 9980,6988 9981,6983 9983,6972 9985,6956 9988,6934 9992,6906 9997,6874 10003,6838 10008,6802 10014,6764 10019,6725 10025,6688 10030,6653 10035,6619 10039,6587 10044,6558 10048,6530 10051,6503 10054,6478 10057,6454 10060,6431 10064,6408 10067,6386 10069,6361 10072,6337 10075,6311 10077,6285 10080,6258 10083,6229 10087,6199 10090,6167 10093,6133 10096,6097 10099,6059 10102,6020 10107,5982 10110,5944 10113,5908 10115,5878 10118,5853 10119,5834 10120,5821 10121,5814 10121,5811 " />
+  <circle
+     id="circle26-6"
+     style="fill:#008000;stroke:#008000;stroke-width:32.01348492;stroke-miterlimit:4;stroke-dasharray:none"
+     r="188"
+     cy="9637"
+     cx="8031.9951" />
+  <circle
+     cx="9254.5449"
+     cy="5303.1602"
+     r="188"
+     style="fill:#ff0000;stroke:#ff0000;stroke-width:32.01348495;stroke-miterlimit:4;stroke-dasharray:none"
+     id="circle4791"
+     inkscape:transform-center-x="-125.29933"
+     inkscape:transform-center-y="-100.23932" />
+</svg>

@@ -11,6 +11,8 @@
 #include "sessionparams.h"
 #include "startsequence.h"
 #include "igtlinkclient.h"
+#include "breastgraph.h"
+#include "side.h"
 
 namespace Ui {
 class MainWindow;
@@ -36,6 +38,7 @@ public slots:
     void listeningStopped(int e);
     void receivePos(QVector4D pos);    
     void sequenceTerminator();
+    void setBreastGraph(Side side);
 //    void startImage();    
 
 //protected:
@@ -57,6 +60,9 @@ private:
     IGTLinkClient * client;
 
     StartSequence *startSequence;
+    BreastGraph *bgraph;
+    void showBreastGraph();
+
 
 //    BreastSelector *breastSelector;
 //    void selectBreast();
