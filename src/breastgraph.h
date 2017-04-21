@@ -12,6 +12,10 @@ public:
     ~BreastGraph();
     void paintEvent(QPaintEvent *);
 
+private:
+    QVector<double> x, y;
+
+
 signals:
 
 public slots:
