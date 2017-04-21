@@ -30,7 +30,9 @@ SOURCES += main.cpp\
     writer.cpp \
 #    breastselector.cpp \
     startsequence.cpp \
-    breastgraph.cpp
+    breastgraph.cpp \
+    breastselector.cpp \
+#    position.cpp
 
 HEADERS  += mainwindow.h \
     igtlinkclient.h \
@@ -43,7 +45,9 @@ HEADERS  += mainwindow.h \
 #    breastselector.h \
     startsequence.h \
     breastgraph.h \
-    side.h
+    side.h \
+    breastselector.h \
+#    position.h
 
 FORMS    += mainwindow.ui \
     startsequence.ui
@@ -59,9 +63,12 @@ else:unix: LIBS += -L$$PWD/../../../../../usr/local/lib/igtl/ -lOpenIGTLink
 
 win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$IGTL_BUILD/bin/libOpenIGTLink.a
 else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$IGTL_BUILD/bin/libOpenIGTLink.a
-#else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../../../usr/local/lib/igtl/release/OpenIGTLink.lib
-#else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../../../usr/local/lib/igtl/debug/OpenIGTLink.lib
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../../../usr/local/lib/igtl/release/OpenIGTLink.lib
+##else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../../../usr/local/lib/igtl/debug/OpenIGTLink.lib
 else:unix: PRE_TARGETDEPS += $$PWD/../../../../../usr/local/lib/igtl/libOpenIGTLink.a
 
 
 DISTFILES += ../sonoGrabber.ini
+
+RESOURCES += \
+    images.qrc

@@ -38,6 +38,7 @@ private:
     void initImage(bool reset);
 
     Side getSide();
+    int w;
 
 signals:
     void terminateStartSequence();

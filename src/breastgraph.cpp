@@ -8,6 +8,7 @@
 
 BreastGraph::BreastGraph(Side side, QWidget *parent) : QWidget(parent)
 {
+      this->setObjectName("BreastGraph");
 
 //    QPainter painter(this);
 //    painter.setWindow(QRect(-1, -1.2, 1, 1));

@@ -29,7 +29,7 @@ StartSequence::StartSequence(QWidget *parent) :
 //    timer->start(1000);
 
 ////    image = new QSvgWidget();
-////    image->load((const QString &)"/home/schier/qt-test/Image/place tracker.svg");
+////    image->load((const QString &)":/images/place tracker.svg");
 //    ui->heading->setText("Přilepte sondu\nOznačte kalibrační bod");
 //    ui->heading->adjustSize();
 //    ui->heading->updateGeometry();
@@ -55,11 +55,12 @@ void StartSequence::initImage(bool reset)
         ui->heading->adjustSize();
         ui->heading->updateGeometry();
 
-        QSvgWidget *imageL = new QSvgWidget("/home/schier/qt-test/Image/sel_left_wtracker.svg");
-        QSvgWidget *imageR = new QSvgWidget("/home/schier/qt-test/Image/sel_right_wtracker.svg");
+        QSvgWidget *imageL = new QSvgWidget(":/images/sel_left_wtracker.svg");
+        QSvgWidget *imageR = new QSvgWidget(":/images/sel_right_wtracker.svg");
         imageLR = new QStackedWidget();
         imageLR->addWidget(imageL);
         imageLR->addWidget(imageR);
+        w = imageLR->width();
         if (reset) {
             ui->startBox->replaceWidget(img, imageLR);
             delete img;
@@ -82,9 +83,9 @@ QSvgWidget* StartSequence::getImageUnderBreast(Side side)
 {
     QString path;
     if (side==Side::LEFT)
-        path = "/home/schier/qt-test/Image/selected_left.svg";
+        path = ":/images/selected_left.svg";
     else
-        path = "/home/schier/qt-test/Image/selected_right.svg";
+        path = ":/images/selected_right.svg";
     QSvgWidget *img = new QSvgWidget(path);
     return img;
 }
@@ -98,9 +99,9 @@ QSvgWidget* StartSequence::getImageArmpit(Side side)
 {
     QString path;
     if (side==Side::LEFT)
-        path = "/home/schier/qt-test/Image/armpit_left.svg";
+        path = ":/images/armpit_left.svg";
     else
-        path = "/home/schier/qt-test/Image/armpit_right.svg";
+        path = ":/images/armpit_right.svg";
     return new QSvgWidget(path);
 }
 
@@ -132,7 +133,7 @@ void StartSequence::setImage2(Side side)
 void StartSequence::mousePressEvent(QMouseEvent *event)
 {
     if (event) {
-        int w = imageLR->width();
+//        int w = imageLR->width();
         switch (step) {
         case 0:
             if (this->imageLR->mapFromGlobal(QCursor::pos()).x() >= w/2) {
@@ -159,11 +160,11 @@ void StartSequence::getPos(QVector4D pos)
 {
     switch (step) {
     case 0:
-        //disconnect(timer, SIGNAL(timeout()), this, SLOT(update()));
         if (pos.z()<0)
             side = Side::LEFT;
         else
             side = Side::RIGHT;
+        emit sideSig(side);
         setImage1(side);
         break;
     case 1:

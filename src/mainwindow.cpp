@@ -81,6 +81,7 @@ void MainWindow::setBreastGraph(Side side)
 void MainWindow::showBreastGraph()
 {
     bgraph->update();
+    ui->mainWindow->addWidget(bgraph);
     bgraph->show();
 }
 
@@ -99,6 +100,7 @@ void MainWindow::setOutputDir(QString dirPath)
 
 void MainWindow::sequenceTerminator()
 {
+    ui->mainWindow->removeWidget(startSequence);
     delete startSequence;
     showBreastGraph();
 }
@@ -125,7 +127,10 @@ void MainWindow::toggleRun(bool buttonPressed)
         ui->lineEdit_3->setEnabled(true);
         ui->lineEdit_3->setText(QString::number(params->getFilenameIndex()));
         ui->sonoImage->setPixmap(QPixmap());
-        bool seq = this->findChild<QWidget *>("StartSequence");
+        if (this->findChild<QWidget *>("BreastGraph")) {
+            ui->mainWindow->removeWidget(bgraph);
+            delete bgraph;
+        }
         if (!(this->findChild<QWidget *>("StartSequence")))
         {
             startSequence = new StartSequence();
@@ -134,6 +139,8 @@ void MainWindow::toggleRun(bool buttonPressed)
             QObject::connect(client, &IGTLinkClient::position, startSequence, &StartSequence::getPos);
             QObject::connect(startSequence, &StartSequence::terminateStartSequence, this,
                              &MainWindow::sequenceTerminator);
+            QObject::connect(startSequence, &StartSequence::sideSig, this, &MainWindow::setBreastGraph);
+
         }
         else
         {
@@ -170,27 +177,6 @@ void MainWindow::showImage(QImage newImage)
     ui->sonoImage->repaint();
 }
 
-//void MainWindow::startImage()
-//{
-//    QSvgWidget *image = new QSvgWidget("/home/schier/qt-test/Image/place tracker.svg");
-//    ui->startBox->addWidget(image);
-//    image->show();
-
-//}
-
-
-//void MainWindow::selectBreast()
-//{
-//    QSvgWidget *imageL = new QSvgWidget("/home/schier/qt-test/Image/sel_right.svg");
-//    QSvgWidget *imageR = new QSvgWidget("/home/schier/qt-test/Image/sel_right.svg");
-//    QStackedWidget *imageLR = new QStackedWidget;
-//    imageLR->addWidget(imageL);
-//    imageLR->addWidget(imageR);
-//    ui->labelStartTitle->setText("Vyberte prs");
-//    ui->startBox->replaceWidget(image, imageLR);
-//    delete image;
-////    ui->startBox->addWidget(imageLR);
-//}
 
 void MainWindow::changeState(QString state)
 {

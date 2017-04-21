@@ -1,5 +1,11 @@
 <RCC>
     <qresource prefix="/">
         <file>images/drawing.svg</file>
+        <file>images/armpit_left.svg</file>
+        <file>images/armpit_right.svg</file>
+        <file>images/sel_left_wtracker.svg</file>
+        <file>images/sel_right_wtracker.svg</file>
+        <file>images/selected_left.svg</file>
+        <file>images/selected_right.svg</file>
     </qresource>
 </RCC>

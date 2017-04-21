@@ -17,12 +17,12 @@ BreastSelector::BreastSelector(QWidget *parent) : QWidget(parent)
     timer->start(1000);
 
     image = new QSvgWidget();
-    image->load((const QString &)"/home/schier/qt-test/Image/place tracker.svg");
+    image->load((const QString &)":/imagges/place tracker.svg");
     ui->startBox->addWidget(image);
     image->show();
 
-    QSvgWidget *imageL = new QSvgWidget("/home/schier/qt-test/Image/sel_right.svg");
-    QSvgWidget *imageR = new QSvgWidget("/home/schier/qt-test/Image/sel_right.svg");
+    QSvgWidget *imageL = new QSvgWidget(":/images/sel_right.svg");
+    QSvgWidget *imageR = new QSvgWidget(":/images/sel_right.svg");
     imageLR = new QStackedWidget;
     imageLR->addWidget(imageL);
     imageLR->addWidget(imageR);
