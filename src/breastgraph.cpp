@@ -12,6 +12,7 @@
 
 qreal r = 100;
 qreal top = .2;
+int nRefPoints = 0;
 
 BreastGraph::BreastGraph(Side side, qreal angle, QWidget *parent) : QWidget(parent)
 {
@@ -27,8 +28,6 @@ BreastGraph::BreastGraph(Side side, qreal angle, QWidget *parent) : QWidget(pare
     qreal xMez = qSqrt((-(2*p*n+1)-qSqrt(t1))/(2*(p*p)));
     int cnt = 2*xMez*10+1;
     double tmp = -xMez;
-//    lobe = new QVector<QPointF>();
-//    lobe->reserve(cnt);
     for (int i=0; i<cnt; i++) {
         lobe << QPointF(tmp, p*tmp*tmp + n);
         tmp+=0.1;
@@ -64,8 +63,13 @@ void BreastGraph::paintEvent(QPaintEvent *event)
         painter.rotate(360.0/12.0);
     }
     painter.restore();
-//    const QPolygonF *points = new QPolygonF(lobe);
     painter.rotate(angle);
     painter.drawPolyline(lobe);
     painter.restore();
+}
+
+void BreastGraph::setPosition(QVector4D pos)
+{
+    refPoints << pos;
+    nRefPoints++;
 }

@@ -2,6 +2,7 @@
 #define BREASTGRAPH_H
 #include <QWidget>
 #include <QVector>
+#include <QVector4D>
 #include <QPolygonF>
 #include "side.h"
 
@@ -17,12 +18,13 @@ public:
 private:
     QPolygonF lobe;
     qreal angle;
-//    QVector<QPointF> *lobe;
+    QVector<QVector4D> refPoints;
 
 
 signals:
 
 public slots:
+    void setPosition(QVector4D pos);
 };
 
 #endif // BREASTGRAPH_H

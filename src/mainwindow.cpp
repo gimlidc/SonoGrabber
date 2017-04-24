@@ -76,6 +76,7 @@ void MainWindow::newSession()
 void MainWindow::setBreastGraph(Side side)
 {
     bgraph = new BreastGraph(side, 120, 0);
+    QObject::connect(client, &IGTLinkClient::position, bgraph, &BreastGraph::setPosition);
 }
 
 void MainWindow::showBreastGraph()

@@ -24,32 +24,11 @@ StartSequence::StartSequence(QWidget *parent) :
 
     initImage(false);
 
-//    timer = new QTimer(this);
-//    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-//    timer->start(1000);
-
-////    image = new QSvgWidget();
-////    image->load((const QString &)":/images/place tracker.svg");
-//    ui->heading->setText("Přilepte sondu\nOznačte kalibrační bod");
-//    ui->heading->adjustSize();
-//    ui->heading->updateGeometry();
-
-//    QSvgWidget *imageL = new QSvgWidget("/home/schier/qt-test/Image/sel_left_wtracker.svg");
-//    QSvgWidget *imageR = new QSvgWidget("/home/schier/qt-test/Image/sel_right_wtracker.svg");
-//    imageLR = new QStackedWidget();
-//    imageLR->addWidget(imageL);
-//    imageLR->addWidget(imageR);
-
-//    ui->startBox->addWidget(imageLR);
-//    imageLR->show();
-
 }
 
 void StartSequence::initImage(bool reset)
 {
 
-//    image = new QSvgWidget();
-//    image->load((const QString &)"/home/schier/qt-test/Image/place tracker.svg");
     if (step>0 || !reset) {
         ui->heading->setText("Přilepte sondu\nOznačte kalibrační bod");
         ui->heading->adjustSize();
