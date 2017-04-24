@@ -2,7 +2,9 @@
 #include <QPainter>
 #include <QPaintEvent>
 #include <QPen>
+#include <QPointF>
 #include <QVector>
+#include <QPolygonF>
 #include <QDebug>
 #include <math.h>
 #include "breastgraph.h"
@@ -11,17 +13,28 @@
 qreal r = 100;
 qreal top = .2;
 
-BreastGraph::BreastGraph(Side side, QWidget *parent) : QWidget(parent)
+BreastGraph::BreastGraph(Side side, qreal angle, QWidget *parent) : QWidget(parent)
 {
     this->setObjectName("BreastGraph");
+    this->angle = angle;
     // lobe
     qreal n = 2*r;
     // touch points
     qreal p = (-n-qSqrt(n*n - r*r))/(2*(r*r));
-    qreal xMez = round(qSqrt((-(2*p*n+1)-qSqrt(4*(r*r)*(p*p)+4*n*p+1))/(2*(p*p)))*10)/10.0;
+//    qreal xMez = round(qSqrt((-(2*p*n+1)-qSqrt(4*(r*r)*(p*p)+4*n*p+1))/(2*(p*p)))*10)/10.0;
+    qreal t1 = 4*(r*r)*(p*p)+4*n*p+1;
+    t1 = t1>0 ? t1 : 0;
+    qreal xMez = qSqrt((-(2*p*n+1)-qSqrt(t1))/(2*(p*p)));
     int cnt = 2*xMez*10+1;
-    x.reserve(cnt);
-    y.reserve(cnt);
+    double tmp = -xMez;
+//    lobe = new QVector<QPointF>();
+//    lobe->reserve(cnt);
+    for (int i=0; i<cnt; i++) {
+        lobe << QPointF(tmp, p*tmp*tmp + n);
+        tmp+=0.1;
+    }
+
+
 }
 
 BreastGraph::~BreastGraph()
@@ -51,5 +64,8 @@ void BreastGraph::paintEvent(QPaintEvent *event)
         painter.rotate(360.0/12.0);
     }
     painter.restore();
-
+//    const QPolygonF *points = new QPolygonF(lobe);
+    painter.rotate(angle);
+    painter.drawPolyline(lobe);
+    painter.restore();
 }

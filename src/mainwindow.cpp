@@ -75,7 +75,7 @@ void MainWindow::newSession()
 
 void MainWindow::setBreastGraph(Side side)
 {
-    bgraph = new BreastGraph(side, 0);
+    bgraph = new BreastGraph(side, 120, 0);
 }
 
 void MainWindow::showBreastGraph()
