@@ -4,6 +4,8 @@
 #include <QPen>
 #include <QPointF>
 #include <QVector>
+#include <QVector3D>
+#include <QVector4D>
 #include <QPolygonF>
 #include <QDebug>
 #include <math.h>
@@ -12,7 +14,6 @@
 
 qreal r = 100;
 qreal top = .2;
-int nRefPoints = 0;
 
 BreastGraph::BreastGraph(Side side, qreal angle, QWidget *parent) : QWidget(parent)
 {
@@ -70,8 +71,18 @@ void BreastGraph::paintEvent(QPaintEvent *event)
     painter.restore();
 }
 
+void BreastGraph::setPlane(QVector<QVector4D> refPoints)
+{
+    QVector3D r2 = QVector3D(refPoints[1]);
+    QVector3D r3 = QVector3D(refPoints[2]);
+    QVector3D normal = QVector3D::crossProduct(r2, r3);
+}
+
 void BreastGraph::setPosition(QVector4D pos)
 {
     refPoints << pos;
-    nRefPoints++;
+    qDebug() << "refPoints: " << refPoints.length();
+    if (refPoints.length()==3) {
+        setPlane(refPoints);
+    }
 }

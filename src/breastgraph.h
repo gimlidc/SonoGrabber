@@ -21,6 +21,8 @@ private:
     QVector<QVector4D> refPoints;
     Side side;
 
+    void setPlane(QVector<QVector4D> refPoints);
+
 
 signals:
 

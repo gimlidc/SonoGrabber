@@ -76,7 +76,10 @@ void MainWindow::newSession()
 void MainWindow::setBreastGraph(Side side)
 {
     bgraph = new BreastGraph(side, 120, 0);
+    qDebug() << "new bgraph";
     QObject::connect(client, &IGTLinkClient::position, bgraph, &BreastGraph::setPosition);
+    QObject::connect(this, &MainWindow::position, bgraph, &BreastGraph::setPosition);
+    emit position(pos);
 }
 
 void MainWindow::showBreastGraph()
@@ -89,6 +92,7 @@ void MainWindow::showBreastGraph()
 
 void MainWindow::receivePos(QVector4D pos)
 {
+    qDebug() << "emit position";
     emit position(pos);
 }
 
@@ -130,6 +134,7 @@ void MainWindow::toggleRun(bool buttonPressed)
         ui->sonoImage->setPixmap(QPixmap());
         if (this->findChild<QWidget *>("BreastGraph")) {
             ui->mainWindow->removeWidget(bgraph);
+            qDebug() << "delete bgraph";
             delete bgraph;
         }
         if (!(this->findChild<QWidget *>("StartSequence")))
