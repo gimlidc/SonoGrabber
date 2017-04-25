@@ -19,6 +19,7 @@ private:
     QPolygonF lobe;
     qreal angle;
     QVector<QVector4D> refPoints;
+    Side side;
 
 
 signals:

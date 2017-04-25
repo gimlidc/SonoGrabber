@@ -18,6 +18,7 @@ BreastGraph::BreastGraph(Side side, qreal angle, QWidget *parent) : QWidget(pare
 {
     this->setObjectName("BreastGraph");
     this->angle = angle;
+    this->side = side;
     // lobe
     qreal n = 2*r;
     // touch points
@@ -47,9 +48,9 @@ void BreastGraph::paintEvent(QPaintEvent *event)
     QRect v = painter.viewport();
     int dh = width();
     int dv = height();
-    int side = qMin(dh, dv)/((1+top));
+    int s = qMin(dh, dv)/((1+top));
     painter.setWindow(-r, -(1+top)*r, 2*r, (2+top)*r);
-    painter.setViewport(QRect((dh-side)/2, dv-side, side, side));
+    painter.setViewport(QRect((dh-s)/2, dv-s, s, s));
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setPen(QPen(Qt::black, 0, Qt::SolidLine));
     // segmented circles
@@ -63,7 +64,8 @@ void BreastGraph::paintEvent(QPaintEvent *event)
         painter.rotate(360.0/12.0);
     }
     painter.restore();
-    painter.rotate(angle);
+    painter.save();
+    painter.rotate((side==Side::LEFT) ? -angle : angle);
     painter.drawPolyline(lobe);
     painter.restore();
 }
