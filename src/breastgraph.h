@@ -12,14 +12,16 @@ class BreastGraph : public QWidget
     Q_OBJECT
 public:
     explicit BreastGraph(Side side, qreal angle, QWidget *parent = 0);
+    explicit BreastGraph(qreal angle, QWidget *parent = 0);
     ~BreastGraph();
     void paintEvent(QPaintEvent *);
+    void setSide(Side side);
 
 private:
     QPolygonF lobe;
     qreal angle;
     QVector<QVector4D> refPoints;
-    Side side;
+    Side side = Side::ND;
 
     void setPlane(QVector<QVector4D> refPoints);
 

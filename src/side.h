@@ -2,6 +2,7 @@
 #define SIDE_H
 
 enum Side{
+    ND,     // not defined
     LEFT,
     RIGHT
 };

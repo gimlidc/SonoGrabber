@@ -19,9 +19,7 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
 {
     ui->setupUi(this);
 
-//    bgraph = new BreastGraph(Side::LEFT, 0);
-//    bgraph->update();
-//    bgraph->show();
+    bgraph = new BreastGraph(120, 0);
 
     params = session;
     timer = new QTimer(this);
@@ -46,14 +44,9 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
     QObject::connect(client, &IGTLinkClient::position, startSequence, &StartSequence::getPos);
     QObject::connect(startSequence, &StartSequence::terminateStartSequence, this,
                      &MainWindow::sequenceTerminator);
+
     QObject::connect(startSequence, &StartSequence::sideSig, this, &MainWindow::setBreastGraph);
-
-
-//    image = new QSvgWidget();
-//    image->load((const QString &)"/home/schier/qt-test/Image/place tracker.svg");
-//    ui->startBox->addWidget(image);
-//    image->show();
-//    breastSelector = new BreastSelector();
+    QObject::connect(client, &IGTLinkClient::position, bgraph, &BreastGraph::setPosition);
 }
 
 MainWindow::~MainWindow()
@@ -75,11 +68,11 @@ void MainWindow::newSession()
 
 void MainWindow::setBreastGraph(Side side)
 {
-    bgraph = new BreastGraph(side, 120, 0);
-    qDebug() << "new bgraph";
-    QObject::connect(client, &IGTLinkClient::position, bgraph, &BreastGraph::setPosition);
-    QObject::connect(this, &MainWindow::position, bgraph, &BreastGraph::setPosition);
-    emit position(pos);
+    if (!this->findChild<QWidget *>("BreastGraph")) {
+        bgraph = new BreastGraph(120, 0);
+        QObject::connect(client, &IGTLinkClient::position, bgraph, &BreastGraph::setPosition);
+    }
+    bgraph->setSide(side);
 }
 
 void MainWindow::showBreastGraph()

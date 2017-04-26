@@ -6,6 +6,7 @@
 #include <QVector>
 #include <QVector3D>
 #include <QVector4D>
+#include <QMatrix4x4>
 #include <QPolygonF>
 #include <QDebug>
 #include <math.h>
@@ -17,10 +18,15 @@ qreal top = .2;
 
 BreastGraph::BreastGraph(Side side, qreal angle, QWidget *parent) : QWidget(parent)
 {
-    this->setObjectName("BreastGraph");
-    this->angle = angle;
     this->side = side;
+    BreastGraph(angle, parent);
+}
+
+BreastGraph::BreastGraph(qreal angle, QWidget *parent) : QWidget(parent)
+{
+    this->setObjectName("BreastGraph");
     // lobe
+    this->angle = angle;
     qreal n = 2*r;
     // touch points
     qreal p = (-n-qSqrt(n*n - r*r))/(2*(r*r));
@@ -34,8 +40,6 @@ BreastGraph::BreastGraph(Side side, qreal angle, QWidget *parent) : QWidget(pare
         lobe << QPointF(tmp, p*tmp*tmp + n);
         tmp+=0.1;
     }
-
-
 }
 
 BreastGraph::~BreastGraph()
@@ -73,13 +77,29 @@ void BreastGraph::paintEvent(QPaintEvent *event)
 
 void BreastGraph::setPlane(QVector<QVector4D> refPoints)
 {
+    QVector3D nipple = QVector3D(refPoints[0]);
     QVector3D r2 = QVector3D(refPoints[1]);
     QVector3D r3 = QVector3D(refPoints[2]);
-    QVector3D normal = QVector3D::crossProduct(r2, r3);
+    QVector3D normal = QVector3D::normal(r2, r3);
+    qreal dist = QVector3D::dotProduct(nipple, normal);
+    QVector3D projected = nipple-dist*normal;
+    qreal unit = projected.distanceToPoint(r2);
+    QMatrix4x4* view = new QMatrix4x4();
+    view->setToIdentity();
+    view->lookAt(nipple, projected, nipple-r2);
+    QVector3D armpit = view->mapVector(QVector3D(r3));
+}
+
+void BreastGraph::setSide(Side side)
+{
+    if (this->side==Side::ND)
+        this->side=side;
 }
 
 void BreastGraph::setPosition(QVector4D pos)
 {
+    if (side==Side::ND)
+        side = (pos.z()<0) ? Side::LEFT : Side::RIGHT;
     refPoints << pos;
     qDebug() << "refPoints: " << refPoints.length();
     if (refPoints.length()==3) {
