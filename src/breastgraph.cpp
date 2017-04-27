@@ -6,6 +6,7 @@
 #include <QVector>
 #include <QVector3D>
 #include <QVector4D>
+#include <QMatrix3x3>
 #include <QMatrix4x4>
 #include <QPolygonF>
 #include <QDebug>
@@ -83,7 +84,41 @@ void BreastGraph::setPlane(QVector<QVector4D> refPoints)
     QVector3D normal = QVector3D::normal(r2, r3);
     qreal dist = QVector3D::dotProduct(nipple, normal);
     QVector3D projected = nipple-dist*normal;
+
     qreal unit = projected.distanceToPoint(r2);
+    QVector3D unitX = r2-nipple;
+    unitX.normalize();
+
+    QVector3D unitZ = QVector3D::normal(normal, unitX);
+
+    QMatrix4x4 transform = QMatrix4x4();
+    transform.setToIdentity();
+
+    QMatrix3x3* rotation = new QMatrix3x3();
+    rotation->setToIdentity();
+    float_t rotData[16]={};
+    for (int i=0; i<3; i++) {
+        for (int j=0; j<3;j++) {
+            float_t x = 2*normal[i]*normal[j];
+            rotData[i*4+j] = x;
+        }
+        rotData[i*4+3] = 2*normal[i]*dist;
+    }
+//    for (int j=0; j<3; j++)
+//        rotData[3*4+j]=0;
+//    rotData[15]=1;
+    QMatrix4x4 t1 = QMatrix4x4(rotData);
+    transform = transform-QMatrix4x4(rotData);
+
+
+//    transform->setRow(0, QVector4D(unitX, projected.x()));
+//    transform->setRow(1, QVector4D(normal, projected.y()));
+//    transform->setRow(2, QVector4D(unitZ, projected.z()));
+//    transform->setRow(3, QVector4D(QVector3D(), 1));
+
+    transform.optimize();
+    QVector4D orig = transform*QVector4D(projected, 1);
+
     QMatrix4x4* view = new QMatrix4x4();
     view->setToIdentity();
     view->lookAt(nipple, projected, nipple-r2);
