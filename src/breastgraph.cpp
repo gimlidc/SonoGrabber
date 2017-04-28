@@ -74,6 +74,11 @@ void BreastGraph::paintEvent(QPaintEvent *event)
     painter.rotate((side==Side::LEFT) ? -angle : angle);
     painter.drawPolyline(lobe);
     painter.restore();
+    QVector<QVector4D>::iterator it;
+    for (it = refPoints.begin(); it != refPoints.end(); it++) {
+        QVector4D point = *it;
+        painter.drawPoint(project(r*point.toVector3D()));
+    }
 }
 
 void BreastGraph::setPlane(QVector<QVector4D> refPoints)
@@ -81,48 +86,23 @@ void BreastGraph::setPlane(QVector<QVector4D> refPoints)
     QVector3D nipple = QVector3D(refPoints[0]);
     QVector3D r2 = QVector3D(refPoints[1]);
     QVector3D r3 = QVector3D(refPoints[2]);
+
     QVector3D normal = QVector3D::normal(r2, r3);
-    qreal dist = QVector3D::dotProduct(nipple, normal);
-    QVector3D projected = nipple-dist*normal;
+    origin = nipple-QVector3D::dotProduct(nipple, normal)*normal;
 
-    qreal unit = projected.distanceToPoint(r2);
-    QVector3D unitX = r2-nipple;
-    unitX.normalize();
+    qreal unit = origin.distanceToPoint(r2);
+    vn = -(r2-origin)/(unit*unit);
+//    vn.normalize();
+    un = QVector3D::normal(vn, normal);
+    un = un/unit;
+}
 
-    QVector3D unitZ = QVector3D::normal(normal, unitX);
-
-    QMatrix4x4 transform = QMatrix4x4();
-    transform.setToIdentity();
-
-    QMatrix3x3* rotation = new QMatrix3x3();
-    rotation->setToIdentity();
-    float_t rotData[16]={};
-    for (int i=0; i<3; i++) {
-        for (int j=0; j<3;j++) {
-            float_t x = 2*normal[i]*normal[j];
-            rotData[i*4+j] = x;
-        }
-        rotData[i*4+3] = 2*normal[i]*dist;
-    }
-//    for (int j=0; j<3; j++)
-//        rotData[3*4+j]=0;
-//    rotData[15]=1;
-    QMatrix4x4 t1 = QMatrix4x4(rotData);
-    transform = transform-QMatrix4x4(rotData);
-
-
-//    transform->setRow(0, QVector4D(unitX, projected.x()));
-//    transform->setRow(1, QVector4D(normal, projected.y()));
-//    transform->setRow(2, QVector4D(unitZ, projected.z()));
-//    transform->setRow(3, QVector4D(QVector3D(), 1));
-
-    transform.optimize();
-    QVector4D orig = transform*QVector4D(projected, 1);
-
-    QMatrix4x4* view = new QMatrix4x4();
-    view->setToIdentity();
-    view->lookAt(nipple, projected, nipple-r2);
-    QVector3D armpit = view->mapVector(QVector3D(r3));
+QPointF BreastGraph::project(QVector3D x)
+{
+    QPointF out;
+    out.setX(QVector3D::dotProduct(un, x-origin));
+    out.setY(QVector3D::dotProduct(vn, x-origin));
+    return out;
 }
 
 void BreastGraph::setSide(Side side)
@@ -139,5 +119,7 @@ void BreastGraph::setPosition(QVector4D pos)
     qDebug() << "refPoints: " << refPoints.length();
     if (refPoints.length()==3) {
         setPlane(refPoints);
+        QPointF r2 = project(refPoints[1].toVector3D());
+        QPointF r3 = project(refPoints[2].toVector3D());
     }
 }
