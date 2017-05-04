@@ -66,28 +66,28 @@ void MainWindow::newSession()
 
 }
 
-void MainWindow::setBreastGraph(Side side)
+void MainWindow::setBreastGraph()
 {
     if (!this->findChild<QWidget *>("BreastGraph")) {
         bgraph = new BreastGraph(120, 0);
         QObject::connect(client, &IGTLinkClient::position, bgraph, &BreastGraph::setPosition);
     }
-    bgraph->setSide(side);
+//    bgraph->setSide(side);
 }
 
 void MainWindow::showBreastGraph()
 {
-    bgraph->update();
+//    bgraph->update();
     ui->mainWindow->addWidget(bgraph);
     bgraph->show();
 }
 
 
-void MainWindow::receivePos(QVector4D pos)
-{
-    qDebug() << "emit position";
-    emit position(pos);
-}
+//void MainWindow::receivePos(QVector4D pos)
+//{
+//    qDebug() << "emit position";
+//    emit position(pos);
+//}
 
 void MainWindow::setOutputDir(QString dirPath)
 {

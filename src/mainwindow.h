@@ -36,9 +36,9 @@ public slots:
     void changeState(QString state);
     void updateTime();
     void listeningStopped(int e);
-    void receivePos(QVector4D pos);    
+//    void receivePos(QVector4D pos);
     void sequenceTerminator();
-    void setBreastGraph(Side side);
+    void setBreastGraph();
 //    void startImage();    
 
 //protected:

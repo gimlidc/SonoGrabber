@@ -1,12 +1,16 @@
 #ifndef BREASTGRAPH_H
 #define BREASTGRAPH_H
 #include <QWidget>
+#include <QtCharts/QScatterSeries>
+#include <QtCharts/QChartView>
+#include <QtCharts/QChart>
 #include <QVector>
 #include <QVector3D>
 #include <QVector4D>
 #include <QPolygonF>
 #include "side.h"
 
+QT_CHARTS_USE_NAMESPACE
 
 class BreastGraph : public QWidget
 {
@@ -16,17 +20,22 @@ public:
     explicit BreastGraph(qreal angle, QWidget *parent = 0);
     ~BreastGraph();
     void paintEvent(QPaintEvent *);
-    void setSide(Side side);
+//    void setSide(Side side);
     QPointF project(QVector3D x);
 
 private:
     QPolygonF lobe;
     qreal angle;
-    QVector<QVector4D> refPoints;
+//    QScatterSeries *points;
+//    QChart *chart;
+//    QChartView *chartView;
+    QVector<QPointF> refProjection;
+    QVector<QPointF> *points;
+    QVector<QVector3D> refPoints;
     Side side = Side::ND;
     QVector3D un, vn;
     QVector3D origin;
-    void setPlane(QVector<QVector4D> refPoints);
+    void setPlane(QVector<QVector3D> refPoints);
 
 
 signals:

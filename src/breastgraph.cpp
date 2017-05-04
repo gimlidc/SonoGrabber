@@ -16,11 +16,13 @@
 
 qreal r = 100;
 qreal top = .2;
+bool planeSet = false;
 
 BreastGraph::BreastGraph(Side side, qreal angle, QWidget *parent) : QWidget(parent)
 {
     this->side = side;
     BreastGraph(angle, parent);
+
 }
 
 BreastGraph::BreastGraph(qreal angle, QWidget *parent) : QWidget(parent)
@@ -41,6 +43,18 @@ BreastGraph::BreastGraph(qreal angle, QWidget *parent) : QWidget(parent)
         lobe << QPointF(tmp, p*tmp*tmp + n);
         tmp+=0.1;
     }
+    points = new QVector<QPointF>;
+    refPoints.reserve(3);
+    refProjection.reserve(3);
+
+//    chart = new QChart();
+//    chartView = new QChartView(chart);
+//    chartView->setRenderHint(QPainter::Antialiasing);
+//    points = new QScatterSeries();
+//    points->setMarkerShape(QScatterSeries::MarkerShapeCircle);
+//    points->setMarkerSize(5.0);
+//    points->setColor(Qt::red);
+//    chart->addSeries(points);
 }
 
 BreastGraph::~BreastGraph()
@@ -50,6 +64,7 @@ BreastGraph::~BreastGraph()
 
 void BreastGraph::paintEvent(QPaintEvent *event)
 {
+    qDebug() << "paint: len: " << refProjection.size();
     QPainter painter(this);
     QRect v = painter.viewport();
     int dh = width();
@@ -74,18 +89,22 @@ void BreastGraph::paintEvent(QPaintEvent *event)
     painter.rotate((side==Side::LEFT) ? -angle : angle);
     painter.drawPolyline(lobe);
     painter.restore();
-    QVector<QVector4D>::iterator it;
-    for (it = refPoints.begin(); it != refPoints.end(); it++) {
-        QVector4D point = *it;
-        painter.drawPoint(project(r*point.toVector3D()));
+    painter.setPen(QPen(Qt::red, 0));
+//    QVector<QVector4D>::iterator it;
+    for (int i = 0; i<refProjection.size(); i++) {
+        QPointF point = refProjection.at(i);
+        qDebug() << "x: " << point.x() << " y: " << point.y();
+        painter.drawPoint(r*point);
     }
 }
 
-void BreastGraph::setPlane(QVector<QVector4D> refPoints)
+void BreastGraph::setPlane(QVector<QVector3D> refPoints)
 {
-    QVector3D nipple = QVector3D(refPoints[0]);
-    QVector3D r2 = QVector3D(refPoints[1]);
-    QVector3D r3 = QVector3D(refPoints[2]);
+    planeSet = true;
+    qDebug() << "setPlane: #refPoints: " << refPoints.length();
+    QVector3D nipple = refPoints[0];
+    QVector3D r2 = refPoints[1];
+    QVector3D r3 = refPoints[2];
 
     QVector3D normal = QVector3D::normal(r2, r3);
     origin = nipple-QVector3D::dotProduct(nipple, normal)*normal;
@@ -95,6 +114,10 @@ void BreastGraph::setPlane(QVector<QVector4D> refPoints)
 //    vn.normalize();
     un = QVector3D::normal(vn, normal);
     un = un/unit;
+    refProjection<<project(nipple)<<project(r2)<<project(r3);
+    qDebug() << "setPlane: len: " << refProjection.size();
+
+//    *points<<project(nipple)<<project(r2)<<project(r3);
 }
 
 QPointF BreastGraph::project(QVector3D x)
@@ -105,21 +128,27 @@ QPointF BreastGraph::project(QVector3D x)
     return out;
 }
 
-void BreastGraph::setSide(Side side)
-{
-    if (this->side==Side::ND)
-        this->side=side;
-}
+//void BreastGraph::setSide(Side side)
+//{
+//    if (this->side==Side::ND)
+//        this->side=side;
+//}
 
 void BreastGraph::setPosition(QVector4D pos)
 {
+    qDebug() << "refPoints: " << refPoints.length() << " " << planeSet;
     if (side==Side::ND)
         side = (pos.z()<0) ? Side::LEFT : Side::RIGHT;
-    refPoints << pos;
-    qDebug() << "refPoints: " << refPoints.length();
-    if (refPoints.length()==3) {
+    if (refPoints.length()<3)
+        refPoints.append(QVector3D(pos));
+    if (!planeSet && refPoints.length()==3) {
         setPlane(refPoints);
-        QPointF r2 = project(refPoints[1].toVector3D());
-        QPointF r3 = project(refPoints[2].toVector3D());
+        QPointF r2 = project(refPoints[1]);
+        QPointF r3 = project(refPoints[2]);
+    }
+    if (refPoints.length()>3) {
+        *points<<project(QVector3D(pos));
+//        *points<<project(QVector3D(pos));
+//        this->update();
     }
 }
