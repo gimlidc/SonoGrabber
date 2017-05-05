@@ -18,6 +18,8 @@ qreal r = 100;
 qreal top = .2;
 bool planeSet = false;
 
+QVector<QPointF> refProjection;
+
 BreastGraph::BreastGraph(Side side, qreal angle, QWidget *parent) : QWidget(parent)
 {
     this->side = side;
@@ -98,6 +100,15 @@ void BreastGraph::paintEvent(QPaintEvent *event)
     }
 }
 
+void BreastGraph::reset()
+{
+    this->hide();
+    side = Side::ND;
+    refPoints.clear();
+    refProjection.clear();
+    points = new QVector<QPointF>;
+}
+
 void BreastGraph::setPlane(QVector<QVector3D> refPoints)
 {
     planeSet = true;
@@ -114,8 +125,10 @@ void BreastGraph::setPlane(QVector<QVector3D> refPoints)
 //    vn.normalize();
     un = QVector3D::normal(vn, normal);
     un = un/unit;
-    refProjection<<project(nipple)<<project(r2)<<project(r3);
-    qDebug() << "setPlane: len: " << refProjection.size();
+    refProjection.append(project(nipple));
+    refProjection.append(project(r2));
+    refProjection.append(project(r3));
+    qDebug() << "setPlane: refProjection: " << refProjection.size();
 
 //    *points<<project(nipple)<<project(r2)<<project(r3);
 }
@@ -136,11 +149,12 @@ QPointF BreastGraph::project(QVector3D x)
 
 void BreastGraph::setPosition(QVector4D pos)
 {
-    qDebug() << "refPoints: " << refPoints.length() << " " << planeSet;
     if (side==Side::ND)
         side = (pos.z()<0) ? Side::LEFT : Side::RIGHT;
-    if (refPoints.length()<3)
+    if (refPoints.length()<3) {
         refPoints.append(QVector3D(pos));
+    }
+    qDebug() << "setPos: refPoints: " << refPoints.size() << " " << planeSet;
     if (!planeSet && refPoints.length()==3) {
         setPlane(refPoints);
         QPointF r2 = project(refPoints[1]);

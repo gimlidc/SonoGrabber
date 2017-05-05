@@ -137,7 +137,7 @@ void StartSequence::mousePressEvent(QMouseEvent *event)
 
 void StartSequence::getPos(QVector4D pos)
 {
-    switch (step) {
+    switch (step) {    
     case 0:
         if (pos.z()<0)
             side = Side::LEFT;

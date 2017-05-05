@@ -45,7 +45,6 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
     QObject::connect(startSequence, &StartSequence::terminateStartSequence, this,
                      &MainWindow::sequenceTerminator);
 
-    QObject::connect(startSequence, &StartSequence::sideSig, this, &MainWindow::setBreastGraph);
     QObject::connect(client, &IGTLinkClient::position, bgraph, &BreastGraph::setPosition);
 }
 
@@ -66,19 +65,10 @@ void MainWindow::newSession()
 
 }
 
-void MainWindow::setBreastGraph()
-{
-    if (!this->findChild<QWidget *>("BreastGraph")) {
-        bgraph = new BreastGraph(120, 0);
-        QObject::connect(client, &IGTLinkClient::position, bgraph, &BreastGraph::setPosition);
-    }
-//    bgraph->setSide(side);
-}
-
 void MainWindow::showBreastGraph()
 {
-//    bgraph->update();
     ui->mainWindow->addWidget(bgraph);
+    ui->mainWindow->addWidget(ui->sonoImage);
     bgraph->show();
 }
 
@@ -127,8 +117,8 @@ void MainWindow::toggleRun(bool buttonPressed)
         ui->sonoImage->setPixmap(QPixmap());
         if (this->findChild<QWidget *>("BreastGraph")) {
             ui->mainWindow->removeWidget(bgraph);
-            qDebug() << "delete bgraph";
-            delete bgraph;
+            bgraph->reset();
+            qDebug() << "reset bgraph";
         }
         if (!(this->findChild<QWidget *>("StartSequence")))
         {
@@ -138,7 +128,6 @@ void MainWindow::toggleRun(bool buttonPressed)
             QObject::connect(client, &IGTLinkClient::position, startSequence, &StartSequence::getPos);
             QObject::connect(startSequence, &StartSequence::terminateStartSequence, this,
                              &MainWindow::sequenceTerminator);
-            QObject::connect(startSequence, &StartSequence::sideSig, this, &MainWindow::setBreastGraph);
 
         }
         else

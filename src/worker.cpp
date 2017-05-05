@@ -7,6 +7,7 @@
 #include "imageprocessor.h"
 #include "sessionnamegenerator.h"
 
+
 Worker::Worker(SessionParams * conn)
 {
     session = conn;

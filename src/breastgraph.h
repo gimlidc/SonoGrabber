@@ -22,6 +22,7 @@ public:
     void paintEvent(QPaintEvent *);
 //    void setSide(Side side);
     QPointF project(QVector3D x);
+    void reset();
 
 private:
     QPolygonF lobe;
@@ -29,7 +30,6 @@ private:
 //    QScatterSeries *points;
 //    QChart *chart;
 //    QChartView *chartView;
-    QVector<QPointF> refProjection;
     QVector<QPointF> *points;
     QVector<QVector3D> refPoints;
     Side side = Side::ND;
