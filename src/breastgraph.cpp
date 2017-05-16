@@ -10,12 +10,14 @@
 #include <QMatrix4x4>
 #include <QPolygonF>
 #include <QDebug>
+#include <QtMath>
 #include <math.h>
 #include "breastgraph.h"
 #include "side.h"
 
 qreal r = 100;
-qreal top = .2;
+qreal rp; //armpit
+qreal top = .3;
 bool planeSet = false;
 
 QVector<QPointF> refProjection;
@@ -27,12 +29,14 @@ BreastGraph::BreastGraph(Side side, qreal angle, QWidget *parent) : QWidget(pare
 
 }
 
-BreastGraph::BreastGraph(qreal angle, QWidget *parent) : QWidget(parent)
+QPolygonF BreastGraph::getLobe(QPointF rp)
 {
-    this->setObjectName("BreastGraph");
-    // lobe
-    this->angle = angle;
-    qreal n = 2*r;
+    qreal n = r*qSqrt(qPow(rp.x(), 2) + qPow(rp.y(), 2));
+    angle = qRadiansToDegrees(qAtan2(rp.x(), rp.y()));
+//    angle = (rp.x()>0 ? 1 : -1) * (90+angle);
+    angle = 180 - angle;
+
+    QPolygonF lobe;
     // touch points
     qreal p = (-n-qSqrt(n*n - r*r))/(2*(r*r));
 //    qreal xMez = round(qSqrt((-(2*p*n+1)-qSqrt(4*(r*r)*(p*p)+4*n*p+1))/(2*(p*p)))*10)/10.0;
@@ -45,18 +49,17 @@ BreastGraph::BreastGraph(qreal angle, QWidget *parent) : QWidget(parent)
         lobe << QPointF(tmp, p*tmp*tmp + n);
         tmp+=0.1;
     }
+    return lobe;
+}
+
+BreastGraph::BreastGraph(qreal angle, QWidget *parent) : QWidget(parent)
+{
+    this->setObjectName("BreastGraph");
+    // lobe
+    this->angle = angle;
     points = new QVector<QPointF>;
     refPoints.reserve(3);
     refProjection.reserve(3);
-
-//    chart = new QChart();
-//    chartView = new QChartView(chart);
-//    chartView->setRenderHint(QPainter::Antialiasing);
-//    points = new QScatterSeries();
-//    points->setMarkerShape(QScatterSeries::MarkerShapeCircle);
-//    points->setMarkerSize(5.0);
-//    points->setColor(Qt::red);
-//    chart->addSeries(points);
 }
 
 BreastGraph::~BreastGraph()
@@ -71,9 +74,10 @@ void BreastGraph::paintEvent(QPaintEvent *event)
     QRect v = painter.viewport();
     int dh = width();
     int dv = height();
-    int s = qMin(dh, dv)/((1+top));
-    painter.setWindow(-r, -(1+top)*r, 2*r, (2+top)*r);
+    int s = qMin(dh, dv)/((1+1.2*top));
+    painter.setWindow(-(1+top)*r, -(1+top)*r, 2*(1+top)*r, (2+top)*r);
     painter.setViewport(QRect((dh-s)/2, dv-s, s, s));
+//    painter.setViewport(QRect(0, dv-s, dh, s));
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setPen(QPen(Qt::black, 0, Qt::SolidLine));
     // segmented circles
@@ -96,7 +100,8 @@ void BreastGraph::paintEvent(QPaintEvent *event)
     for (int i = 0; i<refProjection.size(); i++) {
         QPointF point = refProjection.at(i);
         qDebug() << "x: " << point.x() << " y: " << point.y();
-        painter.drawPoint(r*point);
+        painter.drawEllipse(r*QPointF(point.x(), -point.y()), 2, 2);
+//        painter.drawPoint(r*point);
     }
 }
 
@@ -128,9 +133,9 @@ void BreastGraph::setPlane(QVector<QVector3D> refPoints)
     refProjection.append(project(nipple));
     refProjection.append(project(r2));
     refProjection.append(project(r3));
+    QPointF armpit = refProjection.last();
     qDebug() << "setPlane: refProjection: " << refProjection.size();
-
-//    *points<<project(nipple)<<project(r2)<<project(r3);
+    lobe = getLobe(armpit);
 }
 
 QPointF BreastGraph::project(QVector3D x)
@@ -141,11 +146,6 @@ QPointF BreastGraph::project(QVector3D x)
     return out;
 }
 
-//void BreastGraph::setSide(Side side)
-//{
-//    if (this->side==Side::ND)
-//        this->side=side;
-//}
 
 void BreastGraph::setPosition(QVector4D pos)
 {
@@ -157,6 +157,7 @@ void BreastGraph::setPosition(QVector4D pos)
     qDebug() << "setPos: refPoints: " << refPoints.size() << " " << planeSet;
     if (!planeSet && refPoints.length()==3) {
         setPlane(refPoints);
+        *points<<project(QVector3D(pos));
         QPointF r2 = project(refPoints[1]);
         QPointF r3 = project(refPoints[2]);
     }

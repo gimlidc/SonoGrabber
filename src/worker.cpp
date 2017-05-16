@@ -7,6 +7,7 @@
 #include "imageprocessor.h"
 #include "sessionnamegenerator.h"
 
+int cnt=0;
 
 Worker::Worker(SessionParams * conn)
 {
@@ -126,7 +127,8 @@ void Worker::flushData(double ts)
 
         updateState(isFrozen,isCropped);
 
-        if (isFrozen && !frozenLastStatus && writer->getImageCounter()>0) {
+        if (isFrozen && !frozenLastStatus &&
+                writer->getImageCounter()>0) {
             emit position(pos);
         }
         frozenLastStatus = isFrozen;

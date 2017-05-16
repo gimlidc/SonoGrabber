@@ -34,6 +34,7 @@ SOURCES += main.cpp\
     breastgraph.cpp \
     breastselector.cpp \
 #    position.cpp
+    sonoimage.cpp
 
 HEADERS  += mainwindow.h \
     igtlinkclient.h \
@@ -49,6 +50,7 @@ HEADERS  += mainwindow.h \
     side.h \
     breastselector.h \
 #    position.h
+    sonoimage.h
 
 FORMS    += mainwindow.ui \
     startsequence.ui

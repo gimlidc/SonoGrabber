@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 //#include "breastselector.h"
 #include "ui_mainwindow.h"
+#include "sonoimage.h"
 #include "sessionnamegenerator.h"
 #include "igtlinkclient.h"
 #include "side.h"
@@ -20,6 +21,7 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
     ui->setupUi(this);
 
     bgraph = new BreastGraph(120, 0);
+    image = new SonoImage;
 
     params = session;
     timer = new QTimer(this);
@@ -68,7 +70,8 @@ void MainWindow::newSession()
 void MainWindow::showBreastGraph()
 {
     ui->mainWindow->addWidget(bgraph);
-    ui->mainWindow->addWidget(ui->sonoImage);
+//    ui->mainWindow->addWidget(ui->sonoImage);
+    ui->mainWindow->addWidget(image);
     bgraph->show();
 }
 
@@ -161,6 +164,7 @@ void MainWindow::showImage(QImage newImage)
 {
 //    qDebug() << "drawing";
     ui->sonoImage->setPixmap(QPixmap::fromImage(newImage));
+    ui->sonoImage->setScaledContents(true);
     ui->sonoImage->adjustSize();
     ui->sonoImage->repaint();
 }

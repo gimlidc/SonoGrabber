@@ -26,6 +26,7 @@ public:
 
 private:
     QPolygonF lobe;
+    QPolygonF getLobe(QPointF rp);
     qreal angle;
 //    QScatterSeries *points;
 //    QChart *chart;
