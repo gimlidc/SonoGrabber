@@ -22,7 +22,8 @@ bool planeSet = false;
 
 QVector<QPointF> refProjection;
 
-BreastGraph::BreastGraph(Side side, qreal angle, QWidget *parent) : QWidget(parent)
+
+BreastGraph::BreastGraph(QRect crop, Side side, qreal angle, QWidget *parent) : QWidget(parent)
 {
     this->side = side;
     BreastGraph(angle, parent);
@@ -147,7 +148,7 @@ QPointF BreastGraph::project(QVector3D x)
 }
 
 
-void BreastGraph::setPosition(QVector4D pos)
+void BreastGraph::setPosition(QMatrix4x4 transform)
 {
     if (side==Side::ND)
         side = (pos.z()<0) ? Side::LEFT : Side::RIGHT;

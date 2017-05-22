@@ -18,6 +18,7 @@ bool Worker::Terminate = true;
 IGTLinkClient::IGTLinkClient(SessionParams * connection, qint64 refreshRate, QObject *parent) : QObject(parent)
 {
     worker = new Worker(connection);
+    in = new QVector4D(connection->getCrop().x(), connection->getCrop().y(), 0, 1);
     worker->moveToThread(&_workerThread);
 
     qRegisterMetaType<igtl::TransformMessage::Pointer>("igtl::TransformMessage::Pointer");
@@ -88,8 +89,9 @@ void IGTLinkClient::showImage(char * imageBuffer, QSize imgSize, QString state)
     lastRefreshTime = QDateTime::currentMSecsSinceEpoch();
 }
 
-void IGTLinkClient::receivePos(QVector4D pos)
+void IGTLinkClient::receivePos(QMatrix4x4 transform)
 {
+    QVector4D pos = transform* (*in);
     qDebug() << "Position: z" << pos.z() << ", x: " << pos.x() << ", y: " << pos.y();
-    emit position(pos);
+    emit position(transform);
 }

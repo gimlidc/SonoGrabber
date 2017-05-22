@@ -90,10 +90,10 @@ signals:
      * @brief stopped is emmited when worker is stopped (connection closed).
      */
     void stopped(int);
-    void position(QVector4D pos);
+    void position(QMatrix4x4 pos);
 private:
     bool frozenLastStatus = true;
-    QVector4D pos;
+    QMatrix4x4 pos;
     QMap<QString, QMatrix4x4> transforms;
 //    QList<QMatrix4x4> transform;
     void probePos(const igtl::TransformMessage::Pointer &transMsg, double ts);

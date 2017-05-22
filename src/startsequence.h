@@ -6,6 +6,7 @@
 #include <QSvgWidget>
 #include <QStackedWidget>
 #include "side.h"
+#include "position.h"
 
 namespace Ui {
 class StartSequence;
@@ -16,7 +17,7 @@ class StartSequence : public QWidget
     Q_OBJECT
 
 public:
-    explicit StartSequence(QWidget *parent = 0);
+    explicit StartSequence(Position *pos, QWidget *parent = 0);
     void reset();
     ~StartSequence();
 
@@ -39,13 +40,14 @@ private:
 
     Side getSide();
     int w;
+    Position *position;
 
 signals:
     void terminateStartSequence();
     void sideSig(Side side);
 
 public slots:
-    void getPos(QVector4D pos);
+    void getPos(QMatrix4x4 transform);
 
 };
 

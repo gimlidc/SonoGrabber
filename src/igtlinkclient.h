@@ -12,6 +12,7 @@
 #include <QSettings>
 #include <QRgb>
 #include <QImage>
+#include <QVector4D>
 
 #include "worker.h"
 #include "sessionparams.h"
@@ -49,12 +50,14 @@ public:
     explicit IGTLinkClient(SessionParams * connection, qint64 refreshRate = 200, QObject *parent = 0);
     ~IGTLinkClient();
 
+private:
+    QVector4D *in;
 
 public slots:
     void startReading();
     void stopReading();
     void showImage(char * imageBuffer, QSize imgSize, QString state);
-    void receivePos(QVector4D pos);
+    void receivePos(QMatrix4x4 pos);
 private slots:
     void receiveStopSignal(int e);
 signals:
@@ -62,7 +65,7 @@ signals:
     void stopped(ErrorType);
     void imageReceived(QImage newImage);
     void stateChanged(QString state);
-    void position(QVector4D pos);
+    void position(QMatrix4x4 pos);
 };
 
 #endif // IGTLINKCLIENT_H

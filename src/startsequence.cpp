@@ -1,4 +1,5 @@
 #include "startsequence.h"
+#include "icorner.h"
 #include "ui_startsequence.h"
 #include <QSvgWidget>
 #include <QStackedWidget>
@@ -8,12 +9,14 @@
 #include <QDebug>
 #include <QCursor>
 #include <QPoint>
+#include <QRect>
+#include <QMatrix4x4>
 
 int step=0;
 QTimer* timer;
 QSvgWidget *img;
 
-StartSequence::StartSequence(QWidget *parent) :
+StartSequence::StartSequence(Position *pos, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::StartSequence)
 {
@@ -23,7 +26,7 @@ StartSequence::StartSequence(QWidget *parent) :
     timer->start(1000);
 
     initImage(false);
-
+    this->position = pos;
 }
 
 void StartSequence::initImage(bool reset)
@@ -135,8 +138,9 @@ void StartSequence::mousePressEvent(QMouseEvent *event)
     }
 }
 
-void StartSequence::getPos(QVector4D pos)
+void StartSequence::getPos(QMatrix4x4 transform)
 {
+    QVector3D pos = position->getOrig(&transform);
     switch (step) {    
     case 0:
         if (pos.z()<0)

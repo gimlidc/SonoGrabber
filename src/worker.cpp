@@ -8,6 +8,9 @@
 #include "sessionnamegenerator.h"
 
 int cnt=0;
+QMatrix4x4 transf;
+
+const QPoint fullOrigin = QPoint(187, 84);
 
 Worker::Worker(SessionParams * conn)
 {
@@ -338,7 +341,7 @@ void Worker::probePos(const igtl::TransformMessage::Pointer &transMsg, double ts
     // check equal time stamps
     if (imgTS.count(ts) + transTS.count(ts) == imgTS.size() + transTS.size()) {
         pos = transforms["ReferenceToTracker"].inverted()*transforms["ProbeToTracker"]
-                *transforms["ImageToProbe"].map(QVector4D(0.0, 0.0, 0.0, 1.0));
+                *transforms["ImageToProbe"];
     }
 
 }

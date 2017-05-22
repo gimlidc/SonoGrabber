@@ -31,7 +31,8 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
     ui->lineEdit_3->setStyleSheet("color: red");
     ui->lineEdit_3->setValidator(new QIntValidator(0,1e10,this));
 
-    startSequence = new StartSequence();
+    pos = new Position(session->getCrop());
+    startSequence = new StartSequence(pos);
     startSequence->show();
     ui->mainWindow->addWidget(startSequence);
     connect(this, &MainWindow::position, startSequence, &StartSequence::getPos);
@@ -125,7 +126,7 @@ void MainWindow::toggleRun(bool buttonPressed)
         }
         if (!(this->findChild<QWidget *>("StartSequence")))
         {
-            startSequence = new StartSequence();
+            startSequence = new StartSequence(pos);
             ui->mainWindow->addWidget(startSequence);
             startSequence->show();
             QObject::connect(client, &IGTLinkClient::position, startSequence, &StartSequence::getPos);

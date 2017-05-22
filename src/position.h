@@ -1,27 +1,16 @@
 #ifndef POSITION_H
 #define POSITION_H
 
-#include "sessionparams.h"
-#include "igtlTransformMessage.h"
-#include <QObject>
+#include <QRect>
 #include <QMatrix4x4>
+#include <QVector3D>
 
-class Position : public QObject
+class Position
 {
-    Q_OBJECT
 public:
-    explicit Position(SessionParams * session);
-    ~Position();
-
-public slots:
-    void receiveTransform(const igtl::TransformMessage::Pointer& transMsg);
-
-private:
-    SessionParams *session;
-    QList<igtl::TransformMessage::Pointer> transMsgList;
-    QList<QMatrix4x4> transform;
-    QVector<double> transTS;
-
+    Position(QRect crop);
+    QVector3D getOrig(QMatrix4x4 *transform);
+    QVector3D getX(QMatrix4x4 *transform);
 };
 
 #endif // POSITION_H

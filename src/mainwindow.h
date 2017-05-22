@@ -13,6 +13,7 @@
 #include "startsequence.h"
 #include "igtlinkclient.h"
 #include "breastgraph.h"
+#include "position.h"
 #include "side.h"
 
 namespace Ui {
@@ -48,7 +49,7 @@ public slots:
 signals:
     void startListening();
     void stopListening();
-    void position(QVector4D pos);
+    void position(QMatrix4x4 transform);
 
 private:
     Ui::MainWindow *ui;
@@ -65,7 +66,7 @@ private:
     BreastGraph *bgraph;
     void showBreastGraph();
 
-
+    Position *pos;
 //    BreastSelector *breastSelector;
 //    void selectBreast();
 };

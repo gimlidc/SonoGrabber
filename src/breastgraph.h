@@ -16,7 +16,7 @@ class BreastGraph : public QWidget
 {
     Q_OBJECT
 public:
-    explicit BreastGraph(Side side, qreal angle, QWidget *parent = 0);
+    explicit BreastGraph(QRect crop, Side side, qreal angle, QWidget *parent = 0);
     explicit BreastGraph(qreal angle, QWidget *parent = 0);
     ~BreastGraph();
     void paintEvent(QPaintEvent *);
@@ -38,11 +38,10 @@ private:
     QVector3D origin;
     void setPlane(QVector<QVector3D> refPoints);
 
-
 signals:
 
 public slots:
-    void setPosition(QVector4D pos);
+    void setPosition(QMatrix4x4 transform);
 };
 
 #endif // BREASTGRAPH_H

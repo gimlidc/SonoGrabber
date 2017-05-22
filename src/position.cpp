@@ -1,15 +1,22 @@
 #include "position.h"
-#include <QMatrix4x4>
-#include <QDebug>
-#include "sessionparams.h"
+#include <QRect>
 
-Position::Position(SessionParams * session) : session(session)
+QRect *crop;
+
+Position::Position(QRect *crop)
 {
-    qDebug("Position init");
+    this->crop = crop;
 }
 
-Position::~Position()
+QVector3D Position::getOrig(QMatrix4x4 *transform)
 {
-    qDebug("Positiuon close");
+    QVector4D in = QVector4D(crop->x(), crop->y(), 0, 1);
+    return QVector3D(*transform * in);
 }
+
+QVector3D Position::getX(QMatrix4x4 *transform)
+{
+
+}
+
 
