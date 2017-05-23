@@ -4,7 +4,7 @@
 #include <QSettings>
 
 #include "igtlinkclient.h"
-#include "position.h"
+#include "transform.h"
 #include <QLineEdit>
 #include <QCommandLineParser>
 #include <QDir>

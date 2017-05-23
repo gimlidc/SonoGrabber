@@ -13,7 +13,7 @@
 #include "startsequence.h"
 #include "igtlinkclient.h"
 #include "breastgraph.h"
-#include "position.h"
+#include "transform.h"
 #include "side.h"
 
 namespace Ui {
@@ -66,7 +66,7 @@ private:
     BreastGraph *bgraph;
     void showBreastGraph();
 
-    Position *pos;
+    Transform *transform;
 //    BreastSelector *breastSelector;
 //    void selectBreast();
 };

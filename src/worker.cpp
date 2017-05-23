@@ -132,6 +132,7 @@ void Worker::flushData(double ts)
 
         if (isFrozen && !frozenLastStatus &&
                 writer->getImageCounter()>0) {
+            cnt++;
             emit position(pos);
         }
         frozenLastStatus = isFrozen;

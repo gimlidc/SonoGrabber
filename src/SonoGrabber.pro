@@ -35,7 +35,7 @@ SOURCES += main.cpp\
     breastselector.cpp \
 #    position.cpp
     sonoimage.cpp \
-    position.cpp
+    transform.cpp
 
 HEADERS  += mainwindow.h \
     igtlinkclient.h \
@@ -53,7 +53,7 @@ HEADERS  += mainwindow.h \
 #    position.h
     sonoimage.h \
     icorner.h \
-    position.h
+    transform.h
 
 FORMS    += mainwindow.ui \
     startsequence.ui

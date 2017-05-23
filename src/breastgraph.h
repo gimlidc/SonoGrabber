@@ -9,6 +9,7 @@
 #include <QVector4D>
 #include <QPolygonF>
 #include "side.h"
+#include "transform.h"
 
 QT_CHARTS_USE_NAMESPACE
 
@@ -16,8 +17,8 @@ class BreastGraph : public QWidget
 {
     Q_OBJECT
 public:
-    explicit BreastGraph(QRect crop, Side side, qreal angle, QWidget *parent = 0);
-    explicit BreastGraph(qreal angle, QWidget *parent = 0);
+    explicit BreastGraph(Transform *transform, Side side, qreal angle, QWidget *parent = 0);
+    explicit BreastGraph(Transform *transform, qreal angle, QWidget *parent = 0);
     ~BreastGraph();
     void paintEvent(QPaintEvent *);
 //    void setSide(Side side);
@@ -26,6 +27,7 @@ public:
 
 private:
     QPolygonF lobe;
+    Transform *transform;
     QPolygonF getLobe(QPointF rp);
     qreal angle;
 //    QScatterSeries *points;

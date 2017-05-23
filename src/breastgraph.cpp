@@ -6,7 +6,6 @@
 #include <QVector>
 #include <QVector3D>
 #include <QVector4D>
-#include <QMatrix3x3>
 #include <QMatrix4x4>
 #include <QPolygonF>
 #include <QDebug>
@@ -14,6 +13,7 @@
 #include <math.h>
 #include "breastgraph.h"
 #include "side.h"
+#include "transform.h"
 
 qreal r = 100;
 qreal rp; //armpit
@@ -23,10 +23,10 @@ bool planeSet = false;
 QVector<QPointF> refProjection;
 
 
-BreastGraph::BreastGraph(QRect crop, Side side, qreal angle, QWidget *parent) : QWidget(parent)
+BreastGraph::BreastGraph(Transform *transform, Side side, qreal angle, QWidget *parent) : QWidget(parent)
 {
     this->side = side;
-    BreastGraph(angle, parent);
+    BreastGraph(transform, angle, parent);
 
 }
 
@@ -53,7 +53,7 @@ QPolygonF BreastGraph::getLobe(QPointF rp)
     return lobe;
 }
 
-BreastGraph::BreastGraph(qreal angle, QWidget *parent) : QWidget(parent)
+BreastGraph::BreastGraph(Transform *transform, qreal angle, QWidget *parent) : QWidget(parent)
 {
     this->setObjectName("BreastGraph");
     // lobe
@@ -61,6 +61,7 @@ BreastGraph::BreastGraph(qreal angle, QWidget *parent) : QWidget(parent)
     points = new QVector<QPointF>;
     refPoints.reserve(3);
     refProjection.reserve(3);
+    this->transform = transform;
 }
 
 BreastGraph::~BreastGraph()
@@ -148,8 +149,9 @@ QPointF BreastGraph::project(QVector3D x)
 }
 
 
-void BreastGraph::setPosition(QMatrix4x4 transform)
+void BreastGraph::setPosition(QMatrix4x4 trfMatrix)
 {
+    QVector3D pos = transform->getLowest(&trfMatrix);
     if (side==Side::ND)
         side = (pos.z()<0) ? Side::LEFT : Side::RIGHT;
     if (refPoints.length()<3) {

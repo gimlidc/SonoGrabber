@@ -16,7 +16,7 @@ int step=0;
 QTimer* timer;
 QSvgWidget *img;
 
-StartSequence::StartSequence(Position *pos, QWidget *parent) :
+StartSequence::StartSequence(Transform *pos, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::StartSequence)
 {

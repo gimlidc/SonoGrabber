@@ -20,7 +20,8 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
 {
     ui->setupUi(this);
 
-    bgraph = new BreastGraph(120, 0);
+    transform = new Transform(session->getCrop());
+    bgraph = new BreastGraph(transform, 120, 0);
     image = new SonoImage;
 
     params = session;
@@ -31,8 +32,7 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
     ui->lineEdit_3->setStyleSheet("color: red");
     ui->lineEdit_3->setValidator(new QIntValidator(0,1e10,this));
 
-    pos = new Position(session->getCrop());
-    startSequence = new StartSequence(pos);
+    startSequence = new StartSequence(transform);
     startSequence->show();
     ui->mainWindow->addWidget(startSequence);
     connect(this, &MainWindow::position, startSequence, &StartSequence::getPos);
@@ -126,7 +126,7 @@ void MainWindow::toggleRun(bool buttonPressed)
         }
         if (!(this->findChild<QWidget *>("StartSequence")))
         {
-            startSequence = new StartSequence(pos);
+            startSequence = new StartSequence(transform);
             ui->mainWindow->addWidget(startSequence);
             startSequence->show();
             QObject::connect(client, &IGTLinkClient::position, startSequence, &StartSequence::getPos);
