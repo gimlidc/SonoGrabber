@@ -20,7 +20,7 @@ qreal rp; //armpit
 qreal top = .3;
 bool planeSet = false;
 
-QVector<QPointF> refProjection;
+QVector<QPointF> refProjection, probePos;
 
 
 BreastGraph::BreastGraph(Transform *transform, Side side, qreal angle, QWidget *parent) : QWidget(parent)
@@ -32,8 +32,8 @@ BreastGraph::BreastGraph(Transform *transform, Side side, qreal angle, QWidget *
 
 QPolygonF BreastGraph::getLobe(QPointF rp)
 {
-    qreal n = r*qSqrt(qPow(rp.x(), 2) + qPow(rp.y(), 2));
-    angle = qRadiansToDegrees(qAtan2(rp.x(), rp.y()));
+    qreal n = qSqrt(qPow(rp.x(), 2) + qPow(rp.y(), 2));
+    angle = qRadiansToDegrees(qAtan2(rp.x(), -rp.y()));
 //    angle = (rp.x()>0 ? 1 : -1) * (90+angle);
     angle = 180 - angle;
 
@@ -98,13 +98,19 @@ void BreastGraph::paintEvent(QPaintEvent *event)
     painter.drawPolyline(lobe);
     painter.restore();
     painter.setPen(QPen(Qt::red, 0));
-//    QVector<QVector4D>::iterator it;
     for (int i = 0; i<refProjection.size(); i++) {
         QPointF point = refProjection.at(i);
         qDebug() << "x: " << point.x() << " y: " << point.y();
-        painter.drawEllipse(r*QPointF(point.x(), -point.y()), 2, 2);
-//        painter.drawPoint(r*point);
+        painter.drawEllipse(QPointF(point.x(), point.y()), 2, 2);
     }
+    painter.setPen(QPen(Qt::blue, 0));
+    for (int i=0; i<probePos.size(); i+=2) {
+        QPointF p0 = probePos.at(i);
+        QPointF pX = probePos.at(i+1);
+        painter.drawLine(p0, pX);
+        painter.drawEllipse(QPointF(pX.x(), pX.y()), 2, 2);
+    }
+    update();
 }
 
 void BreastGraph::reset()
@@ -143,30 +149,35 @@ void BreastGraph::setPlane(QVector<QVector3D> refPoints)
 QPointF BreastGraph::project(QVector3D x)
 {
     QPointF out;
-    out.setX(QVector3D::dotProduct(un, x-origin));
-    out.setY(QVector3D::dotProduct(vn, x-origin));
+    out.setX(r*QVector3D::dotProduct(un, x-origin));
+    out.setY(-r*QVector3D::dotProduct(vn, x-origin));
     return out;
 }
 
 
 void BreastGraph::setPosition(QMatrix4x4 trfMatrix)
 {
-    QVector3D pos = transform->getLowest(&trfMatrix);
-    if (side==Side::ND)
-        side = (pos.z()<0) ? Side::LEFT : Side::RIGHT;
     if (refPoints.length()<3) {
-        refPoints.append(QVector3D(pos));
-    }
-    qDebug() << "setPos: refPoints: " << refPoints.size() << " " << planeSet;
-    if (!planeSet && refPoints.length()==3) {
-        setPlane(refPoints);
-        *points<<project(QVector3D(pos));
-        QPointF r2 = project(refPoints[1]);
-        QPointF r3 = project(refPoints[2]);
-    }
-    if (refPoints.length()>3) {
-        *points<<project(QVector3D(pos));
+        QVector3D pos = transform->getLowest(&trfMatrix);
+        if (side==Side::ND)
+            side = (pos.z()<0) ? Side::LEFT : Side::RIGHT;
+        refPoints.append(pos);
+        qDebug() << "setPos: refPoints: " << refPoints.size() << " " << planeSet;
+        if (!planeSet && refPoints.length()==3) {
+            setPlane(refPoints);
+            *points<<project(QVector3D(pos));
+            QPointF r2 = project(refPoints[1]);
+            QPointF r3 = project(refPoints[2]);
+        }
+    } else {
+        QVector3D pos0 = transform->getOrig(&trfMatrix);
+        QVector3D posX = transform->getX(&trfMatrix);
+        probePos.append(project(pos0));
+        probePos.append(project(posX));
+
+//    if (refPoints.length()>3) {
 //        *points<<project(QVector3D(pos));
-//        this->update();
-    }
+////        *points<<project(QVector3D(pos));
+////        this->update();
+//    }
 }

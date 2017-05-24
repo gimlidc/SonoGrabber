@@ -137,6 +137,10 @@ void Worker::flushData(double ts)
         }
         frozenLastStatus = isFrozen;
 
+        if (!isFrozen && cnt>2) {
+            emit position(pos);
+        }
+
         if (isFrozen && frozenImageStored) {
             // frozen image already stored
             return;

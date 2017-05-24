@@ -91,7 +91,5 @@ void IGTLinkClient::showImage(char * imageBuffer, QSize imgSize, QString state)
 
 void IGTLinkClient::receivePos(QMatrix4x4 transform)
 {
-    QVector4D pos = transform* (*in);
-    qDebug() << "Position: z" << pos.z() << ", x: " << pos.x() << ", y: " << pos.y();
     emit position(transform);
 }
