@@ -23,19 +23,28 @@ bool planeSet = false;
 QVector<QPointF> refProjection, probePos;
 
 
-BreastGraph::BreastGraph(Transform *transform, Side side, qreal angle, QWidget *parent) : QWidget(parent)
+BreastGraph::BreastGraph(Transform *transform, Side side, QWidget *parent) : QWidget(parent)
 {
     this->side = side;
-    BreastGraph(transform, angle, parent);
+    BreastGraph(transform, parent);
 
+}
+
+BreastGraph::BreastGraph(Transform *transform, QWidget *parent) : QWidget(parent)
+{
+    this->setObjectName("BreastGraph");
+    // lobe
+//    this->angle = angle;
+    points = new QVector<QPointF>;
+    refPoints.reserve(3);
+    refProjection.reserve(3);
+    this->transform = transform;
 }
 
 QPolygonF BreastGraph::getLobe(QPointF rp)
 {
     qreal n = qSqrt(qPow(rp.x(), 2) + qPow(rp.y(), 2));
-    angle = qRadiansToDegrees(qAtan2(rp.x(), -rp.y()));
-//    angle = (rp.x()>0 ? 1 : -1) * (90+angle);
-    angle = 180 - angle;
+    angle = qRadiansToDegrees(qAtan2(rp.x(), rp.y()));
 
     QPolygonF lobe;
     // touch points
@@ -53,17 +62,6 @@ QPolygonF BreastGraph::getLobe(QPointF rp)
     return lobe;
 }
 
-BreastGraph::BreastGraph(Transform *transform, qreal angle, QWidget *parent) : QWidget(parent)
-{
-    this->setObjectName("BreastGraph");
-    // lobe
-    this->angle = angle;
-    points = new QVector<QPointF>;
-    refPoints.reserve(3);
-    refProjection.reserve(3);
-    this->transform = transform;
-}
-
 BreastGraph::~BreastGraph()
 {
 
@@ -71,7 +69,6 @@ BreastGraph::~BreastGraph()
 
 void BreastGraph::paintEvent(QPaintEvent *event)
 {
-    qDebug() << "paint: len: " << refProjection.size();
     QPainter painter(this);
     QRect v = painter.viewport();
     int dh = width();
@@ -100,7 +97,6 @@ void BreastGraph::paintEvent(QPaintEvent *event)
     painter.setPen(QPen(Qt::red, 0));
     for (int i = 0; i<refProjection.size(); i++) {
         QPointF point = refProjection.at(i);
-        qDebug() << "x: " << point.x() << " y: " << point.y();
         painter.drawEllipse(QPointF(point.x(), point.y()), 2, 2);
     }
     painter.setPen(QPen(Qt::blue, 0));
@@ -135,7 +131,6 @@ void BreastGraph::setPlane(QVector<QVector3D> refPoints)
 
     qreal unit = origin.distanceToPoint(r2);
     vn = -(r2-origin)/(unit*unit);
-//    vn.normalize();
     un = QVector3D::normal(vn, normal);
     un = un/unit;
     refProjection.append(project(nipple));
@@ -154,6 +149,17 @@ QPointF BreastGraph::project(QVector3D x)
     return out;
 }
 
+bool BreastGraph::checkDistance(QVector3D point)
+{
+    return fabs(point.x())<400 && fabs(point.y())<120 && fabs(point.z())<400;
+}
+
+bool BreastGraph::checkOrientation(QVector3D p0, QVector3D py)
+{
+    QVector3D q = py-p0;
+    qreal A = qAcos(-q.y()/qSqrt(q.lengthSquared()));
+    return A<(M_PI_2);
+}
 
 void BreastGraph::setPosition(QMatrix4x4 trfMatrix)
 {
@@ -166,18 +172,19 @@ void BreastGraph::setPosition(QMatrix4x4 trfMatrix)
         if (!planeSet && refPoints.length()==3) {
             setPlane(refPoints);
             *points<<project(QVector3D(pos));
-            QPointF r2 = project(refPoints[1]);
-            QPointF r3 = project(refPoints[2]);
         }
     } else {
         QVector3D pos0 = transform->getOrig(&trfMatrix);
         QVector3D posX = transform->getX(&trfMatrix);
-        probePos.append(project(pos0));
-        probePos.append(project(posX));
+        QVector3D posY = transform->getY(&trfMatrix);
+        qDebug() << "x: " << pos0.x() << ", y: " << pos0.y() << ", z: " << pos0.z();
+//        if (checkDistance(pos0) && checkOrientation(pos0, posY)) {
+        if (checkOrientation(pos0, posY)) {
+            probePos.append(project(pos0));
+            probePos.append(project(posX));
+        } else {
+            qDebug() << "Orientation";
+        }
+    }
 
-//    if (refPoints.length()>3) {
-//        *points<<project(QVector3D(pos));
-////        *points<<project(QVector3D(pos));
-////        this->update();
-//    }
 }

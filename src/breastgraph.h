@@ -17,11 +17,10 @@ class BreastGraph : public QWidget
 {
     Q_OBJECT
 public:
-    explicit BreastGraph(Transform *transform, Side side, qreal angle, QWidget *parent = 0);
-    explicit BreastGraph(Transform *transform, qreal angle, QWidget *parent = 0);
+    explicit BreastGraph(Transform *transform, Side side, QWidget *parent = 0);
+    explicit BreastGraph(Transform *transform, QWidget *parent = 0);
     ~BreastGraph();
     void paintEvent(QPaintEvent *);
-//    void setSide(Side side);
     QPointF project(QVector3D x);
     void reset();
 
@@ -39,6 +38,8 @@ private:
     QVector3D un, vn;
     QVector3D origin;
     void setPlane(QVector<QVector3D> refPoints);
+    bool checkDistance(QVector3D point);
+    bool checkOrientation(QVector3D p0, QVector3D py);
 
 signals:
 

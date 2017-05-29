@@ -21,7 +21,7 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
     ui->setupUi(this);
 
     transform = new Transform(session->getCrop());
-    bgraph = new BreastGraph(transform, 120, 0);
+    bgraph = new BreastGraph(transform, 0);
     image = new SonoImage;
 
     params = session;
