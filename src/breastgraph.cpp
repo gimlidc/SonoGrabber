@@ -18,24 +18,26 @@
 qreal r = 100;
 qreal rp; //armpit
 qreal top = .3;
+qreal imgHeight;
 bool planeSet = false;
 
 QVector<QPointF> refProjection, probePos;
+QVector3D lastPos;
 
 
-BreastGraph::BreastGraph(Transform *transform, Side side, QWidget *parent) : QWidget(parent)
+BreastGraph::BreastGraph(Transform *transform, Side side, int fps, QWidget *parent) : QWidget(parent)
 {
     this->side = side;
-    BreastGraph(transform, parent);
-
+    BreastGraph(transform, fps, parent);
 }
 
-BreastGraph::BreastGraph(Transform *transform, QWidget *parent) : QWidget(parent)
+BreastGraph::BreastGraph(Transform *transform, int fps, QWidget *parent) : QWidget(parent)
 {
     this->setObjectName("BreastGraph");
     // lobe
 //    this->angle = angle;
     points = new QVector<QPointF>;
+    this->fps = fps;
     refPoints.reserve(3);
     refProjection.reserve(3);
     this->transform = transform;
@@ -157,13 +159,26 @@ bool BreastGraph::checkDistance(QVector3D point)
 bool BreastGraph::checkOrientation(QVector3D p0, QVector3D py)
 {
     QVector3D q = py-p0;
-    qreal A = qAcos(-q.y()/qSqrt(q.lengthSquared()));
+    qreal A = qAcos(-q.y()/imgHeight);
     return A<(M_PI_2);
+}
+
+bool BreastGraph::checkSpeeed(QVector3D point)
+{
+    qreal speed = qSqrt(point.distanceToPoint(lastPos))*fps;
+    lastPos = point;
+    return speed<=220;
 }
 
 void BreastGraph::setPosition(QMatrix4x4 trfMatrix)
 {
     if (refPoints.length()<3) {
+        if (refPoints.length()==0) {
+            QVector3D pos0 = transform->getOrig(&trfMatrix);
+            QVector3D posY = transform->getY(&trfMatrix);
+            QVector3D q = posY-pos0;
+            imgHeight = qSqrt(q.lengthSquared());
+        }
         QVector3D pos = transform->getLowest(&trfMatrix);
         if (side==Side::ND)
             side = (pos.z()<0) ? Side::LEFT : Side::RIGHT;
@@ -172,19 +187,23 @@ void BreastGraph::setPosition(QMatrix4x4 trfMatrix)
         if (!planeSet && refPoints.length()==3) {
             setPlane(refPoints);
             *points<<project(QVector3D(pos));
+            lastPos = transform->getC(&trfMatrix);
         }
     } else {
         QVector3D pos0 = transform->getOrig(&trfMatrix);
         QVector3D posX = transform->getX(&trfMatrix);
         QVector3D posY = transform->getY(&trfMatrix);
-        qDebug() << "x: " << pos0.x() << ", y: " << pos0.y() << ", z: " << pos0.z();
-//        if (checkDistance(pos0) && checkOrientation(pos0, posY)) {
-        if (checkOrientation(pos0, posY)) {
+//        qDebug() << "x: " << pos0.x() << ", y: " << pos0.y() << ", z: " << pos0.z();
+        bool dist = checkDistance(pos0);
+        bool speed = checkSpeeed(transform->getC(&trfMatrix));
+        bool orient = checkOrientation(pos0, posY);
+        if (dist && speed && orient) {
             probePos.append(project(pos0));
             probePos.append(project(posX));
         } else {
-            qDebug() << "Orientation";
+            qDebug() << "Rejected";
         }
+
     }
 
 }

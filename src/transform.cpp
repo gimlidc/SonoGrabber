@@ -19,6 +19,12 @@ QVector3D Transform::getX(QMatrix4x4 *transform)
     return QVector3D(*transform * in);
 }
 
+QVector3D Transform::getC(QMatrix4x4 *transform)
+{
+    QVector4D in = QVector4D(crop.x()+crop.width()/2, crop.y(), 0, 1);
+    return QVector3D(*transform * in);
+}
+
 QVector3D Transform::getY(QMatrix4x4 *transform)
 {
     QVector4D in = QVector4D(crop.x(), crop.y()+crop.height(), 0, 1);

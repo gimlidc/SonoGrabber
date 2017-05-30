@@ -12,6 +12,7 @@ public:
     QVector3D getOrig(QMatrix4x4 *transform);
     QVector3D getX(QMatrix4x4 *transform);
     QVector3D getY(QMatrix4x4 *transform);
+    QVector3D getC(QMatrix4x4 *transform);
     QVector3D getLowest(QMatrix4x4 *transform);
 
 private:
