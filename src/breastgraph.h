@@ -10,6 +10,7 @@
 #include <QPolygonF>
 #include "side.h"
 #include "transform.h"
+#include "frozen.h"
 
 QT_CHARTS_USE_NAMESPACE
 
@@ -17,8 +18,8 @@ class BreastGraph : public QWidget
 {
     Q_OBJECT
 public:
-    explicit BreastGraph(Transform *transform, Side side, int fps, QWidget *parent = 0);
-    explicit BreastGraph(Transform *transform, int fps, QWidget *parent = 0);
+//    explicit BreastGraph(Transform *transform, Side side, int fps, QWidget *parent = 0);
+    explicit BreastGraph(Transform *transform, int fps, int buffSize, QWidget *parent = 0);
     ~BreastGraph();
     void paintEvent(QPaintEvent *);
     QPointF project(QVector3D x);
@@ -27,6 +28,10 @@ public:
 private:
     QPolygonF lobe;
     Transform *transform;
+    int buffSize=0;
+    int fps;
+    Frozen freeze;
+
     QPolygonF getLobe(QPointF rp);
     qreal angle;
 //    QScatterSeries *points;
@@ -41,12 +46,14 @@ private:
     bool checkDistance(QVector3D point);
     bool checkOrientation(QVector3D p0, QVector3D py);
     bool checkSpeeed(QVector3D point);
-    int fps;
+    bool frozenLastStatus = false;
 
 signals:
 
 public slots:
     void setPosition(QMatrix4x4 transform);
+    void receiveFrozen(int imgNumber);
 };
+
 
 #endif // BREASTGRAPH_H

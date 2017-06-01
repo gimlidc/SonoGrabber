@@ -134,12 +134,12 @@ void Worker::flushData(double ts)
                 writer->getImageCounter()>0) {
             cnt++;
             emit position(pos);
+            emit frozen(writer->getImageCounter());
         }
         frozenLastStatus = isFrozen;
 
-        if (!isFrozen && cnt>2) {
+        if (cnt>2 && !isFrozen)
             emit position(pos);
-        }
 
         if (isFrozen && frozenImageStored) {
             // frozen image already stored

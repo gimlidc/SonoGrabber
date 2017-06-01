@@ -53,7 +53,8 @@ HEADERS  += mainwindow.h \
 #    position.h
     sonoimage.h \
     icorner.h \
-    transform.h
+    transform.h \
+    frozen.h
 
 FORMS    += mainwindow.ui \
     startsequence.ui

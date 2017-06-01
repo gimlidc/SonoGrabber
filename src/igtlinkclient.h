@@ -58,6 +58,7 @@ public slots:
     void stopReading();
     void showImage(char * imageBuffer, QSize imgSize, QString state);
     void receivePos(QMatrix4x4 pos);
+    void receiveFrozen(int imgNumber);
 private slots:
     void receiveStopSignal(int e);
 signals:
@@ -66,6 +67,7 @@ signals:
     void imageReceived(QImage newImage);
     void stateChanged(QString state);
     void position(QMatrix4x4 pos);
+    void frozen(int imgNumber);
 };
 
 #endif // IGTLINKCLIENT_H

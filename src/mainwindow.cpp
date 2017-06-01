@@ -21,7 +21,7 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
     ui->setupUi(this);
 
     transform = new Transform(session->getCrop());
-    bgraph = new BreastGraph(transform, session->getFps(), 0);
+    bgraph = new BreastGraph(transform, session->getFps(), 0, 0);
     image = new SonoImage;
 
     params = session;
@@ -49,6 +49,7 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
                      &MainWindow::sequenceTerminator);
 
     QObject::connect(client, &IGTLinkClient::position, bgraph, &BreastGraph::setPosition);
+    QObject::connect(client, &IGTLinkClient::frozen, bgraph, &BreastGraph::receiveFrozen);
 }
 
 MainWindow::~MainWindow()

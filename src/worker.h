@@ -64,11 +64,13 @@ public:
      * @return true if worker is running, false otherwise (stopped/error)
      */
     static int isRunning();
+
 public slots:
     /**
      * @brief start creates new connection (Plus server) and start to process incoming data
      */
     void start();
+
 signals:
     /**
      * @brief transformReceived When transformation is correctly parsed this signal is emmited.
@@ -90,12 +92,13 @@ signals:
      * @brief stopped is emmited when worker is stopped (connection closed).
      */
     void stopped(int);
+    void frozen(int);
     void position(QMatrix4x4 pos);
+
 private:
     bool frozenLastStatus = true;
     QMatrix4x4 pos;
     QMap<QString, QMatrix4x4> transforms;
-//    QList<QMatrix4x4> transform;
     void probePos(const igtl::TransformMessage::Pointer &transMsg, double ts);
 };
 

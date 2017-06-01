@@ -10,5 +10,5 @@ SonoImage::SonoImage(QWidget *parent) : QWidget(parent)
 
 SonoImage::~SonoImage()
 {
-    delete this;
+//    delete this;
 }

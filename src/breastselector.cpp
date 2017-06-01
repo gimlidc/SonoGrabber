@@ -26,9 +26,6 @@ BreastSelector::BreastSelector(QWidget *parent) : QWidget(parent)
     imageLR = new QStackedWidget;
     imageLR->addWidget(imageL);
     imageLR->addWidget(imageR);
-
-//    comboBox->addItem("breat 1");
-//    comboBox->addItem("breast 2");
 }
 
 void BreastSelector::paintEvent(QPaintEvent *)
@@ -37,11 +34,6 @@ void BreastSelector::paintEvent(QPaintEvent *)
     int idx = 5;//time.second() % 2;
     cout<<idx;
 }
-
-//void BreastSelector::setStartImage(const QString &fileName)
-//{
-//    image->load(fileName);
-//}
 
 
 QStackedWidget* BreastSelector::getWidget()
