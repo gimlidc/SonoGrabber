@@ -1,5 +1,6 @@
 #include "sonoimage.h"
 
+// Widget - display sono image
 SonoImage::SonoImage(QWidget *parent) : QWidget(parent)
 {
     image = new QLabel(parent);

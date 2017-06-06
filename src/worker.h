@@ -18,6 +18,7 @@
 #include "igtlPositionMessage.h"
 #include "sessionparams.h"
 #include "writer.h"
+#include "image.h"
 
 /**
  * @brief Worker is responsible for socket reading
@@ -92,6 +93,7 @@ signals:
      * @brief stopped is emmited when worker is stopped (connection closed).
      */
     void stopped(int);
+    void imgPosition(Image);
     void frozen(int);
     void position(QMatrix4x4 pos);
 

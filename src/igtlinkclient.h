@@ -16,6 +16,7 @@
 
 #include "worker.h"
 #include "sessionparams.h"
+#include "image.h"
 #include "igtlOSUtil.h"
 #include "igtlMessageHeader.h"
 #include "igtlTransformMessage.h"
@@ -57,15 +58,17 @@ public slots:
     void startReading();
     void stopReading();
     void showImage(char * imageBuffer, QSize imgSize, QString state);
+    void rcvImgPosition(Image);
     void receivePos(QMatrix4x4 pos);
     void receiveFrozen(int imgNumber);
-private slots:
+private slots:    
     void receiveStopSignal(int e);
 signals:
     void startWorker();
     void stopped(ErrorType);
     void imageReceived(QImage newImage);
     void stateChanged(QString state);
+    void imgPosition(Image);
     void position(QMatrix4x4 pos);
     void frozen(int imgNumber);
 };

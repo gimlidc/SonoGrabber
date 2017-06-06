@@ -1,6 +1,6 @@
 #include "transform.h"
 #include <QRect>
-
+#include <QtMath>
 
 Transform::Transform(QRect crop)
 {
@@ -38,6 +38,14 @@ QVector3D Transform::getLowest(QMatrix4x4 *transform)
     return p0.y() < px.y() ?
                 p0 :
                 px;
+}
+
+qreal Transform::getHeight(QMatrix4x4 *transform)
+{
+    QVector3D pos0 = getOrig(transform);
+    QVector3D posY = getY(transform);
+    QVector3D q = posY-pos0;
+    return qSqrt(q.lengthSquared());
 }
 
 

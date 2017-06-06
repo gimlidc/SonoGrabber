@@ -50,6 +50,7 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
 
     QObject::connect(client, &IGTLinkClient::position, bgraph, &BreastGraph::setPosition);
     QObject::connect(client, &IGTLinkClient::frozen, bgraph, &BreastGraph::receiveFrozen);
+    QObject::connect(client, &IGTLinkClient::imgPosition, bgraph, &BreastGraph::rcvImgPosition);
 }
 
 MainWindow::~MainWindow()

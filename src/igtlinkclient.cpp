@@ -1,6 +1,7 @@
 #include "igtlinkclient.h"
 #include "mainwindow.h"
 #include "imageprocessor.h"
+#include "image.h"
 #include <QtDebug>
 #include <QDebug>
 #include <QByteArray>
@@ -87,6 +88,11 @@ void IGTLinkClient::showImage(char * imageBuffer, QSize imgSize, QString state)
     //newImage.fromData(imageBufferCopy, imgSize.width() * imgSize.height());
     emit imageReceived(newImage);
     lastRefreshTime = QDateTime::currentMSecsSinceEpoch();
+}
+
+void IGTLinkClient::rcvImgPosition(Image pos)
+{
+    emit imgPosition(pos);
 }
 
 void IGTLinkClient::receivePos(QMatrix4x4 transform)

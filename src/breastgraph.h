@@ -11,6 +11,7 @@
 #include "side.h"
 #include "transform.h"
 #include "frozen.h"
+#include "image.h"
 
 QT_CHARTS_USE_NAMESPACE
 
@@ -51,6 +52,7 @@ private:
 signals:
 
 public slots:
+    void rcvImgPosition(Image);
     void setPosition(QMatrix4x4 transform);
     void receiveFrozen(int imgNumber);
 };

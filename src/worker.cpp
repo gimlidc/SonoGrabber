@@ -2,6 +2,7 @@
 #include <QMatrix4x4>
 #include <QVector4D>
 #include "worker.h"
+#include "image.h"
 #include "sessionparams.h"
 #include "igtlinkclient.h"
 #include "imageprocessor.h"
@@ -133,6 +134,7 @@ void Worker::flushData(double ts)
         if (isFrozen && !frozenLastStatus &&
                 writer->getImageCounter()>0) {
             cnt++;
+            emit imgPosition(Image(pos,FROZEN));
             emit position(pos);
             emit frozen(writer->getImageCounter());
         }
