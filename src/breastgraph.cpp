@@ -227,8 +227,10 @@ void BreastGraph::setPosition(QMatrix4x4 trfMatrix)
             lastPos = transform->getC(&trfMatrix);
         }
     } else {
-        if (bufLen==0)
+        if (bufLen==0) {
             freeze = Frozen::UNFROZEN;
+            bufLen++;
+        }
         QVector3D pos0 = transform->getOrig(&trfMatrix);
         QVector3D posX = transform->getX(&trfMatrix);
         QVector3D posY = transform->getY(&trfMatrix);
@@ -241,9 +243,11 @@ void BreastGraph::setPosition(QMatrix4x4 trfMatrix)
                 probePos.append(project(pos0));
                 probePos.append(project(posX));
                 freezPoints.append(freeze);
-                if (freeze==Frozen::FROZEN)
+                if (freezPoints.last()==FROZEN)
+                    qDebug() << "last freezpoint frozen";
+                if (freeze==FROZEN)
                     qDebug() << "bg: frozen";
-                freeze = Frozen::UNFROZEN;
+                freeze = UNFROZEN;
             } else {
                 probePos.replace(bufPos, project(pos0));
                 probePos.replace(bufPos+1, project(posX));
@@ -261,5 +265,5 @@ void BreastGraph::setPosition(QMatrix4x4 trfMatrix)
 void BreastGraph::receiveFrozen(int imgNumber)
 {
     freeze = FROZEN;
-    qDebug() << "receiveFrozen";
+    qDebug() << "receiveFrozen, buflen=" << bufLen;
 }
