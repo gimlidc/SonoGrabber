@@ -20,7 +20,7 @@ qreal r = 100;
 qreal rp; //armpit
 qreal top = .3;
 qreal imgHeight;
-qreal fade = 0.995;
+qreal fade = 0.95;
 bool planeSet = false;
 
 QVector<QPointF> refProjection, probePos;
@@ -29,12 +29,6 @@ QVector<qreal> alpha;
 QVector3D lastPos;
 int bufPos=0, bufLen=0;
 
-
-//BreastGraph::BreastGraph(Transform *transform, Side side, int fps, QWidget *parent) : QWidget(parent)
-//{
-//    this->side = side;
-//    BreastGraph(transform, fps, parent);
-//}
 
 BreastGraph::BreastGraph(Transform *transform, int fps, int buffSize, QWidget *parent) : QWidget(parent)
 {
@@ -47,6 +41,7 @@ BreastGraph::BreastGraph(Transform *transform, int fps, int buffSize, QWidget *p
     if (buffSize>0) {
         probePos = QVector<QPointF>(2*buffSize);
         freezPoints = QVector<Frozen>(buffSize);
+        alpha = QVector<qreal>(buffSize);
         this->buffSize = 2*buffSize;
     }
 }
@@ -135,15 +130,17 @@ void BreastGraph::paintEvent(QPaintEvent *event)
         QColor blueCol = QColor(Qt::blue);
 //        painter.setPen(QPen(Qt::blue, 0));
         for (int i=0; i<bufLen; i+=2) {
-            qDebug() << "paint: " << i/2;
-            qDebug() << "paint: alpha size " << alpha.size();
-            blueCol.setAlphaF(alpha[i/2]);
-            painter.setPen(QPen(blueCol, 0));
+//            qDebug() << "paint: " << i/2;
+//            qDebug() << "paint: alpha size " << alpha.size();
+//            qDebug() << "event: i/2=" << i/2 << " fPoints size=" << freezPoints.size();
             if (freezPoints.at(i/2)==Frozen::UNFROZEN) {
-            QPointF p0 = probePos.at(i);
-            QPointF pX = probePos.at(i+1);
-            painter.drawLine(p0, pX);
-            painter.drawEllipse(QPointF(pX.x(), pX.y()), 2, 2);
+                blueCol.setAlphaF(alpha[i/2]);
+                qDebug() << "alpha: " << alpha[i/2];
+                painter.setPen(QPen(blueCol, 0));
+                QPointF p0 = probePos.at(i);
+                QPointF pX = probePos.at(i+1);
+                painter.drawLine(p0, pX);
+                painter.drawEllipse(QPointF(pX.x(), pX.y()), 2, 2);
             }
         }
         painter.setPen(QPen(Qt::red, 0));
@@ -264,14 +261,13 @@ void BreastGraph::setPosition(QMatrix4x4 trfMatrix)
                 probePos.replace(bufPos, project(pos0));
                 probePos.replace(bufPos+1, project(posX));
                 freezPoints.replace(bufPos/2, freeze);
+                for (int i=0; i<alpha.size(); i++)
+                    alpha[i] *=fade;
+                alpha.replace(bufPos/2,1);
                 bufPos = (bufPos+2)%buffSize;
                 freeze = Frozen::UNFROZEN;
-                if (bufLen<buffSize) {
+                if (bufLen<(buffSize-1)) {
                     bufLen += 2;
-                    qDebug() << "alpha size: " << alpha.size();
-                    for (int i=0; i<alpha.size(); i++)
-                        alpha[i] *=fade;
-                    alpha.append(1);
                 }
             }
         }
