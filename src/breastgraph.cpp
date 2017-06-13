@@ -108,48 +108,46 @@ void BreastGraph::paintEvent(QPaintEvent *event)
     if (buffSize==0) {
         QColor blueCol = QColor(Qt::blue);
         for (int i=0; i<probePos.size(); i+=2) {
-            blueCol.setAlphaF(alpha[i/2]);
-            painter.setPen(QPen(blueCol, 0));
-            if (freezPoints.at(i/2)==Frozen::UNFROZEN) {
-                QPointF p0 = probePos.at(i);
-                QPointF pX = probePos.at(i+1);
-                painter.drawLine(p0, pX);
-                painter.drawEllipse(QPointF(pX.x(), pX.y()), 2, 2);
-            }
-        }
-        painter.setPen(QPen(Qt::red, 0));
-        for (int i=0; i<probePos.size(); i+=2) {
-            if (freezPoints.at(i/2)==Frozen::FROZEN) {
-                QPointF p0 = probePos.at(i);
-                QPointF pX = probePos.at(i+1);
-                painter.drawLine(p0, pX);
-                painter.drawEllipse(QPointF(pX.x(), pX.y()), 2, 2);
-            }
-        }
-    } else {
-        QColor blueCol = QColor(Qt::blue);
-//        painter.setPen(QPen(Qt::blue, 0));
-        for (int i=0; i<bufLen; i+=2) {
-//            qDebug() << "paint: " << i/2;
-//            qDebug() << "paint: alpha size " << alpha.size();
-//            qDebug() << "event: i/2=" << i/2 << " fPoints size=" << freezPoints.size();
             if (freezPoints.at(i/2)==Frozen::UNFROZEN) {
                 blueCol.setAlphaF(alpha[i/2]);
-                qDebug() << "alpha: " << alpha[i/2];
-                painter.setPen(QPen(blueCol, 0));
-                QPointF p0 = probePos.at(i);
-                QPointF pX = probePos.at(i+1);
-                painter.drawLine(p0, pX);
-                painter.drawEllipse(QPointF(pX.x(), pX.y()), 2, 2);
+                painter.setPen(QPen(blueCol, 2));
+            } else {
+                painter.setPen(QPen(Qt::red, 2));
             }
-        }
-        painter.setPen(QPen(Qt::red, 0));
-        for (int i=0; i<bufLen; i+=2) {
-            if (freezPoints.at(i/2)==Frozen::FROZEN) {
             QPointF p0 = probePos.at(i);
             QPointF pX = probePos.at(i+1);
             painter.drawLine(p0, pX);
             painter.drawEllipse(QPointF(pX.x(), pX.y()), 2, 2);
+            if (i>=3) {
+                QPointF points[4] = {probePos.at(i-3), probePos.at(i-1), probePos.at(i), probePos.at(i-2)};
+                painter.setPen(QPen(Qt::green, 0));
+                painter.setBrush(QBrush(Qt::green, Qt::SolidPattern));
+                painter.setOpacity(0.5);
+                painter.drawPolygon(points, 4);
+            }
+        }
+    } else {
+        QColor blueCol = QColor(Qt::blue);
+        for (int i=0; i<bufLen; i+=2) {
+            if (freezPoints.at(i/2)==Frozen::UNFROZEN) {
+                blueCol.setAlphaF(alpha[i/2]);
+                painter.setPen(QPen(blueCol, 2));
+            } else {
+                painter.setPen(QPen(Qt::red, 2));
+            }
+            QPointF p0 = probePos.at(i);
+            QPointF pX = probePos.at(i+1);
+            painter.drawLine(p0, pX);
+            painter.drawEllipse(QPointF(pX.x(), pX.y()), 2, 2);
+            if (i>=3) {
+                QPointF points[4] = {probePos.at(i-3), probePos.at(i-1), probePos.at(i), probePos.at(i-2)};
+//                QPointF points[4];
+//                for (int j=0; j<4; j++)
+//                    points[j] = probePos.at(i-3+j);
+                painter.setPen(QPen(Qt::green, 0));
+                painter.setBrush(QBrush(Qt::green, Qt::SolidPattern));
+                painter.setOpacity(0.5);
+                painter.drawPolygon(points, 4);
             }
         }
     }
