@@ -5,6 +5,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QSize>
+#include <QVector4D>
 #include <igtlTransformMessage.h>
 #include <igtlImageMessage.h>
 
@@ -18,6 +19,8 @@ class Writer
     QFile headerFile;
     /** File contains indices of images frozen (interesting places) */
     QFile frozenSeqFile;
+    /** File contains indices and position of frozen frames */
+    QFile frozenSeqPosFile;
     /** number of files used for images */
     int fileCounter;
     /** number of currently stored images (in last file) */
@@ -46,6 +49,7 @@ public:
     void closeSequence();
     void writeFooter();
     void writeFrozenIndex();
+    void writeFrozenIndexAndPos(QVector4D pos);
     int createOutDir();
     int getImageCounter() {return imageCounter; }
 };

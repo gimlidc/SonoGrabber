@@ -11,6 +11,7 @@ Writer::Writer(QDir targetDir, int chunkSize)
     fileCounter = 0;
     rawFile.setFileName(dir.absolutePath() + "/" + SessionNameGenerator::generateRawFileName(fileCounter));
     frozenSeqFile.setFileName(dir.absolutePath() + "/" + "frozen.txt");
+    frozenSeqPosFile.setFileName(dir.absolutePath() + "/" + "frozenIdxPos.txt");
     this->chunkSize = chunkSize;
 }
 
@@ -50,6 +51,7 @@ void Writer::closeFiles()
     writeFooter();
     rawFile.close();
     frozenSeqFile.close();
+    frozenSeqPosFile.close();
     headerFile.close();
 }
 
@@ -181,4 +183,21 @@ void Writer::writeFrozenIndex()
 
     frozenSeqFile.write(QString::number(imageCounter).append("\n").toLatin1());
     frozenSeqFile.flush();
+}
+
+void Writer::writeFrozenIndexAndPos(QVector4D pos)
+{
+    if (!frozenSeqPosFile.isOpen()) {
+        if (!frozenSeqPosFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            qWarning() << "Cannot open file" << frozenSeqPosFile.fileName();
+            return;
+        }
+    }
+
+    QTextStream out(&frozenSeqPosFile);
+    out << imageCounter << " " << pos.x() << " " << pos.y() << " " << pos.z() << "\n";
+//    frozenSeqFile.write(QString::number(imageCounter).append(" ").toLatin1());
+    out.flush();
+//    frozenSeqFile.flush();
+
 }

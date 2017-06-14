@@ -162,6 +162,7 @@ void Worker::flushData(double ts)
         }
         if (isFrozen) {
             writer->writeFrozenIndex();
+            writer->writeFrozenIndexAndPos(pos.map(QVector4D(0, 0, 0, 1)));
         }
 
         writer->writeHeader(imgMsgList[0]);

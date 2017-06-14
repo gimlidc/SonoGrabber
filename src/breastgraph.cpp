@@ -28,6 +28,7 @@ QVector<Frozen> freezPoints;
 QVector<qreal> alpha;
 QVector3D lastPos;
 int bufPos=0, bufLen=0;
+qreal alphaLast=1;
 
 
 BreastGraph::BreastGraph(Transform *transform, int fps, int buffSize, QWidget *parent) : QWidget(parent)
@@ -42,6 +43,10 @@ BreastGraph::BreastGraph(Transform *transform, int fps, int buffSize, QWidget *p
         probePos = QVector<QPointF>(2*buffSize);
         freezPoints = QVector<Frozen>(buffSize);
         alpha = QVector<qreal>(buffSize);
+        for (int i=0; i<buffSize; i++) {
+            alpha[i] = alphaLast;
+            alphaLast *= fade;
+        }
         this->buffSize = 2*buffSize;
     }
 }
@@ -108,16 +113,6 @@ void BreastGraph::paintEvent(QPaintEvent *event)
     if (buffSize==0) {
         QColor blueCol = QColor(Qt::blue);
         for (int i=0; i<probePos.size(); i+=2) {
-            if (freezPoints.at(i/2)==Frozen::UNFROZEN) {
-                blueCol.setAlphaF(alpha[i/2]);
-                painter.setPen(QPen(blueCol, 2));
-            } else {
-                painter.setPen(QPen(Qt::red, 2));
-            }
-            QPointF p0 = probePos.at(i);
-            QPointF pX = probePos.at(i+1);
-            painter.drawLine(p0, pX);
-            painter.drawEllipse(QPointF(pX.x(), pX.y()), 2, 2);
             if (i>=3) {
                 QPointF points[4] = {probePos.at(i-3), probePos.at(i-1), probePos.at(i), probePos.at(i-2)};
                 painter.setPen(QPen(Qt::green, 0));
@@ -125,12 +120,8 @@ void BreastGraph::paintEvent(QPaintEvent *event)
                 painter.setOpacity(0.5);
                 painter.drawPolygon(points, 4);
             }
-        }
-    } else {
-        QColor blueCol = QColor(Qt::blue);
-        for (int i=0; i<bufLen; i+=2) {
             if (freezPoints.at(i/2)==Frozen::UNFROZEN) {
-                blueCol.setAlphaF(alpha[i/2]);
+                blueCol.setAlphaF(alpha[alpha.size()-i/2-1]);
                 painter.setPen(QPen(blueCol, 2));
             } else {
                 painter.setPen(QPen(Qt::red, 2));
@@ -139,6 +130,10 @@ void BreastGraph::paintEvent(QPaintEvent *event)
             QPointF pX = probePos.at(i+1);
             painter.drawLine(p0, pX);
             painter.drawEllipse(QPointF(pX.x(), pX.y()), 2, 2);
+        }
+    } else {
+        QColor blueCol = QColor(Qt::blue);
+        for (int i=0; i<bufLen; i+=2) {
             if (i>=3) {
                 QPointF points[4] = {probePos.at(i-3), probePos.at(i-1), probePos.at(i), probePos.at(i-2)};
 //                QPointF points[4];
@@ -149,6 +144,16 @@ void BreastGraph::paintEvent(QPaintEvent *event)
                 painter.setOpacity(0.5);
                 painter.drawPolygon(points, 4);
             }
+            if (freezPoints.at(i/2)==Frozen::UNFROZEN) {
+                blueCol.setAlphaF(alpha[alpha.size()-i/2-1]);
+                painter.setPen(QPen(blueCol, 2));
+            } else {
+                painter.setPen(QPen(Qt::red, 2));
+            }
+            QPointF p0 = probePos.at(i);
+            QPointF pX = probePos.at(i+1);
+            painter.drawLine(p0, pX);
+            painter.drawEllipse(QPointF(pX.x(), pX.y()), 2, 2);
         }
     }
     update();
@@ -246,9 +251,11 @@ void BreastGraph::setPosition(QMatrix4x4 trfMatrix)
             if (buffSize==0) {
                 probePos.append(project(pos0));
                 probePos.append(project(posX));
-                for (int i=0; i<alpha.size(); i++)
-                    alpha[i] *= fade;
-                alpha.append(1);
+                alpha.append(alphaLast);
+                alphaLast *= fade;
+//                for (int i=0; i<alpha.size(); i++)
+//                    alpha[i] *= fade;
+//                alpha.append(1);
                 freezPoints.append(freeze);
                 if (freezPoints.last()==FROZEN)
                     qDebug() << "last freezpoint frozen";
@@ -259,9 +266,9 @@ void BreastGraph::setPosition(QMatrix4x4 trfMatrix)
                 probePos.replace(bufPos, project(pos0));
                 probePos.replace(bufPos+1, project(posX));
                 freezPoints.replace(bufPos/2, freeze);
-                for (int i=0; i<alpha.size(); i++)
-                    alpha[i] *=fade;
-                alpha.replace(bufPos/2,1);
+//                for (int i=0; i<alpha.size(); i++)
+//                    alpha[i] *=fade;
+//                alpha.replace(bufPos/2,1);
                 bufPos = (bufPos+2)%buffSize;
                 freeze = Frozen::UNFROZEN;
                 if (bufLen<(buffSize-1)) {
