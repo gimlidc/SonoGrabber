@@ -36,7 +36,8 @@ SOURCES += main.cpp\
 #    position.cpp
     sonoimage.cpp \
     transform.cpp \
-    image.cpp
+    image.cpp \
+    probepath.cpp
 
 HEADERS  += mainwindow.h \
     igtlinkclient.h \
@@ -56,7 +57,8 @@ HEADERS  += mainwindow.h \
     icorner.h \
     transform.h \
     frozen.h \
-    image.h
+    image.h \
+    probepath.h
 
 FORMS    += mainwindow.ui \
     startsequence.ui
