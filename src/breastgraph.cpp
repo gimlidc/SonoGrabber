@@ -20,7 +20,7 @@ qreal r = 100;
 qreal rp; //armpit
 qreal top = .3;
 qreal imgHeight;
-qreal fade = 0.95;
+qreal fade = 0.99;
 bool planeSet = false;
 
 QVector<QPointF> refProjection, probePos;
@@ -86,59 +86,67 @@ void BreastGraph::paintEvent(QPaintEvent *event)
     int s = qMin(dh, dv)/((1+1.2*top));
     painter.setWindow(-(1+top)*r, -(1+top)*r, 2*(1+top)*r, (2+top)*r);
     painter.setViewport(QRect((dh-s)/2, .9*(dv-s), s, s));
-//    painter.setViewport(QRect(0, dv-s, dh, s));
     painter.setRenderHint(QPainter::Antialiasing);
-    painter.setPen(QPen(Qt::black, 0, Qt::SolidLine));
-    // segmented circles
-    qreal deltaR = r/4;
-    for (int i=1; i<(4+1); i++) {
-        painter.drawEllipse(QPointF(0.0,0.0), (qreal)i*deltaR, (qreal)i*deltaR);
-    }
-    painter.save();
-    for (int cnt=0; cnt<12; cnt++) {
-        painter.drawLine(QPointF(-r,0), QPointF(-deltaR,0));
-        painter.rotate(360.0/12.0);
-    }
-    painter.restore();
-    painter.save();
-    painter.rotate((side==Side::LEFT) ? -angle : angle);
-    painter.drawPolyline(lobe);
-    painter.restore();
-    painter.setPen(QPen(Qt::red, 0));
-    for (int i = 0; i<refProjection.size(); i++) {
-        QPointF point = refProjection.at(i);
-        painter.drawEllipse(QPointF(point.x(), point.y()), 2, 2);
-    }
+//    painter.setViewport(QRect(0, dv-s, dh, s));
     painter.setPen(QPen(Qt::blue, 0));
     if (buffSize==0) {
         QColor blueCol = QColor(Qt::blue);
+        painter.setPen(QPen(Qt::green, 0));
+        painter.setBrush(QBrush(Qt::green, Qt::SolidPattern));
+        painter.setOpacity(0.5);
         for (int i=0; i<probePos.size(); i+=2) {
             if (i>=3) {
                 QPointF points[4] = {probePos.at(i-3), probePos.at(i-1), probePos.at(i), probePos.at(i-2)};
-                painter.setPen(QPen(Qt::green, 0));
-                painter.setBrush(QBrush(Qt::green, Qt::SolidPattern));
-                painter.setOpacity(0.5);
                 painter.drawPolygon(points, 4);
             }
+        }
+        for (int i=0; i<probePos.size(); i+=2) {
             if (freezPoints.at(i/2)==Frozen::UNFROZEN) {
                 blueCol.setAlphaF(alpha[alpha.size()-i/2-1]);
-                painter.setPen(QPen(blueCol, 2));
-            } else {
-                painter.setPen(QPen(Qt::red, 2));
+                painter.setPen(QPen(blueCol, 0));
+                QPointF p0 = probePos.at(i);
+                QPointF pX = probePos.at(i+1);
+                painter.drawLine(p0, pX);
+                painter.drawEllipse(QPointF(pX.x(), pX.y()), 2, 2);
             }
-            QPointF p0 = probePos.at(i);
-            QPointF pX = probePos.at(i+1);
-            painter.drawLine(p0, pX);
-            painter.drawEllipse(QPointF(pX.x(), pX.y()), 2, 2);
+        }
+        painter.setPen(QPen(Qt::red, 3));
+        for (int i=0; i<probePos.size(); i+=2) {
+            if (freezPoints.at(i/2)==Frozen::FROZEN) {
+                QPointF p0 = probePos.at(i);
+                QPointF pX = probePos.at(i+1);
+                painter.drawLine(p0, pX);
+                painter.drawEllipse(QPointF(pX.x(), pX.y()), 2, 2);
+            }
+        }
+        painter.setPen(QPen(Qt::black, 0, Qt::SolidLine));
+        painter.setBrush(QBrush(Qt::transparent, Qt::SolidPattern));
+
+        // segmented circles
+        qreal deltaR = r/4;
+        for (int i=1; i<(4+1); i++) {
+            painter.drawEllipse(QPointF(0.0,0.0), (qreal)i*deltaR, (qreal)i*deltaR);
+        }
+        painter.save();
+        for (int cnt=0; cnt<12; cnt++) {
+            painter.drawLine(QPointF(-r,0), QPointF(-deltaR,0));
+            painter.rotate(360.0/12.0);
+        }
+        painter.restore();
+        painter.save();
+        painter.rotate((side==Side::LEFT) ? -angle : angle);
+        painter.drawPolyline(lobe);
+        painter.restore();
+        painter.setPen(QPen(Qt::red, 0));
+        for (int i = 0; i<refProjection.size(); i++) {
+            QPointF point = refProjection.at(i);
+            painter.drawEllipse(QPointF(point.x(), point.y()), 2, 2);
         }
     } else {
         QColor blueCol = QColor(Qt::blue);
         for (int i=0; i<bufLen; i+=2) {
             if (i>=3) {
                 QPointF points[4] = {probePos.at(i-3), probePos.at(i-1), probePos.at(i), probePos.at(i-2)};
-//                QPointF points[4];
-//                for (int j=0; j<4; j++)
-//                    points[j] = probePos.at(i-3+j);
                 painter.setPen(QPen(Qt::green, 0));
                 painter.setBrush(QBrush(Qt::green, Qt::SolidPattern));
                 painter.setOpacity(0.5);
@@ -146,9 +154,9 @@ void BreastGraph::paintEvent(QPaintEvent *event)
             }
             if (freezPoints.at(i/2)==Frozen::UNFROZEN) {
                 blueCol.setAlphaF(alpha[alpha.size()-i/2-1]);
-                painter.setPen(QPen(blueCol, 2));
+                painter.setPen(QPen(blueCol, 0));
             } else {
-                painter.setPen(QPen(Qt::red, 2));
+                painter.setPen(QPen(Qt::red, 3));
             }
             QPointF p0 = probePos.at(i);
             QPointF pX = probePos.at(i+1);
@@ -253,9 +261,6 @@ void BreastGraph::setPosition(QMatrix4x4 trfMatrix)
                 probePos.append(project(posX));
                 alpha.append(alphaLast);
                 alphaLast *= fade;
-//                for (int i=0; i<alpha.size(); i++)
-//                    alpha[i] *= fade;
-//                alpha.append(1);
                 freezPoints.append(freeze);
                 if (freezPoints.last()==FROZEN)
                     qDebug() << "last freezpoint frozen";
@@ -266,9 +271,6 @@ void BreastGraph::setPosition(QMatrix4x4 trfMatrix)
                 probePos.replace(bufPos, project(pos0));
                 probePos.replace(bufPos+1, project(posX));
                 freezPoints.replace(bufPos/2, freeze);
-//                for (int i=0; i<alpha.size(); i++)
-//                    alpha[i] *=fade;
-//                alpha.replace(bufPos/2,1);
                 bufPos = (bufPos+2)%buffSize;
                 freeze = Frozen::UNFROZEN;
                 if (bufLen<(buffSize-1)) {
