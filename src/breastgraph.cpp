@@ -29,7 +29,7 @@ QVector<qreal> alpha;
 QVector3D lastPos;
 int bufPos=0, bufLen=0;
 qreal alphaLast=1;
-
+bool unFreeze=false;
 
 BreastGraph::BreastGraph(Transform *transform, int fps, int buffSize, QWidget *parent) : QWidget(parent)
 {
@@ -40,8 +40,8 @@ BreastGraph::BreastGraph(Transform *transform, int fps, int buffSize, QWidget *p
     refProjection.reserve(3);
     this->transform = transform;
     if (buffSize>0) {
-        probePos = QVector<QPointF>(2*buffSize);
-        freezPoints = QVector<Frozen>(buffSize);
+//        probePos = QVector<QPointF>(2*buffSize);
+//        freezPoints = QVector<Frozen>(buffSize);
         alpha = QVector<qreal>(buffSize);
         for (int i=0; i<buffSize; i++) {
             alpha[i] = alphaLast;
@@ -89,17 +89,18 @@ void BreastGraph::paintEvent(QPaintEvent *event)
     painter.setRenderHint(QPainter::Antialiasing);
 //    painter.setViewport(QRect(0, dv-s, dh, s));
     painter.setPen(QPen(Qt::blue, 0));
+    // green "snake"
+    painter.setPen(QPen(Qt::green, 0));
+    painter.setBrush(QBrush(Qt::green, Qt::SolidPattern));
+    for (int i=0; i<probePos.size(); i+=2) {
+        if (i>=3) {
+            QPointF points[4] = {probePos.at(i-3), probePos.at(i-1), probePos.at(i), probePos.at(i-2)};
+            painter.drawPolygon(points, 4);
+        }
+    }
+    qDebug() << "bufLen: " << bufLen;
     if (buffSize==0) {
         QColor blueCol = QColor(Qt::blue);
-        painter.setPen(QPen(Qt::green, 0));
-        painter.setBrush(QBrush(Qt::green, Qt::SolidPattern));
-        painter.setOpacity(0.5);
-        for (int i=0; i<probePos.size(); i+=2) {
-            if (i>=3) {
-                QPointF points[4] = {probePos.at(i-3), probePos.at(i-1), probePos.at(i), probePos.at(i-2)};
-                painter.drawPolygon(points, 4);
-            }
-        }
         for (int i=0; i<probePos.size(); i+=2) {
             if (freezPoints.at(i/2)==Frozen::UNFROZEN) {
                 blueCol.setAlphaF(alpha[alpha.size()-i/2-1]);
@@ -109,60 +110,51 @@ void BreastGraph::paintEvent(QPaintEvent *event)
                 painter.drawLine(p0, pX);
                 painter.drawEllipse(QPointF(pX.x(), pX.y()), 2, 2);
             }
-        }
-        painter.setPen(QPen(Qt::red, 3));
-        for (int i=0; i<probePos.size(); i+=2) {
-            if (freezPoints.at(i/2)==Frozen::FROZEN) {
-                QPointF p0 = probePos.at(i);
-                QPointF pX = probePos.at(i+1);
-                painter.drawLine(p0, pX);
-                painter.drawEllipse(QPointF(pX.x(), pX.y()), 2, 2);
-            }
-        }
-        painter.setPen(QPen(Qt::black, 0, Qt::SolidLine));
-        painter.setBrush(QBrush(Qt::transparent, Qt::SolidPattern));
-
-        // segmented circles
-        qreal deltaR = r/4;
-        for (int i=1; i<(4+1); i++) {
-            painter.drawEllipse(QPointF(0.0,0.0), (qreal)i*deltaR, (qreal)i*deltaR);
-        }
-        painter.save();
-        for (int cnt=0; cnt<12; cnt++) {
-            painter.drawLine(QPointF(-r,0), QPointF(-deltaR,0));
-            painter.rotate(360.0/12.0);
-        }
-        painter.restore();
-        painter.save();
-        painter.rotate((side==Side::LEFT) ? -angle : angle);
-        painter.drawPolyline(lobe);
-        painter.restore();
-        painter.setPen(QPen(Qt::red, 0));
-        for (int i = 0; i<refProjection.size(); i++) {
-            QPointF point = refProjection.at(i);
-            painter.drawEllipse(QPointF(point.x(), point.y()), 2, 2);
         }
     } else {
         QColor blueCol = QColor(Qt::blue);
-        for (int i=0; i<bufLen; i+=2) {
-            if (i>=3) {
-                QPointF points[4] = {probePos.at(i-3), probePos.at(i-1), probePos.at(i), probePos.at(i-2)};
-                painter.setPen(QPen(Qt::green, 0));
-                painter.setBrush(QBrush(Qt::green, Qt::SolidPattern));
-                painter.setOpacity(0.5);
-                painter.drawPolygon(points, 4);
-            }
+        for (int i=0; i<bufLen-1; i+=2) {
             if (freezPoints.at(i/2)==Frozen::UNFROZEN) {
                 blueCol.setAlphaF(alpha[alpha.size()-i/2-1]);
                 painter.setPen(QPen(blueCol, 0));
-            } else {
-                painter.setPen(QPen(Qt::red, 3));
+                QPointF p0 = probePos.at(probePos.size()-bufLen+i);
+                QPointF pX = probePos.at(probePos.size()-bufLen+i+1);
+                painter.drawLine(p0, pX);
+                painter.drawEllipse(QPointF(pX.x(), pX.y()), 2, 2);
             }
+        }
+    }
+    painter.setPen(QPen(Qt::red, 3));
+    for (int i=0; i<probePos.size(); i+=2) {
+        if (freezPoints.at(i/2)==Frozen::FROZEN) {
             QPointF p0 = probePos.at(i);
             QPointF pX = probePos.at(i+1);
             painter.drawLine(p0, pX);
             painter.drawEllipse(QPointF(pX.x(), pX.y()), 2, 2);
         }
+    }
+    painter.setPen(QPen(Qt::black, 0, Qt::SolidLine));
+    painter.setBrush(QBrush(Qt::transparent, Qt::SolidPattern));
+
+    // segmented circles
+    qreal deltaR = r/4;
+    for (int i=1; i<(4+1); i++) {
+        painter.drawEllipse(QPointF(0.0,0.0), (qreal)i*deltaR, (qreal)i*deltaR);
+    }
+    painter.save();
+    for (int cnt=0; cnt<12; cnt++) {
+        painter.drawLine(QPointF(-r,0), QPointF(-deltaR,0));
+        painter.rotate(360.0/12.0);
+    }
+    painter.restore();
+    painter.save();
+    painter.rotate((side==Side::LEFT) ? -angle : angle);
+    painter.drawPolyline(lobe);
+    painter.restore();
+    painter.setPen(QPen(Qt::red, 0));
+    for (int i = 0; i<refProjection.size(); i++) {
+        QPointF point = refProjection.at(i);
+        painter.drawEllipse(QPointF(point.x(), point.y()), 2, 2);
     }
     update();
 }
@@ -244,37 +236,34 @@ void BreastGraph::setPosition(QMatrix4x4 trfMatrix)
             lastPos = transform->getC(&trfMatrix);
         }
     } else {
-        if (bufLen==0) {
+        if (!unFreeze) {
             freeze = Frozen::UNFROZEN;
-            bufLen++;
+            unFreeze=true;
         }
         QVector3D pos0 = transform->getOrig(&trfMatrix);
         QVector3D posX = transform->getX(&trfMatrix);
         QVector3D posY = transform->getY(&trfMatrix);
-//        qDebug() << "x: " << pos0.x() << ", y: " << pos0.y() << ", z: " << pos0.z();
         bool dist = checkDistance(pos0);
-        bool speed = checkSpeeed(transform->getC(&trfMatrix));
         bool orient = checkOrientation(pos0, posY);
-        if (dist && speed && orient) {
+        if (dist && orient) {
+            probePos.append(project(pos0));
+            probePos.append(project(posX));
+            freezPoints.append(freeze);
+            qDebug() << "freezPoints.size=" << freezPoints.size() << " buflen: " << bufLen;
             if (buffSize==0) {
-                probePos.append(project(pos0));
-                probePos.append(project(posX));
                 alpha.append(alphaLast);
                 alphaLast *= fade;
-                freezPoints.append(freeze);
                 if (freezPoints.last()==FROZEN)
                     qDebug() << "last freezpoint frozen";
                 if (freeze==FROZEN)
                     qDebug() << "bg: frozen";
                 freeze = UNFROZEN;
             } else {
-                probePos.replace(bufPos, project(pos0));
-                probePos.replace(bufPos+1, project(posX));
-                freezPoints.replace(bufPos/2, freeze);
                 bufPos = (bufPos+2)%buffSize;
                 freeze = Frozen::UNFROZEN;
                 if (bufLen<(buffSize-1)) {
                     bufLen += 2;
+                    qDebug() << "buflen: " << bufLen;
                 }
             }
         }
@@ -338,5 +327,4 @@ void BreastGraph::rcvImgPosition(Image imgPos)
 void BreastGraph::receiveFrozen(int imgNumber)
 {
     freeze = FROZEN;
-    qDebug() << "receiveFrozen, buflen=" << bufLen;
 }
