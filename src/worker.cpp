@@ -134,14 +134,16 @@ void Worker::flushData(double ts)
         if (isFrozen && !frozenLastStatus &&
                 writer->getImageCounter()>0) {
             cnt++;
-            emit imgPosition(Image(pos,FROZEN));
-            emit position(pos);
-            emit frozen(writer->getImageCounter());
+            Image probe = Image(pos, FROZEN);
+            emit imgPosition(probe);
+//            emit position(pos);
+//            emit frozen(writer->getImageCounter());
         }
         frozenLastStatus = isFrozen;
 
         if (cnt>2 && !isFrozen)
-            emit position(pos);
+            emit imgPosition(Image(pos, UNFROZEN));
+//            emit position(pos);
 
         if (isFrozen && frozenImageStored) {
             // frozen image already stored

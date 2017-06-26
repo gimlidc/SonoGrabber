@@ -20,6 +20,8 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
 {
     ui->setupUi(this);
 
+    qRegisterMetaType<Image>();
+
     transform = new Transform(session->getCrop());
     bgraph = new BreastGraph(transform, session->getFps(), 100, 0);
     image = new SonoImage;
@@ -44,12 +46,14 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
     QObject::connect(client, &IGTLinkClient::imageReceived, this, &MainWindow::showImage);
     QObject::connect(client, &IGTLinkClient::stateChanged, this, &MainWindow::changeState);
     QObject::connect(client, &IGTLinkClient::stopped, this, &MainWindow::listeningStopped);
-    QObject::connect(client, &IGTLinkClient::position, startSequence, &StartSequence::getPos);
+    //QObject::connect(client, &IGTLinkClient::position, startSequence, &StartSequence::getPos);
+    QObject::connect(client, &IGTLinkClient::imgPosition, startSequence,
+                     &StartSequence::rcvImgPosition);
     QObject::connect(startSequence, &StartSequence::terminateStartSequence, this,
                      &MainWindow::sequenceTerminator);
 
-    QObject::connect(client, &IGTLinkClient::position, bgraph, &BreastGraph::setPosition);
-    QObject::connect(client, &IGTLinkClient::frozen, bgraph, &BreastGraph::receiveFrozen);
+//    QObject::connect(client, &IGTLinkClient::position, bgraph, &BreastGraph::setPosition);
+//    QObject::connect(client, &IGTLinkClient::frozen, bgraph, &BreastGraph::receiveFrozen);
     QObject::connect(client, &IGTLinkClient::imgPosition, bgraph, &BreastGraph::rcvImgPosition);
 }
 

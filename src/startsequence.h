@@ -7,6 +7,7 @@
 #include <QStackedWidget>
 #include "side.h"
 #include "transform.h"
+#include "image.h"
 
 namespace Ui {
 class StartSequence;
@@ -48,6 +49,7 @@ signals:
 
 public slots:
     void getPos(QMatrix4x4 transform);
+    void rcvImgPosition(Image probePos);
 
 };
 

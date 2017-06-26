@@ -160,6 +160,29 @@ void StartSequence::getPos(QMatrix4x4 transform)
     step++;
 }
 
+void StartSequence::rcvImgPosition(Image probePos)
+{
+    QMatrix4x4 transform = probePos.getPosition();
+    QVector3D pos = position->getOrig(&transform);
+    switch (step) {
+    case 0:
+        if (pos.z()<0)
+            side = Side::LEFT;
+        else
+            side = Side::RIGHT;
+        emit sideSig(side);
+        setImage1(side);
+        break;
+    case 1:
+        setImage2(side);
+        break;
+    case 2: emit terminateStartSequence();
+    default:
+        break;
+    }
+    step++;
+}
+
 void StartSequence::paintEvent(QPaintEvent *)
 {
     if (step==0) {

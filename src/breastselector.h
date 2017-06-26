@@ -5,6 +5,7 @@
 #include <QStackedWidget>
 #include <QtGui>
 #include "ui_startsequence.h"
+#include "image.h"
 
 class BreastSelector : public QWidget
 {
@@ -17,7 +18,6 @@ public:
 protected:
 //    void mousePressEvent(QMouseEvent *event);
     void paintEvent(QPaintEvent *event) override;
-
 
 private:
     Ui::StartSequence *ui;

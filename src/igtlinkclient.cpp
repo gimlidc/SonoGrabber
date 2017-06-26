@@ -31,7 +31,8 @@ IGTLinkClient::IGTLinkClient(SessionParams * connection, qint64 refreshRate, QOb
     guiRefreshRateMs = refreshRate;
     connect(worker, &Worker::imageReceived, this, &IGTLinkClient::showImage);
     connect(worker, &Worker::stopped, this, &IGTLinkClient::receiveStopSignal);
-    connect(worker, &Worker::position, this, &IGTLinkClient::receivePos);    
+//    connect(worker, &Worker::position, this, &IGTLinkClient::receivePos);
+    connect(worker, &Worker::imgPosition, this, &IGTLinkClient::rcvImgPosition);
 
     firstImage = true;
     for (int i = 0; i < 256; i++) {
@@ -92,6 +93,7 @@ void IGTLinkClient::showImage(char * imageBuffer, QSize imgSize, QString state)
 
 void IGTLinkClient::rcvImgPosition(Image pos)
 {
+    qDebug() << "igtLInkclient: rcvPos";
     emit imgPosition(pos);
 }
 

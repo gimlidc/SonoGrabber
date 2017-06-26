@@ -7,14 +7,19 @@
 class Image
 {
 public:
+    Image();
     Image(QMatrix4x4, Frozen);
-    Frozen getStatus();
-    QMatrix4x4 getPosition();
+    Frozen getStatus() const;
+    QMatrix4x4 getPosition() const;
+    void setLine(QPointF p1, QPointF p2);
+    QLineF getLine() const;
 
 private:
     QMatrix4x4 position;
     Frozen status;
-    QLineF position2D;
+    QLineF line2D;
 };
+
+Q_DECLARE_METATYPE(Image);
 
 #endif // IMAGE_H

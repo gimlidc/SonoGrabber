@@ -7,6 +7,7 @@
 #include <QVector3D>
 #include <QVector4D>
 #include <QMatrix4x4>
+#include <QLineF>
 #include <QPolygonF>
 #include <QDebug>
 #include <QtMath>
@@ -24,6 +25,7 @@ qreal fade = 0.99;
 bool planeSet = false;
 
 QVector<QPointF> refProjection, probePos;
+QVector<Image> extPoints;
 QVector<Frozen> freezPoints;
 QVector<qreal> alpha;
 QVector3D lastPos;
@@ -101,14 +103,25 @@ void BreastGraph::paintEvent(QPaintEvent *event)
     qDebug() << "bufLen: " << bufLen;
     if (buffSize==0) {
         QColor blueCol = QColor(Qt::blue);
-        for (int i=0; i<probePos.size(); i+=2) {
-            if (freezPoints.at(i/2)==Frozen::UNFROZEN) {
+//        for (int i=0; i<probePos.size(); i+=2) {
+//            if (freezPoints.at(i/2)==Frozen::UNFROZEN) {
+//                blueCol.setAlphaF(alpha[alpha.size()-i/2-1]);
+//                painter.setPen(QPen(blueCol, 0));
+//                QPointF p0 = probePos.at(i);
+//                QPointF pX = probePos.at(i+1);
+//                painter.drawLine(p0, pX);
+//                painter.drawEllipse(QPointF(pX.x(), pX.y()), 2, 2);
+//            }
+//        }
+        for (int i=0; i<probePos.size()/2; i++) {
+            if ((extPoints.at(i)).getStatus()==Frozen::UNFROZEN) {
                 blueCol.setAlphaF(alpha[alpha.size()-i/2-1]);
                 painter.setPen(QPen(blueCol, 0));
-                QPointF p0 = probePos.at(i);
-                QPointF pX = probePos.at(i+1);
-                painter.drawLine(p0, pX);
-                painter.drawEllipse(QPointF(pX.x(), pX.y()), 2, 2);
+//                QPointF p0 = probePos.at(i);
+//                QPointF pX = probePos.at(i+1);
+                QLineF line = extPoints.at(i).getLine();
+                painter.drawLine(line);
+                painter.drawEllipse(line.p2(), 2, 2);
             }
         }
     } else {
@@ -125,12 +138,22 @@ void BreastGraph::paintEvent(QPaintEvent *event)
         }
     }
     painter.setPen(QPen(Qt::red, 3));
-    for (int i=0; i<probePos.size(); i+=2) {
-        if (freezPoints.at(i/2)==Frozen::FROZEN) {
-            QPointF p0 = probePos.at(i);
-            QPointF pX = probePos.at(i+1);
-            painter.drawLine(p0, pX);
-            painter.drawEllipse(QPointF(pX.x(), pX.y()), 2, 2);
+//    for (int i=0; i<probePos.size(); i+=2) {
+//        if (freezPoints.at(i/2)==Frozen::FROZEN) {
+//            QPointF p0 = probePos.at(i);
+//            QPointF pX = probePos.at(i+1);
+//            painter.drawLine(p0, pX);
+//            painter.drawEllipse(QPointF(pX.x(), pX.y()), 2, 2);
+//        }
+//    }
+    for (int i=0; i<probePos.size()/2; i++) {
+        if (extPoints.at(i).getStatus()==Frozen::FROZEN) {
+//            QPointF p0 = probePos.at(i);
+//            QPointF pX = probePos.at(i+1);
+            QLineF line = extPoints.at(i).getLine();
+            painter.drawLine(line);
+            QPointF point = line.p2();
+            painter.drawEllipse(point, 2.0, 2.0);
         }
     }
     painter.setPen(QPen(Qt::black, 0, Qt::SolidLine));
@@ -273,54 +296,57 @@ void BreastGraph::setPosition(QMatrix4x4 trfMatrix)
 
 void BreastGraph::rcvImgPosition(Image imgPos)
 {
-//    if (refPoints.length()<3) {
-//        QMatrix4x4 trfMatrix = imgPos.getPosition();
-//        if (refPoints.length()==0) {
-//            imgHeight = transform->getHeight(&trfMatrix);
-//        }
-//        QVector3D pos = transform->getLowest(&trfMatrix);
-//        if (side==Side::ND)
-//            side = (pos.z()<0) ? Side::LEFT : Side::RIGHT;
-//        refPoints.append(pos);
-//        if (!planeSet && refPoints.length()==3) {
-//            setPlane(refPoints);
-//            *points<<project(QVector3D(pos));
-//            lastPos = transform->getC(&trfMatrix);
-//        }
-//    } else {
-//        if (bufLen==0) {
+    QMatrix4x4 trfMatrix = imgPos.getPosition();
+    if (refPoints.length()<3) {
+        if (refPoints.length()==0) {
+            QVector3D pos0 = transform->getOrig(&trfMatrix);
+            QVector3D posY = transform->getY(&trfMatrix);
+            QVector3D q = posY-pos0;
+            imgHeight = qSqrt(q.lengthSquared());
+        }
+        QVector3D pos = transform->getLowest(&trfMatrix);
+        if (side==Side::ND)
+            side = (pos.z()<0) ? Side::LEFT : Side::RIGHT;
+        refPoints.append(pos);
+        if (!planeSet && refPoints.length()==3) {
+            setPlane(refPoints);
+            *points<<project(QVector3D(pos));
+            lastPos = transform->getC(&trfMatrix);
+        }
+    } else {
+//        if (!unFreeze) {
 //            freeze = Frozen::UNFROZEN;
-//            bufLen++;
+//            unFreeze=true;
 //        }
-//        QVector3D pos0 = transform->getOrig(&trfMatrix);
-//        QVector3D posX = transform->getX(&trfMatrix);
-//        QVector3D posY = transform->getY(&trfMatrix);
-////        qDebug() << "x: " << pos0.x() << ", y: " << pos0.y() << ", z: " << pos0.z();
-//        bool dist = checkDistance(pos0);
-//        bool speed = checkSpeeed(transform->getC(&trfMatrix));
-//        bool orient = checkOrientation(pos0, posY);
-//        if (dist && speed && orient) {
-//            if (buffSize==0) {
-//                probePos.append(project(pos0));
-//                probePos.append(project(posX));
-//                freezPoints.append(freeze);
-//                if (freezPoints.last()==FROZEN)
-//                    qDebug() << "last freezpoint frozen";
+        QVector3D pos0 = transform->getOrig(&trfMatrix);
+        QVector3D posX = transform->getX(&trfMatrix);
+        QVector3D posY = transform->getY(&trfMatrix);
+        bool dist = checkDistance(pos0);
+        bool orient = checkOrientation(pos0, posY);
+        if (dist && orient) {
+            imgPos.setLine(project(pos0), project(posX));
+            Image tmpImg = imgPos;
+            extPoints.append(tmpImg);
+            qDebug() << "freezPoints.size=" << freezPoints.size() << " buflen: " << bufLen;
+            if (buffSize==0) {
+                alpha.append(alphaLast);
+                alphaLast *= fade;
+                if (imgPos.getStatus()==FROZEN)
+                    qDebug() << "last freezpoint frozen";
 //                if (freeze==FROZEN)
 //                    qDebug() << "bg: frozen";
 //                freeze = UNFROZEN;
-//            } else {
-//                probePos.replace(bufPos, project(pos0));
-//                probePos.replace(bufPos+1, project(posX));
-//                freezPoints.replace(bufPos/2, freeze);
-//                bufPos = (bufPos+2)%buffSize;
+            } else {
+                bufPos = (bufPos+2)%buffSize;
 //                freeze = Frozen::UNFROZEN;
-//                if (bufLen<buffSize)
-//                    bufLen += 2;
-//            }
-//        }
+                if (bufLen<(buffSize-1)) {
+                    bufLen += 2;
+                    qDebug() << "buflen: " << bufLen;
+                }
+            }
+        }
 
-//    }
+    }
 }
 
 
