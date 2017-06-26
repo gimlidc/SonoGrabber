@@ -26,7 +26,6 @@ IGTLinkClient::IGTLinkClient(SessionParams * connection, qint64 refreshRate, QOb
     qRegisterMetaType<igtl::ImageMessage::Pointer>("igtl::ImageMessage::Pointer");
     connect(&_workerThread, &QThread::finished, worker, &QObject::deleteLater);
     connect(this, &IGTLinkClient::startWorker, worker, &Worker::start);
-    connect(worker, &Worker::frozen, this, &IGTLinkClient::receiveFrozen);
     lastRefreshTime = QDateTime::currentMSecsSinceEpoch();
     guiRefreshRateMs = refreshRate;
     connect(worker, &Worker::imageReceived, this, &IGTLinkClient::showImage);
@@ -93,7 +92,6 @@ void IGTLinkClient::showImage(char * imageBuffer, QSize imgSize, QString state)
 
 void IGTLinkClient::rcvImgPosition(Image pos)
 {
-    qDebug() << "igtLInkclient: rcvPos";
     emit imgPosition(pos);
 }
 

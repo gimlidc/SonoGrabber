@@ -23,7 +23,7 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
     qRegisterMetaType<Image>();
 
     transform = new Transform(session->getCrop());
-    bgraph = new BreastGraph(transform, session->getFps(), 100, 0);
+    bgraph = new BreastGraph(transform, session->getFps(), 0, 0);
     image = new SonoImage;
 
     params = session;
@@ -52,8 +52,6 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
     QObject::connect(startSequence, &StartSequence::terminateStartSequence, this,
                      &MainWindow::sequenceTerminator);
 
-//    QObject::connect(client, &IGTLinkClient::position, bgraph, &BreastGraph::setPosition);
-//    QObject::connect(client, &IGTLinkClient::frozen, bgraph, &BreastGraph::receiveFrozen);
     QObject::connect(client, &IGTLinkClient::imgPosition, bgraph, &BreastGraph::rcvImgPosition);
 }
 
@@ -82,12 +80,6 @@ void MainWindow::showBreastGraph()
     bgraph->show();
 }
 
-
-//void MainWindow::receivePos(QVector4D pos)
-//{
-//    qDebug() << "emit position";
-//    emit position(pos);
-//}
 
 void MainWindow::setOutputDir(QString dirPath)
 {

@@ -137,7 +137,6 @@ void Worker::flushData(double ts)
             Image probe = Image(pos, FROZEN);
             emit imgPosition(probe);
 //            emit position(pos);
-//            emit frozen(writer->getImageCounter());
         }
         frozenLastStatus = isFrozen;
 

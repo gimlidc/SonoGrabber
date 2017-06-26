@@ -94,7 +94,6 @@ signals:
      */
     void stopped(int);
     void imgPosition(Image);
-    void frozen(int);
     void position(QMatrix4x4 pos);
 
 private:
