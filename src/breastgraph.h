@@ -53,7 +53,7 @@ signals:
 
 public slots:
     void rcvImgPosition(Image);
-    void setPosition(QMatrix4x4 transform);
+//    void setPosition(QMatrix4x4 transform);
 };
 
 

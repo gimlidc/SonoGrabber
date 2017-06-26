@@ -23,7 +23,7 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
     qRegisterMetaType<Image>();
 
     transform = new Transform(session->getCrop());
-    bgraph = new BreastGraph(transform, session->getFps(), 0, 0);
+    bgraph = new BreastGraph(transform, session->getFps(), 200, 0);
     image = new SonoImage;
 
     params = session;

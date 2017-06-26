@@ -31,7 +31,6 @@ QVector<qreal> alpha;
 QVector3D lastPos;
 int bufPos=0, bufLen=0;
 qreal alphaLast=1;
-bool unFreeze=false;
 
 BreastGraph::BreastGraph(Transform *transform, int fps, int buffSize, QWidget *parent) : QWidget(parent)
 {
@@ -49,7 +48,7 @@ BreastGraph::BreastGraph(Transform *transform, int fps, int buffSize, QWidget *p
             alpha[i] = alphaLast;
             alphaLast *= fade;
         }
-        this->buffSize = 2*buffSize;
+        this->buffSize = buffSize;
     }
 }
 
@@ -112,14 +111,15 @@ void BreastGraph::paintEvent(QPaintEvent *event)
         }
     } else {
         QColor blueCol = QColor(Qt::blue);
-        for (int i=0; i<bufLen-1; i+=2) {
-            if (freezPoints.at(i/2)==Frozen::UNFROZEN) {
-                blueCol.setAlphaF(alpha[alpha.size()-i/2-1]);
+        for (int i=0; i<bufLen; i++) {
+            if (extPoints.at(extPoints.size()-i-1).getStatus()==Frozen::UNFROZEN) {
+                blueCol.setAlphaF(alpha[i]);
                 painter.setPen(QPen(blueCol, 0));
-                QPointF p0 = probePos.at(probePos.size()-bufLen+i);
-                QPointF pX = probePos.at(probePos.size()-bufLen+i+1);
-                painter.drawLine(p0, pX);
-                painter.drawEllipse(QPointF(pX.x(), pX.y()), 2, 2);
+                QLineF line = extPoints.at(extPoints.size()-i-1).getLine();
+//                QPointF p0 = probePos.at(probePos.size()-bufLen+i);
+//                QPointF pX = probePos.at(probePos.size()-bufLen+i+1);
+                painter.drawLine(line);
+                painter.drawEllipse(line.p1(), 2, 2);
             }
         }
     }
@@ -216,59 +216,59 @@ bool BreastGraph::checkSpeeed(QVector3D point)
     return speed<=220;
 }
 
-void BreastGraph::setPosition(QMatrix4x4 trfMatrix)
-{
-    if (refPoints.length()<3) {
-        if (refPoints.length()==0) {
-            QVector3D pos0 = transform->getOrig(&trfMatrix);
-            QVector3D posY = transform->getY(&trfMatrix);
-            QVector3D q = posY-pos0;
-            imgHeight = qSqrt(q.lengthSquared());
-        }
-        QVector3D pos = transform->getLowest(&trfMatrix);
-        if (side==Side::ND)
-            side = (pos.z()<0) ? Side::LEFT : Side::RIGHT;
-        refPoints.append(pos);
-        if (!planeSet && refPoints.length()==3) {
-            setPlane(refPoints);
-            *points<<project(QVector3D(pos));
-            lastPos = transform->getC(&trfMatrix);
-        }
-    } else {
-        if (!unFreeze) {
-            freeze = Frozen::UNFROZEN;
-            unFreeze=true;
-        }
-        QVector3D pos0 = transform->getOrig(&trfMatrix);
-        QVector3D posX = transform->getX(&trfMatrix);
-        QVector3D posY = transform->getY(&trfMatrix);
-        bool dist = checkDistance(pos0);
-        bool orient = checkOrientation(pos0, posY);
-        if (dist && orient) {
-            probePos.append(project(pos0));
-            probePos.append(project(posX));
-            freezPoints.append(freeze);
-            qDebug() << "freezPoints.size=" << freezPoints.size() << " buflen: " << bufLen;
-            if (buffSize==0) {
-                alpha.append(alphaLast);
-                alphaLast *= fade;
-                if (freezPoints.last()==FROZEN)
-                    qDebug() << "last freezpoint frozen";
-                if (freeze==FROZEN)
-                    qDebug() << "bg: frozen";
-                freeze = UNFROZEN;
-            } else {
-                bufPos = (bufPos+2)%buffSize;
-                freeze = Frozen::UNFROZEN;
-                if (bufLen<(buffSize-1)) {
-                    bufLen += 2;
-                    qDebug() << "buflen: " << bufLen;
-                }
-            }
-        }
+//void BreastGraph::setPosition(QMatrix4x4 trfMatrix)
+//{
+//    if (refPoints.length()<3) {
+//        if (refPoints.length()==0) {
+//            QVector3D pos0 = transform->getOrig(&trfMatrix);
+//            QVector3D posY = transform->getY(&trfMatrix);
+//            QVector3D q = posY-pos0;
+//            imgHeight = qSqrt(q.lengthSquared());
+//        }
+//        QVector3D pos = transform->getLowest(&trfMatrix);
+//        if (side==Side::ND)
+//            side = (pos.z()<0) ? Side::LEFT : Side::RIGHT;
+//        refPoints.append(pos);
+//        if (!planeSet && refPoints.length()==3) {
+//            setPlane(refPoints);
+//            *points<<project(QVector3D(pos));
+//            lastPos = transform->getC(&trfMatrix);
+//        }
+//    } else {
+//        if (!unFreeze) {
+//            freeze = Frozen::UNFROZEN;
+//            unFreeze=true;
+//        }
+//        QVector3D pos0 = transform->getOrig(&trfMatrix);
+//        QVector3D posX = transform->getX(&trfMatrix);
+//        QVector3D posY = transform->getY(&trfMatrix);
+//        bool dist = checkDistance(pos0);
+//        bool orient = checkOrientation(pos0, posY);
+//        if (dist && orient) {
+//            probePos.append(project(pos0));
+//            probePos.append(project(posX));
+//            freezPoints.append(freeze);
+//            qDebug() << "freezPoints.size=" << freezPoints.size() << " buflen: " << bufLen;
+//            if (buffSize==0) {
+//                alpha.append(alphaLast);
+//                alphaLast *= fade;
+//                if (freezPoints.last()==FROZEN)
+//                    qDebug() << "last freezpoint frozen";
+//                if (freeze==FROZEN)
+//                    qDebug() << "bg: frozen";
+//                freeze = UNFROZEN;
+//            } else {
+//                bufPos = (bufPos+2)%buffSize;
+//                freeze = Frozen::UNFROZEN;
+//                if (bufLen<(buffSize-1)) {
+//                    bufLen += 2;
+//                    qDebug() << "buflen: " << bufLen;
+//                }
+//            }
+//        }
 
-    }
-}
+//    }
+//}
 
 void BreastGraph::rcvImgPosition(Image imgPos)
 {
@@ -300,16 +300,15 @@ void BreastGraph::rcvImgPosition(Image imgPos)
             imgPos.setLine(project(pos0), project(posX));
             Image tmpImg = imgPos;
             extPoints.append(tmpImg);
-            qDebug() << "freezPoints.size=" << freezPoints.size() << " buflen: " << bufLen;
             if (buffSize==0) {
                 alpha.append(alphaLast);
                 alphaLast *= fade;
                 if (imgPos.getStatus()==FROZEN)
                     qDebug() << "last freezpoint frozen";
             } else {
-                bufPos = (bufPos+2)%buffSize;
+                bufPos = (bufPos++)%buffSize;
                 if (bufLen<(buffSize-1)) {
-                    bufLen += 2;
+                    bufLen++;
                     qDebug() << "buflen: " << bufLen;
                 }
             }
