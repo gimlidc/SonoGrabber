@@ -12,6 +12,7 @@
 #include <QStackedWidget>
 #include <QtSvg/QGraphicsSvgItem>
 #include <QtSvg/QSvgWidget>
+#include <QVector>
 
 
 MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget *parent) :
@@ -23,8 +24,8 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
     qRegisterMetaType<Image>();
 
     transform = new Transform(session->getCrop());
-    qreal radii[3] = {.333, .666, 1};
-    int segments[3] = {0, 4, 8};
+    QVector<qreal> radii = {.333, .666, 1};
+    QVector<int> segments = {0, 4, 8};
     bgraph = new BreastGraph(transform, session->getFps(), 0, radii,
                              segments, 0);
     image = new SonoImage;

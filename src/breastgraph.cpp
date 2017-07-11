@@ -32,7 +32,8 @@ QVector3D lastPos;
 int bufPos=0, bufLen=0;
 qreal alphaLast=1;
 
-BreastGraph::BreastGraph(Transform *transform, int fps, int buffSize, qreal radii[], int segments[], QWidget *parent) : QWidget(parent)
+BreastGraph::BreastGraph(Transform *transform, int fps, int buffSize,
+                         QVector<qreal> radii, QVector<int> segments, QWidget *parent) : QWidget(parent)
 {
     this->setObjectName("BreastGraph");
     points = new QVector<QPointF>;
@@ -130,10 +131,33 @@ void BreastGraph::drawProbe(QPainter *painter, const QColor probe, const QColor 
     painter->restore();
 }
 
+void BreastGraph::drawGraph(QPainter *painter,
+                            QVector<qreal> radii,
+                            QVector<int> segments)
+{
+    // segmented circles
+    painter->save();
+    painter->setPen(QPen(Qt::black, 0, Qt::SolidLine));
+    painter->setBrush(QBrush(Qt::transparent, Qt::SolidPattern));
+    qreal r1 = 0;
+    for (int i=0; i<radii.size(); i++) {
+        qreal r2 = r*radii[i];
+        painter->drawEllipse(QPointF(0.0,0.0), r2, r2);
+        for (int cnt=0; cnt<segments[i]; cnt++) {
+            painter->drawLine(QPointF(r1,0), QPointF(r2,0));
+            painter->rotate(360.0/segments[i]);
+        }
+        r1 = r2;
+    }
+    painter->restore();
+    painter->rotate((side==Side::LEFT) ? -angle : angle);
+    painter->drawPolyline(lobe);
+    painter->restore();
+}
+
 void BreastGraph::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
-    QRect v = painter.viewport();
     int dh = width();
     int dv = height();
     int s = qMin(dh, dv)/((1+1.2*top));
@@ -143,26 +167,9 @@ void BreastGraph::paintEvent(QPaintEvent *event)
     drawBackground(&painter, Qt::red);
     drawSnake(&painter, Qt::green, &lines);
     drawProbe(&painter, Qt::blue, Qt::red, &lines);
-
-    // segmented circles
-    painter.setPen(QPen(Qt::black, 0, Qt::SolidLine));
-    painter.setBrush(QBrush(Qt::transparent, Qt::SolidPattern));
-    qreal deltaR = r/4;
-    for (int i=1; i<(4+1); i++) {
-        painter.drawEllipse(QPointF(0.0,0.0), (qreal)i*deltaR, (qreal)i*deltaR);
-    }
-
-    painter.save();
-    for (int cnt=0; cnt<12; cnt++) {
-        painter.drawLine(QPointF(-r,0), QPointF(-deltaR,0));
-        painter.rotate(360.0/12.0);
-    }
-    painter.restore();
-    painter.save();
-    painter.rotate((side==Side::LEFT) ? -angle : angle);
-    painter.drawPolyline(lobe);
-    painter.restore();
+    drawGraph(&painter, radii, segments);
     painter.setPen(QPen(Qt::red, 0));
+    // reference points
     for (int i = 0; i<refProjection.size(); i++) {
         QPointF point = refProjection.at(i);
         painter.drawEllipse(QPointF(point.x(), point.y()), 2, 2);

@@ -19,7 +19,8 @@ class BreastGraph : public QWidget
 {
     Q_OBJECT
 public:
-    explicit BreastGraph(Transform *transform, int fps, int buffSize, qreal *radii, int *segments, QWidget *parent = 0);
+    explicit BreastGraph(Transform *transform, int fps, int buffSize,
+                         QVector<qreal> radii, QVector<int> segments, QWidget *parent = 0);
     ~BreastGraph();
     void paintEvent(QPaintEvent *);
     QPointF project(QVector3D x);
@@ -31,8 +32,8 @@ private:
     int buffSize=0;
     int fps;
     Frozen freeze;
-    qreal *radii;
-    int *segments;
+    QVector<qreal> radii;
+    QVector<int> segments;
 
     QPolygonF getLobe(QPointF rp);
     qreal angle;
@@ -44,7 +45,10 @@ private:
     void setPlane(QVector<QVector3D> refPoints);
     void drawBackground(QPainter *painter, const QColor color);
     void drawSnake(QPainter *painter, const QColor color, QVector<Image> *extPoints);
-    void drawProbe(QPainter *painter, const QColor probe, const QColor freeze, QVector<Image> *lines);
+    void drawProbe(QPainter *painter, const QColor probe, const QColor freeze,
+                   QVector<Image> *lines);
+    void drawGraph(QPainter *painter,
+                   QVector<qreal> radii, QVector<int> segments);
     bool checkDistance(QVector3D point);
     bool checkOrientation(QVector3D p0, QVector3D py);
     bool checkSpeeed(QVector3D point);
