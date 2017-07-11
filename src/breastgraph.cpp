@@ -32,11 +32,13 @@ QVector3D lastPos;
 int bufPos=0, bufLen=0;
 qreal alphaLast=1;
 
-BreastGraph::BreastGraph(Transform *transform, int fps, int buffSize, QWidget *parent) : QWidget(parent)
+BreastGraph::BreastGraph(Transform *transform, int fps, int buffSize, qreal radii[], int segments[], QWidget *parent) : QWidget(parent)
 {
     this->setObjectName("BreastGraph");
     points = new QVector<QPointF>;
     this->fps = fps;
+    this->radii = radii;
+    this->segments = segments;
     refPoints.reserve(3);
     refProjection.reserve(3);
     this->transform = transform;
@@ -90,6 +92,7 @@ void BreastGraph::drawBackground(QPainter *painter, const QColor color)
 void BreastGraph::drawSnake(QPainter *painter, const QColor color, QVector<Image> *lines)
 {
     // green "snake"
+    painter->save();
     painter->setPen(QPen(color, 0));
     painter->setBrush(QBrush(color, Qt::SolidPattern));
     for (int i=1; i<lines->size(); i++) {
@@ -98,9 +101,33 @@ void BreastGraph::drawSnake(QPainter *painter, const QColor color, QVector<Image
             QPointF points[4] = {line1.p1(), line1.p2(), line2.p2(), line2.p1()};
             painter->drawPolygon(points, 4);
     }
+    painter->restore();
 
-    painter->setBrush(QBrush(Qt::transparent, Qt::SolidPattern));
+}
 
+void BreastGraph::drawProbe(QPainter *painter, const QColor probe, const QColor freeze, QVector<Image> *lines)
+{
+    QColor blueCol = probe;
+    painter->save();
+    for (int i=0; i<bufLen; i++) {
+        if (lines->at(lines->size()-i-1).getStatus()==Frozen::UNFROZEN) {
+            blueCol.setAlphaF(alpha[i]);
+            painter->setPen(QPen(blueCol, 0));
+            QLineF line = lines->at(lines->size()-i-1).getLine();
+            painter->drawLine(line);
+            painter->drawEllipse(line.p2(), 2, 2);
+        }
+    }
+    painter->setPen(QPen(freeze, 3));
+    for (int i=0; i<lines->size(); i++) {
+        if (lines->at(i).getStatus()==Frozen::FROZEN) {
+            QLineF line = lines->at(i).getLine();
+            painter->drawLine(line);
+            QPointF point = line.p2();
+            painter->drawEllipse(point, 2.0, 2.0);
+        }
+    }
+    painter->restore();
 }
 
 void BreastGraph::paintEvent(QPaintEvent *event)
@@ -115,42 +142,11 @@ void BreastGraph::paintEvent(QPaintEvent *event)
     painter.setRenderHint(QPainter::Antialiasing);
     drawBackground(&painter, Qt::red);
     drawSnake(&painter, Qt::green, &lines);
-//    if (buffSize==0) {
-//        QColor blueCol = QColor(Qt::blue);
-//        for (int i=0; i<bufLen; i++) {
-//            if ((lines.at(lines.size()-i-1)).getStatus()==Frozen::UNFROZEN) {
-//                blueCol.setAlphaF(alpha[i]);
-//                painter.setPen(QPen(blueCol, 0));
-//                QLineF line = lines.at(lines.size()-i-1).getLine();
-//                painter.drawLine(line);
-//                painter.drawEllipse(line.p2(), 2, 2);
-//            }
-//        }
-//    } else {
-        QColor blueCol = QColor(Qt::blue);
-        for (int i=0; i<bufLen; i++) {
-            if (lines.at(lines.size()-i-1).getStatus()==Frozen::UNFROZEN) {
-                blueCol.setAlphaF(alpha[i]);
-                painter.setPen(QPen(blueCol, 0));
-                QLineF line = lines.at(lines.size()-i-1).getLine();
-                painter.drawLine(line);
-                painter.drawEllipse(line.p2(), 2, 2);
-            }
-        }
-//    }
-    painter.setPen(QPen(Qt::red, 3));
-    for (int i=0; i<lines.size(); i++) {
-        if (lines.at(i).getStatus()==Frozen::FROZEN) {
-            QLineF line = lines.at(i).getLine();
-            painter.drawLine(line);
-            QPointF point = line.p2();
-            painter.drawEllipse(point, 2.0, 2.0);
-        }
-    }
-    painter.setPen(QPen(Qt::black, 0, Qt::SolidLine));
-    painter.setBrush(QBrush(Qt::transparent, Qt::SolidPattern));
+    drawProbe(&painter, Qt::blue, Qt::red, &lines);
 
     // segmented circles
+    painter.setPen(QPen(Qt::black, 0, Qt::SolidLine));
+    painter.setBrush(QBrush(Qt::transparent, Qt::SolidPattern));
     qreal deltaR = r/4;
     for (int i=1; i<(4+1); i++) {
         painter.drawEllipse(QPointF(0.0,0.0), (qreal)i*deltaR, (qreal)i*deltaR);
