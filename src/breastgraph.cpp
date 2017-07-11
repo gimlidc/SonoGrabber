@@ -25,7 +25,7 @@ qreal fade = 0.99;
 bool planeSet = false;
 
 QVector<QPointF> refProjection, probePos;
-QVector<Image> extPoints;
+QVector<Image> lines;
 QVector<Frozen> freezPoints;
 QVector<qreal> alpha;
 QVector3D lastPos;
@@ -41,8 +41,6 @@ BreastGraph::BreastGraph(Transform *transform, int fps, int buffSize, QWidget *p
     refProjection.reserve(3);
     this->transform = transform;
     if (buffSize>0) {
-//        probePos = QVector<QPointF>(2*buffSize);
-//        freezPoints = QVector<Frozen>(buffSize);
         alpha = QVector<qreal>(buffSize);
         for (int i=0; i<buffSize; i++) {
             alpha[i] = alphaLast;
@@ -75,6 +73,33 @@ QPolygonF BreastGraph::getLobe(QPointF rp)
 
 BreastGraph::~BreastGraph()
 {
+}
+
+void BreastGraph::drawBackground(QPainter *painter, const QColor color)
+{
+    // background
+    painter->save();
+    painter->setPen(QPen(color));
+    painter->setBrush(QBrush(color, Qt::SolidPattern));
+    painter->drawEllipse(QPointF(0.0,0.0), r, r);
+    painter->rotate((side==Side::LEFT) ? -angle : angle);
+    painter->drawPolygon(lobe);
+    painter->restore();
+}
+
+void BreastGraph::drawSnake(QPainter *painter, const QColor color, QVector<Image> *lines)
+{
+    // green "snake"
+    painter->setPen(QPen(color, 0));
+    painter->setBrush(QBrush(color, Qt::SolidPattern));
+    for (int i=1; i<lines->size(); i++) {
+            QLineF line1 = lines->at(i-1).getLine();
+            QLineF line2 = lines->at(i).getLine();
+            QPointF points[4] = {line1.p1(), line1.p2(), line2.p2(), line2.p1()};
+            painter->drawPolygon(points, 4);
+    }
+
+    painter->setBrush(QBrush(Qt::transparent, Qt::SolidPattern));
 
 }
 
@@ -88,45 +113,35 @@ void BreastGraph::paintEvent(QPaintEvent *event)
     painter.setWindow(-(1+top)*r, -(1+top)*r, 2*(1+top)*r, (2+top)*r);
     painter.setViewport(QRect((dh-s)/2, .9*(dv-s), s, s));
     painter.setRenderHint(QPainter::Antialiasing);
-    // green "snake"
-    painter.setPen(QPen(Qt::green, 0));
-    painter.setBrush(QBrush(Qt::green, Qt::SolidPattern));
-    for (int i=1; i<extPoints.size(); i++) {
-            QLineF line1 = extPoints.at(i-1).getLine();
-            QLineF line2 = extPoints.at(i).getLine();
-            QPointF points[4] = {line1.p1(), line1.p2(), line2.p2(), line2.p1()};
-            painter.drawPolygon(points, 4);
-    }
-    painter.setBrush(QBrush(Qt::transparent, Qt::SolidPattern));
-    if (buffSize==0) {
+    drawBackground(&painter, Qt::red);
+    drawSnake(&painter, Qt::green, &lines);
+//    if (buffSize==0) {
+//        QColor blueCol = QColor(Qt::blue);
+//        for (int i=0; i<bufLen; i++) {
+//            if ((lines.at(lines.size()-i-1)).getStatus()==Frozen::UNFROZEN) {
+//                blueCol.setAlphaF(alpha[i]);
+//                painter.setPen(QPen(blueCol, 0));
+//                QLineF line = lines.at(lines.size()-i-1).getLine();
+//                painter.drawLine(line);
+//                painter.drawEllipse(line.p2(), 2, 2);
+//            }
+//        }
+//    } else {
         QColor blueCol = QColor(Qt::blue);
-        for (int i=0; i<extPoints.size(); i++) {
-            if ((extPoints.at(i)).getStatus()==Frozen::UNFROZEN) {
-                blueCol.setAlphaF(alpha[alpha.size()-i-1]);
+        for (int i=0; i<bufLen; i++) {
+            if (lines.at(lines.size()-i-1).getStatus()==Frozen::UNFROZEN) {
+                blueCol.setAlphaF(alpha[i]);
                 painter.setPen(QPen(blueCol, 0));
-                QLineF line = extPoints.at(i).getLine();
+                QLineF line = lines.at(lines.size()-i-1).getLine();
                 painter.drawLine(line);
                 painter.drawEllipse(line.p2(), 2, 2);
             }
         }
-    } else {
-        QColor blueCol = QColor(Qt::blue);
-        for (int i=0; i<bufLen; i++) {
-            if (extPoints.at(extPoints.size()-i-1).getStatus()==Frozen::UNFROZEN) {
-                blueCol.setAlphaF(alpha[i]);
-                painter.setPen(QPen(blueCol, 0));
-                QLineF line = extPoints.at(extPoints.size()-i-1).getLine();
-//                QPointF p0 = probePos.at(probePos.size()-bufLen+i);
-//                QPointF pX = probePos.at(probePos.size()-bufLen+i+1);
-                painter.drawLine(line);
-                painter.drawEllipse(line.p1(), 2, 2);
-            }
-        }
-    }
+//    }
     painter.setPen(QPen(Qt::red, 3));
-    for (int i=0; i<extPoints.size(); i++) {
-        if (extPoints.at(i).getStatus()==Frozen::FROZEN) {
-            QLineF line = extPoints.at(i).getLine();
+    for (int i=0; i<lines.size(); i++) {
+        if (lines.at(i).getStatus()==Frozen::FROZEN) {
+            QLineF line = lines.at(i).getLine();
             painter.drawLine(line);
             QPointF point = line.p2();
             painter.drawEllipse(point, 2.0, 2.0);
@@ -140,6 +155,7 @@ void BreastGraph::paintEvent(QPaintEvent *event)
     for (int i=1; i<(4+1); i++) {
         painter.drawEllipse(QPointF(0.0,0.0), (qreal)i*deltaR, (qreal)i*deltaR);
     }
+
     painter.save();
     for (int cnt=0; cnt<12; cnt++) {
         painter.drawLine(QPointF(-r,0), QPointF(-deltaR,0));
@@ -216,59 +232,6 @@ bool BreastGraph::checkSpeeed(QVector3D point)
     return speed<=220;
 }
 
-//void BreastGraph::setPosition(QMatrix4x4 trfMatrix)
-//{
-//    if (refPoints.length()<3) {
-//        if (refPoints.length()==0) {
-//            QVector3D pos0 = transform->getOrig(&trfMatrix);
-//            QVector3D posY = transform->getY(&trfMatrix);
-//            QVector3D q = posY-pos0;
-//            imgHeight = qSqrt(q.lengthSquared());
-//        }
-//        QVector3D pos = transform->getLowest(&trfMatrix);
-//        if (side==Side::ND)
-//            side = (pos.z()<0) ? Side::LEFT : Side::RIGHT;
-//        refPoints.append(pos);
-//        if (!planeSet && refPoints.length()==3) {
-//            setPlane(refPoints);
-//            *points<<project(QVector3D(pos));
-//            lastPos = transform->getC(&trfMatrix);
-//        }
-//    } else {
-//        if (!unFreeze) {
-//            freeze = Frozen::UNFROZEN;
-//            unFreeze=true;
-//        }
-//        QVector3D pos0 = transform->getOrig(&trfMatrix);
-//        QVector3D posX = transform->getX(&trfMatrix);
-//        QVector3D posY = transform->getY(&trfMatrix);
-//        bool dist = checkDistance(pos0);
-//        bool orient = checkOrientation(pos0, posY);
-//        if (dist && orient) {
-//            probePos.append(project(pos0));
-//            probePos.append(project(posX));
-//            freezPoints.append(freeze);
-//            qDebug() << "freezPoints.size=" << freezPoints.size() << " buflen: " << bufLen;
-//            if (buffSize==0) {
-//                alpha.append(alphaLast);
-//                alphaLast *= fade;
-//                if (freezPoints.last()==FROZEN)
-//                    qDebug() << "last freezpoint frozen";
-//                if (freeze==FROZEN)
-//                    qDebug() << "bg: frozen";
-//                freeze = UNFROZEN;
-//            } else {
-//                bufPos = (bufPos+2)%buffSize;
-//                freeze = Frozen::UNFROZEN;
-//                if (bufLen<(buffSize-1)) {
-//                    bufLen += 2;
-//                    qDebug() << "buflen: " << bufLen;
-//                }
-//            }
-//        }
-
-//    }
-//}
 
 void BreastGraph::rcvImgPosition(Image imgPos)
 {
@@ -299,17 +262,15 @@ void BreastGraph::rcvImgPosition(Image imgPos)
         if (dist) {
             imgPos.setLine(project(pos0), project(posX));
             Image tmpImg = imgPos;
-            extPoints.append(tmpImg);
+            lines.append(tmpImg);
             if (buffSize==0) {
                 alpha.append(alphaLast);
                 alphaLast *= fade;
-                if (imgPos.getStatus()==FROZEN)
-                    qDebug() << "last freezpoint frozen";
+                bufLen++;
             } else {
                 bufPos = (bufPos++)%buffSize;
                 if (bufLen<(buffSize-1)) {
                     bufLen++;
-                    qDebug() << "buflen: " << bufLen;
                 }
             }
         }

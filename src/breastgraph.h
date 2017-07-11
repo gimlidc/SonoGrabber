@@ -35,15 +35,14 @@ private:
 
     QPolygonF getLobe(QPointF rp);
     qreal angle;
-//    QScatterSeries *points;
-//    QChart *chart;
-//    QChartView *chartView;
     QVector<QPointF> *points;
     QVector<QVector3D> refPoints;
     Side side = Side::ND;
     QVector3D un, vn;
     QVector3D origin;
     void setPlane(QVector<QVector3D> refPoints);
+    void drawBackground(QPainter *painter, const QColor color);
+    void drawSnake(QPainter *painter, const QColor color, QVector<Image> *extPoints);
     bool checkDistance(QVector3D point);
     bool checkOrientation(QVector3D p0, QVector3D py);
     bool checkSpeeed(QVector3D point);
@@ -53,7 +52,6 @@ signals:
 
 public slots:
     void rcvImgPosition(Image);
-//    void setPosition(QMatrix4x4 transform);
 };
 
 
