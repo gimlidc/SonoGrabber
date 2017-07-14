@@ -9,12 +9,12 @@ class Transform
 {
 public:
     Transform(QRect crop);
-    QVector3D getOrig(QMatrix4x4 *transform);
-    QVector3D getX(QMatrix4x4 *transform);
-    QVector3D getY(QMatrix4x4 *transform);
-    QVector3D getC(QMatrix4x4 *transform);
-    QVector3D getLowest(QMatrix4x4 *transform);
-    qreal getHeight(QMatrix4x4 *transform);
+    QVector3D getOrig(const QMatrix4x4 &transform);
+    QVector3D getX(const QMatrix4x4 &transform);
+    QVector3D getY(const QMatrix4x4 &transform);
+    QVector3D getC(const QMatrix4x4 &transform);
+    QVector3D getLowest(const QMatrix4x4 &transform);
+    qreal getHeight(const QMatrix4x4 &transform);
 
 private:
     QRect crop;

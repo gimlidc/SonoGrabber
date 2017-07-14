@@ -23,6 +23,7 @@ qreal top = .3;
 qreal imgHeight;
 qreal fade = 0.99;
 bool planeSet = false;
+qreal speed = 120;
 
 QVector<QPointF> refProjection, probePos;
 QVector<Image> lines;
@@ -90,6 +91,27 @@ void BreastGraph::drawBackground(QPainter *painter, const QColor color)
     painter->restore();
 }
 
+qreal BreastGraph::getSpeed(QVector<Image> *probePos)
+{
+    double t1 = probePos->at(probePos->size()-2).getTimeStamp();
+    double t2 = probePos->last().getTimeStamp();
+    return 1/(t1-t2);
+}
+
+qreal BreastGraph::getSpeed(const QVector<Image> &probePos, int idx)
+{
+    qreal speed;
+    if (probePos.size()>1 && idx>0) {
+        double t1 = probePos.at(idx-1).getTimeStamp();
+        double t2 = probePos.at(idx).getTimeStamp();
+        qreal fps = 1/(t2-t1);
+        QVector3D posC2 = transform->getC(probePos.at(idx).getPosition());
+        QVector3D posC1 = transform->getC(probePos.at(idx-1).getPosition());
+        speed = qSqrt(posC2.distanceToPoint(posC1))*fps;
+    }
+    return speed;
+}
+
 void BreastGraph::drawSnake(QPainter *painter, const QColor color, QVector<Image> *lines)
 {
     // green "snake"
@@ -97,10 +119,15 @@ void BreastGraph::drawSnake(QPainter *painter, const QColor color, QVector<Image
     painter->setPen(QPen(color, 0));
     painter->setBrush(QBrush(color, Qt::SolidPattern));
     for (int i=1; i<lines->size(); i++) {
-            QLineF line1 = lines->at(i-1).getLine();
-            QLineF line2 = lines->at(i).getLine();
-            QPointF points[4] = {line1.p1(), line1.p2(), line2.p2(), line2.p1()};
-            painter->drawPolygon(points, 4);
+        if (getSpeed(*lines, i)<speed)
+            painter->setBrush(QBrush(color, Qt::SolidPattern));
+        else
+            painter->setBrush(QBrush(Qt::red, Qt::SolidPattern));
+
+        QLineF line1 = lines->at(i-1).getLine();
+        QLineF line2 = lines->at(i).getLine();
+        QPointF points[4] = {line1.p1(), line1.p2(), line2.p2(), line2.p1()};
+        painter->drawPolygon(points, 4);
     }
     painter->restore();
 
@@ -150,6 +177,7 @@ void BreastGraph::drawGraph(QPainter *painter,
         r1 = r2;
     }
     painter->restore();
+    painter->save();
     painter->rotate((side==Side::LEFT) ? -angle : angle);
     painter->drawPolyline(lobe);
     painter->restore();
@@ -241,24 +269,24 @@ void BreastGraph::rcvImgPosition(Image imgPos)
     QMatrix4x4 trfMatrix = imgPos.getPosition();
     if (refPoints.length()<3) {
         if (refPoints.length()==0) {
-            QVector3D pos0 = transform->getOrig(&trfMatrix);
-            QVector3D posY = transform->getY(&trfMatrix);
+            QVector3D pos0 = transform->getOrig(trfMatrix);
+            QVector3D posY = transform->getY(trfMatrix);
             QVector3D q = posY-pos0;
             imgHeight = qSqrt(q.lengthSquared());
         }
-        QVector3D pos = transform->getLowest(&trfMatrix);
+        QVector3D pos = transform->getLowest(trfMatrix);
         if (side==Side::ND)
             side = (pos.z()<0) ? Side::LEFT : Side::RIGHT;
         refPoints.append(pos);
         if (!planeSet && refPoints.length()==3) {
             setPlane(refPoints);
             *points<<project(QVector3D(pos));
-            lastPos = transform->getC(&trfMatrix);
+            lastPos = transform->getC(trfMatrix);
         }
     } else {
-        QVector3D pos0 = transform->getOrig(&trfMatrix);
-        QVector3D posX = transform->getX(&trfMatrix);
-        QVector3D posY = transform->getY(&trfMatrix);
+        QVector3D pos0 = transform->getOrig(trfMatrix);
+        QVector3D posX = transform->getX(trfMatrix);
+        QVector3D posY = transform->getY(trfMatrix);
         bool dist = checkDistance(pos0);
         bool orient = checkOrientation(pos0, posY);
 //        if (dist && orient) {

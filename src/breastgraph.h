@@ -49,6 +49,10 @@ private:
                    QVector<Image> *lines);
     void drawGraph(QPainter *painter,
                    QVector<qreal> radii, QVector<int> segments);
+    // get speed between the last and before-last element of probe position
+    qreal getSpeed(QVector<Image> *probe);
+    // get speed between the idx and idx-1 element of probe position
+    qreal getSpeed(const QVector<Image> &probe, int idx);
     bool checkDistance(QVector3D point);
     bool checkOrientation(QVector3D p0, QVector3D py);
     bool checkSpeeed(QVector3D point);

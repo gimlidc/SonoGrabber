@@ -6,8 +6,15 @@ Image::Image()
     status = UNFROZEN;
 }
 
-Image::Image(QMatrix4x4 pos, Frozen status=UNFROZEN)
+//Image::Image(QMatrix4x4 pos, Frozen status=UNFROZEN)
+//{
+//    position = pos;
+//    this->status = status;
+//}
+
+Image::Image(QMatrix4x4 pos, double ts, Frozen status=UNFROZEN)
 {
+    this->ts = ts;
     position = pos;
     this->status = status;
 }
@@ -30,4 +37,9 @@ void Image::setLine(QPointF p1, QPointF p2)
 QLineF Image::getLine() const
 {
     return line2D;
+}
+
+double Image::getTimeStamp() const
+{
+    return ts;
 }

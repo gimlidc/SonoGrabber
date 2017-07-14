@@ -101,6 +101,7 @@ void Worker::flushData(double ts)
             return;
         }
 
+
         lastStoredTS = ts;
         // To have actual fps  equal to session->getFps() we must do it as given below
         // lastStoredTS = lastStoredTS + 1.0 / session->getFps();
@@ -134,14 +135,14 @@ void Worker::flushData(double ts)
         if (isFrozen && !frozenLastStatus &&
                 writer->getImageCounter()>0) {
             cnt++;
-            Image probe = Image(pos, FROZEN);
+            Image probe = Image(pos, ts, FROZEN);
             emit imgPosition(probe);
 //            emit position(pos);
         }
         frozenLastStatus = isFrozen;
 
         if (cnt>2 && !isFrozen)
-            emit imgPosition(Image(pos, UNFROZEN));
+            emit imgPosition(Image(pos, ts, UNFROZEN));
 //            emit position(pos);
 
         if (isFrozen && frozenImageStored) {

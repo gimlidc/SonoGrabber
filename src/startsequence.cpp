@@ -140,7 +140,7 @@ void StartSequence::mousePressEvent(QMouseEvent *event)
 
 void StartSequence::getPos(QMatrix4x4 transform)
 {
-    QVector3D pos = position->getOrig(&transform);
+    QVector3D pos = position->getOrig(transform);
     switch (step) {    
     case 0:
         if (pos.z()<0)
@@ -163,7 +163,7 @@ void StartSequence::getPos(QMatrix4x4 transform)
 void StartSequence::rcvImgPosition(Image probePos)
 {
     QMatrix4x4 transform = probePos.getPosition();
-    QVector3D pos = position->getOrig(&transform);
+    QVector3D pos = position->getOrig(transform);
     switch (step) {
     case 0:
         if (pos.z()<0)
