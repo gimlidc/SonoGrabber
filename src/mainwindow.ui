@@ -14,6 +14,12 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <widget class="QPushButton" name="pushButtonRun">
     <property name="geometry">
      <rect>
@@ -147,28 +153,40 @@
       <x>30</x>
       <y>510</y>
       <width>891</width>
-      <height>41</height>
+      <height>25</height>
      </rect>
     </property>
-    <layout class="QHBoxLayout" name="buttonBox">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetMaximumSize</enum>
+     </property>
      <item>
       <widget class="QPushButton" name="pushF1">
+       <property name="autoFillBackground">
+        <bool>true</bool>
+       </property>
        <property name="text">
         <string>F1</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushF2">
+      <widget class="QPushButton" name="pushF3">
+       <property name="autoFillBackground">
+        <bool>true</bool>
+       </property>
        <property name="text">
-        <string>F2</string>
+        <string>F3</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushF3">
+      <widget class="QPushButton" name="pushF2">
+       <property name="autoFillBackground">
+        <bool>true</bool>
+       </property>
        <property name="text">
-        <string>F3</string>
+        <string>F2</string>
        </property>
       </widget>
      </item>

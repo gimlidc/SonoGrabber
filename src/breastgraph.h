@@ -44,9 +44,10 @@ private:
     QVector3D origin;
     void setPlane(QVector<QVector3D> refPoints);
     void drawBackground(QPainter *painter, const QColor color);
-    void drawSnake(QPainter *painter, const QColor color, QVector<Image> *extPoints);
+    void drawSnake(QPainter *painter, const QColor inLimit,
+                   const QColor overLimit, const QVector<Image> extPoints);
     void drawProbe(QPainter *painter, const QColor probe, const QColor freeze,
-                   QVector<Image> *lines);
+                   const QVector<Image> lines);
     void drawGraph(QPainter *painter,
                    QVector<qreal> radii, QVector<int> segments);
     // get speed between the last and before-last element of probe position

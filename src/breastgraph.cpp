@@ -112,20 +112,20 @@ qreal BreastGraph::getSpeed(const QVector<Image> &probePos, int idx)
     return speed;
 }
 
-void BreastGraph::drawSnake(QPainter *painter, const QColor color, QVector<Image> *lines)
+void BreastGraph::drawSnake(QPainter *painter, const QColor inLimit,
+                            const QColor overLimit, const QVector<Image> lines)
 {
     // green "snake"
     painter->save();
-    painter->setPen(QPen(color, 0));
-    painter->setBrush(QBrush(color, Qt::SolidPattern));
-    for (int i=1; i<lines->size(); i++) {
-        if (getSpeed(*lines, i)<speed)
-            painter->setBrush(QBrush(color, Qt::SolidPattern));
+    painter->setPen(QPen(inLimit, 0));
+    for (int i=1; i<lines.size(); i++) {
+        if (getSpeed(lines, i)<speed)
+            painter->setBrush(QBrush(inLimit, Qt::SolidPattern));
         else
-            painter->setBrush(QBrush(Qt::red, Qt::SolidPattern));
+            painter->setBrush(QBrush(overLimit, Qt::SolidPattern));
 
-        QLineF line1 = lines->at(i-1).getLine();
-        QLineF line2 = lines->at(i).getLine();
+        QLineF line1 = lines.at(i-1).getLine();
+        QLineF line2 = lines.at(i).getLine();
         QPointF points[4] = {line1.p1(), line1.p2(), line2.p2(), line2.p1()};
         painter->drawPolygon(points, 4);
     }
@@ -133,23 +133,25 @@ void BreastGraph::drawSnake(QPainter *painter, const QColor color, QVector<Image
 
 }
 
-void BreastGraph::drawProbe(QPainter *painter, const QColor probe, const QColor freeze, QVector<Image> *lines)
+void BreastGraph::drawProbe(QPainter *painter, const QColor probe,
+                            const QColor freeze,
+                            const QVector<Image> lines)
 {
     QColor blueCol = probe;
     painter->save();
     for (int i=0; i<bufLen; i++) {
-        if (lines->at(lines->size()-i-1).getStatus()==Frozen::UNFROZEN) {
+        if (lines.at(lines.size()-i-1).getStatus()==Frozen::UNFROZEN) {
             blueCol.setAlphaF(alpha[i]);
             painter->setPen(QPen(blueCol, 0));
-            QLineF line = lines->at(lines->size()-i-1).getLine();
+            QLineF line = lines.at(lines.size()-i-1).getLine();
             painter->drawLine(line);
             painter->drawEllipse(line.p2(), 2, 2);
         }
     }
     painter->setPen(QPen(freeze, 3));
-    for (int i=0; i<lines->size(); i++) {
-        if (lines->at(i).getStatus()==Frozen::FROZEN) {
-            QLineF line = lines->at(i).getLine();
+    for (int i=0; i<lines.size(); i++) {
+        if (lines.at(i).getStatus()==Frozen::FROZEN) {
+            QLineF line = lines.at(i).getLine();
             painter->drawLine(line);
             QPointF point = line.p2();
             painter->drawEllipse(point, 2.0, 2.0);
@@ -193,8 +195,8 @@ void BreastGraph::paintEvent(QPaintEvent *event)
     painter.setViewport(QRect((dh-s)/2, .9*(dv-s), s, s));
     painter.setRenderHint(QPainter::Antialiasing);
     drawBackground(&painter, Qt::red);
-    drawSnake(&painter, Qt::green, &lines);
-    drawProbe(&painter, Qt::blue, Qt::red, &lines);
+    drawSnake(&painter, Qt::green, Qt::red, lines);
+    drawProbe(&painter, Qt::blue, Qt::red, lines);
     drawGraph(&painter, radii, segments);
     painter.setPen(QPen(Qt::red, 0));
     // reference points
