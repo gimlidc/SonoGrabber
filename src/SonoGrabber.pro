@@ -4,8 +4,10 @@
 #
 #-------------------------------------------------
 
-SOURCES += pathstroke.cpp
-HEADERS += pathstroke.h
+SOURCES += pathstroke.cpp \
+    mainwindowresizable.cpp
+HEADERS += pathstroke.h \
+    mainwindowresizable.h
 
 SHARED_FOLDER = ../shared
 
@@ -42,7 +44,6 @@ SOURCES += main.cpp\
 #    breastselector.cpp \
     startsequence.cpp \
     breastgraph.cpp \
-    breastselector.cpp \
 #    position.cpp
     sonoimage.cpp \
     transform.cpp \
@@ -60,7 +61,6 @@ HEADERS  += mainwindow.h \
     startsequence.h \
     breastgraph.h \
     side.h \
-    breastselector.h \
 #    position.h
     sonoimage.h \
     icorner.h \

@@ -40,11 +40,6 @@ public slots:
     void listeningStopped(int e);
 //    void receivePos(QVector4D pos);
     void sequenceTerminator();
-//    void setBreastGraph();
-//    void startImage();    
-
-//protected:
-//    void mousePressEvent(QMouseEvent *event);
 
 signals:
     void startListening();

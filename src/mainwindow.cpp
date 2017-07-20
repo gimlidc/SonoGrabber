@@ -1,6 +1,6 @@
 #include "mainwindow.h"
-//#include "breastselector.h"
 #include "ui_mainwindow.h"
+#include "mainwindowresizable.h"
 #include "sonoimage.h"
 #include "sessionnamegenerator.h"
 #include "igtlinkclient.h"
@@ -27,6 +27,9 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
     PathStrokeWidget* pathStrokeWidget = new PathStrokeWidget(this);
 
     pathStrokeWidget->show();
+
+    MainWindowResizable* wResizable = new MainWindowResizable(session, client, nullptr);
+    wResizable->show();
 
     transform = new Transform(session->getCrop());
     QVector<qreal> radii = {.333, .666, 1};
