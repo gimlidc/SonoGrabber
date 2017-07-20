@@ -4,6 +4,16 @@
 #
 #-------------------------------------------------
 
+SOURCES += pathstroke.cpp
+HEADERS += pathstroke.h
+
+SHARED_FOLDER = ../shared
+
+include($$SHARED_FOLDER/shared.pri)
+
+RESOURCES +=
+
+
 QT       += core gui svg
 QT      += charts
 

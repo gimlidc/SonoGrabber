@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "pathstroke.h"
 #include <QApplication>
 #include <QtDebug>
 #include <QSettings>
@@ -12,6 +13,7 @@
 
 int main(int argc, char *argv[])
 {   
+
     // Create application
     QApplication app(argc, argv);
     QApplication::setApplicationName("Sono Grabber");

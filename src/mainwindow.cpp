@@ -5,6 +5,7 @@
 #include "sessionnamegenerator.h"
 #include "igtlinkclient.h"
 #include "side.h"
+#include "pathstroke.h"
 #include <QDebug>
 #include <QPixmap>
 #include <QGraphicsView>
@@ -22,6 +23,10 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
     ui->setupUi(this);
 
     qRegisterMetaType<Image>();
+
+    PathStrokeWidget* pathStrokeWidget = new PathStrokeWidget(this);
+
+    pathStrokeWidget->show();
 
     transform = new Transform(session->getCrop());
     QVector<qreal> radii = {.333, .666, 1};
