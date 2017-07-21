@@ -3,6 +3,7 @@
 
 #include <QImage>
 #include <QTimer>
+#include <QPushButton>
 #include <QtSvg/QSvgWidget>
 #include <QVector4D>
 #include <QLineEdit>
@@ -16,6 +17,7 @@
 #include "breastgraph.h"
 #include "transform.h"
 #include "side.h"
+#include "centralwindow.h"
 
 
 class SessionDataLine : public QWidget
@@ -92,6 +94,8 @@ private:
 
     SessionDataLine *sessionData;
     StatusLine *statusLine;
+    CentralWindow *centralWindow;
+    QPushButton *runButton;
 };
 
 #endif // MAINWINDOWRESIZABLE_H

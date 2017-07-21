@@ -62,8 +62,6 @@ private:
     void showBreastGraph();
 
     Transform *transform;
-//    BreastSelector *breastSelector;
-//    void selectBreast();
 };
 
 #endif // MAINWINDOW_H

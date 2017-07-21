@@ -5,9 +5,11 @@
 #-------------------------------------------------
 
 SOURCES += pathstroke.cpp \
-    mainwindowresizable.cpp
+    mainwindowresizable.cpp \
+    centralwindow.cpp
 HEADERS += pathstroke.h \
-    mainwindowresizable.h
+    mainwindowresizable.h \
+    centralwindow.h
 
 SHARED_FOLDER = ../shared
 

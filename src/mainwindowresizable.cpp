@@ -95,6 +95,17 @@ MainWindowResizable::MainWindowResizable(SessionParams * session, IGTLinkClient 
     basicLayout->addWidget(sessionData);
     statusLine = new StatusLine(this);
     basicLayout->addWidget(statusLine);
+//    basicLayout->addSpacerItem(new QSpacerItem(0,0, QSizePolicy::Expanding, QSizePolicy::Expanding));
+    centralWindow = new CentralWindow(params, client, this);
+    basicLayout->addSpacerItem(new QSpacerItem(0, 0,
+                                                 QSizePolicy::Expanding,
+                                                 QSizePolicy::Expanding));
+    basicLayout->addWidget(centralWindow);
+    basicLayout->addSpacerItem(new QSpacerItem(0, 0,
+                                                 QSizePolicy::Expanding,
+                                                 QSizePolicy::Expanding));
+    runButton = new QPushButton("Start", this);
+    basicLayout->addWidget(runButton);
 }
 
 
