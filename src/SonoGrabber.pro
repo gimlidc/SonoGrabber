@@ -6,10 +6,12 @@
 
 SOURCES += pathstroke.cpp \
     mainwindowresizable.cpp \
-    centralwindow.cpp
+    centralwindow.cpp \
+    startsequencescene.cpp
 HEADERS += pathstroke.h \
     mainwindowresizable.h \
-    centralwindow.h
+    centralwindow.h \
+    startsequencescene.h
 
 SHARED_FOLDER = ../shared
 
