@@ -1,5 +1,5 @@
 #include "mainwindowresizable.h"
-#include "sonoimage.h"
+#include "sonoimageresizable.h"
 #include "sessionnamegenerator.h"
 #include "igtlinkclient.h"
 #include "side.h"
@@ -21,6 +21,7 @@ SessionDataLine::SessionDataLine(QDir dirPath, int fileIdx, QWidget* parent) : Q
     timer->setInterval(1000);
     connect(timer, SIGNAL(timeout()), this, SLOT(updateTime()));
     timer->start();
+
 
     QHBoxLayout *mainLayout = new QHBoxLayout(this);
     mainLayout->setMargin(0);
@@ -74,7 +75,6 @@ MainWindowResizable::MainWindowResizable(SessionParams * session, IGTLinkClient 
     transform = new Transform(session->getCrop());
     QVector<qreal> radii = {.333, .666, 1};
     QVector<int> segments = {0, 4, 8};
-    image = new SonoImage;
 
     params = session;
     timer = new QTimer(this);

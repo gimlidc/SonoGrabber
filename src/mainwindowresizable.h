@@ -4,6 +4,7 @@
 #include <QImage>
 #include <QTimer>
 #include <QPushButton>
+#include <QLabel>
 #include <QtSvg/QSvgWidget>
 #include <QVector4D>
 #include <QLineEdit>
@@ -11,7 +12,7 @@
 #include <QWidget>
 
 #include "sessionparams.h"
-#include "sonoimage.h"
+#include "sonoimageresizable.h"
 #include "startsequence.h"
 #include "igtlinkclient.h"
 #include "breastgraph.h"
@@ -80,7 +81,6 @@ private:
     QString dirPath;
     SessionParams * params;
     QTimer *timer;
-    SonoImage *image;
     int step = 0;
     void newSession();
     void showDiag();

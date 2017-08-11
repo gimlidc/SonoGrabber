@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "startsequence.h"
 #include "startsequencescene.h"
+#include "sonoimageresizable.h"
 #include "sessionparams.h"
 #include "transform.h"
 #include "igtlinkclient.h"
@@ -22,6 +23,8 @@ public slots:
 private:
     StartSequence *startSequence;
     StartSequenceScene *startSequenceScene;
+    SonoImageResizable *image;
+
     SessionParams *params;
     Transform *transform;
 };
