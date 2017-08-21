@@ -76,8 +76,7 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui \
     startsequence.ui \
-    mainwindowResize.ui \
-    mainwindowResize2.ui
+    mainwindowResize.ui
 
 DISTFILES += ../sonoGrabber.ini
 

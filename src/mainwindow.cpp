@@ -1,5 +1,5 @@
 #include "mainwindow.h"
-#include "ui_mainwindowResize2.h"
+#include "ui_mainwindowResize.h"
 #include "mainwindowresizable.h"
 #include "sonoimage.h"
 #include "sessionnamegenerator.h"
@@ -47,8 +47,9 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
     ui->lineEdit_3->setValidator(new QIntValidator(0,1e10,this));
 
     startSequence = new StartSequence(transform);
-    startSequence->show();
+    ui->mainLayout->addWidget(startSequence);
 //    ui->mainWindow->addWidget(startSequence);
+    startSequence->show();
     connect(this, &MainWindow::position, startSequence, &StartSequence::getPos);
     this->client = client;
 
@@ -110,80 +111,80 @@ void MainWindow::sequenceTerminator()
 
 void MainWindow::toggleRun(bool buttonPressed)
 {
-//    if (buttonPressed) {
-//        ui->pushButtonRun->setText("Stop");
-//        timer->stop();
-//        ui->lineEdit->setEnabled(false);
-//        ui->lineEdit_2->setEnabled(false);
-//        ui->lineEdit_3->setEnabled(false);
-//        newSession();
-//        qDebug() << "Setting output dir: " << params->getOutDir().absolutePath();
-//        emit startListening();
-//    }
-//    else {
-//        emit stopListening();
-//        timer->start();
-//        ui->pushButtonRun->setText("Start");
-//        ui->lineEdit->setEnabled(true);
-//        ui->lineEdit_2->setEnabled(true);
-//        ui->lineEdit_3->setEnabled(true);
-//        ui->lineEdit_3->setText(QString::number(params->getFilenameIndex()));
-//        ui->sonoImage->setPixmap(QPixmap());
-//        if (this->findChild<QWidget *>("BreastGraph")) {
-//            ui->mainWindow->removeWidget(bgraph);
-//            bgraph->reset();
-//            qDebug() << "reset bgraph";
-//        }
-//        if (!(this->findChild<QWidget *>("StartSequence")))
-//        {
-//            startSequence = new StartSequence(transform);
-//            ui->mainWindow->addWidget(startSequence);
-//            startSequence->show();
-//            QObject::connect(client, &IGTLinkClient::position, startSequence, &StartSequence::getPos);
-//            QObject::connect(startSequence, &StartSequence::terminateStartSequence, this,
-//                             &MainWindow::sequenceTerminator);
+    if (buttonPressed) {
+        ui->pushButtonRun->setText("Stop");
+        timer->stop();
+        ui->lineEdit->setEnabled(false);
+        ui->lineEdit_2->setEnabled(false);
+        ui->lineEdit_3->setEnabled(false);
+        newSession();
+        qDebug() << "Setting output dir: " << params->getOutDir().absolutePath();
+        emit startListening();
+    }
+    else {
+        emit stopListening();
+        timer->start();
+        ui->pushButtonRun->setText("Start");
+        ui->lineEdit->setEnabled(true);
+        ui->lineEdit_2->setEnabled(true);
+        ui->lineEdit_3->setEnabled(true);
+        ui->lineEdit_3->setText(QString::number(params->getFilenameIndex()));
+        ui->sonoImage->setPixmap(QPixmap());
+        if (this->findChild<QWidget *>("BreastGraph")) {
+            ui->mainWindow->removeWidget(bgraph);
+            bgraph->reset();
+            qDebug() << "reset bgraph";
+        }
+        if (!(this->findChild<QWidget *>("StartSequence")))
+        {
+            startSequence = new StartSequence(transform);
+            ui->mainWindow->addWidget(startSequence);
+            startSequence->show();
+            QObject::connect(client, &IGTLinkClient::position, startSequence, &StartSequence::getPos);
+            QObject::connect(startSequence, &StartSequence::terminateStartSequence, this,
+                             &MainWindow::sequenceTerminator);
 
-//        }
-//        else
-//        {
-//            startSequence->reset();
-//        }
-//    }
+        }
+        else
+        {
+            startSequence->reset();
+        }
+    }
 }
 
 
 void MainWindow::listeningStopped(int e)
 {
-//    switch ((IGTLinkClient::ErrorType)e) {
-//    case IGTLinkClient::UserInterrupt:
-//        ui->state->setText("OK");
-//        params->incFilenameIndex();
-//        break;
-//    case IGTLinkClient::ReceiveError:
-//        ui->state->setText("REC ERROR");
-//        params->incFilenameIndex();
-//        break;
-//    case IGTLinkClient::SocketOpenError:
-//        ui->state->setText("SOCKET ERROR");
-//    }
-//    ui->lineEdit_3->setText(QString::number(params->getFilenameIndex()));
-//    if (ui->pushButtonRun->isChecked())
-//        ui->pushButtonRun->setChecked(false);
+    switch ((IGTLinkClient::ErrorType)e) {
+    case IGTLinkClient::UserInterrupt:
+        ui->state->setText("OK");
+        params->incFilenameIndex();
+        break;
+    case IGTLinkClient::ReceiveError:
+        ui->state->setText("REC ERROR");
+        params->incFilenameIndex();
+        break;
+    case IGTLinkClient::SocketOpenError:
+        ui->state->setText("SOCKET ERROR");
+    }
+    ui->lineEdit_3->setText(QString::number(params->getFilenameIndex()));
+    if (ui->pushButtonRun->isChecked())
+        ui->pushButtonRun->setChecked(false);
 }
 
 void MainWindow::showImage(QImage newImage)
 {
-//    qDebug() << "drawing";
-//    ui->sonoImage->setPixmap(QPixmap::fromImage(newImage));
-//    ui->sonoImage->setScaledContents(true);
-//    ui->sonoImage->adjustSize();
-//    ui->sonoImage->repaint();
+    qDebug() << "drawing";
+    ui->sonoImage->setPixmap(QPixmap::fromImage(newImage));
+    ui->sonoImage->setScaledContents(true);
+    ui->sonoImage->adjustSize();
+    ui->sonoImage->repaint();
 }
 
 
 void MainWindow::changeState(QString state)
 {
-//    ui->state->setText(state);
+    ui->state->setText(state);
 }
 
 void MainWindow::updateTime()
