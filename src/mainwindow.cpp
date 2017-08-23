@@ -46,8 +46,12 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
     ui->lineEdit_3->setStyleSheet("color: red");
     ui->lineEdit_3->setValidator(new QIntValidator(0,1e10,this));
 
-    startSequence = new StartSequence(transform);
-    ui->mainLayout->addWidget(startSequence);
+    startSequence = new StartSequence(transform, this);
+    startSequence->setMinimumSize(800, 300);
+    startSequence->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+    ui->mainLayout->insertWidget(0, startSequence);
+    ui->mainLayout->setStretch(0, 1);
+    ui->mainLayout->setAlignment(startSequence, Qt::AlignCenter);
 //    ui->mainWindow->addWidget(startSequence);
     startSequence->show();
     connect(this, &MainWindow::position, startSequence, &StartSequence::getPos);

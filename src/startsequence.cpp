@@ -4,6 +4,8 @@
 #include <QSvgWidget>
 #include <QStackedWidget>
 #include <QLayoutItem>
+#include <QLabel>
+#include <QHBoxLayout>
 #include <QTimer>
 #include <QTime>
 #include <QDebug>
@@ -24,6 +26,7 @@ StartSequence::StartSequence(Transform *pos, QWidget *parent) :
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
     timer->start(1000);
+
 
     initImage(false);
     this->position = pos;
@@ -189,11 +192,11 @@ void StartSequence::rcvImgPosition(Image probePos)
 
 void StartSequence::paintEvent(QPaintEvent *)
 {
-    if (step==0) {
-        QTime time = QTime::currentTime();
-        int idx = time.second() % 2;
-        imageLR->setCurrentIndex(idx);
-    }
+//    if (step==0) {
+//        QTime time = QTime::currentTime();
+//        int idx = time.second() % 2;
+//        imageLR->setCurrentIndex(idx);
+//    }
 }
 
 
