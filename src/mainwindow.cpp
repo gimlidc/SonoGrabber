@@ -91,10 +91,11 @@ void MainWindow::newSession()
 
 void MainWindow::showBreastGraph()
 {
-//    ui->mainWindow->addWidget(bgraph);
+    ui->mainLayout->insertWidget(0, bgraph);
+    ui->mainLayout->setStretch(0, 1);
 //    ui->mainWindow->addWidget(ui->sonoImage);
 //    ui->mainWindow->addWidget(image);
-//    bgraph->show();
+    bgraph->show();
 }
 
 
@@ -180,8 +181,8 @@ void MainWindow::showImage(QImage newImage)
 {
     qDebug() << "drawing";
     ui->sonoImage->setPixmap(QPixmap::fromImage(newImage));
-    ui->sonoImage->setScaledContents(true);
-    ui->sonoImage->adjustSize();
+//    ui->sonoImage->setScaledContents(true);
+//    ui->sonoImage->adjustSize();
     ui->sonoImage->repaint();
 }
 
