@@ -143,7 +143,8 @@ void MainWindow::toggleRun(bool buttonPressed)
         if (!(this->findChild<QWidget *>("StartSequence")))
         {
             startSequence = new StartSequence(transform);
-            ui->mainWindow->addWidget(startSequence);
+            ui->mainLayout->insertWidget(0, startSequence);
+            ui->mainLayout->setStretch(0, 1);
             startSequence->show();
             QObject::connect(client, &IGTLinkClient::position, startSequence, &StartSequence::getPos);
             QObject::connect(startSequence, &StartSequence::terminateStartSequence, this,
