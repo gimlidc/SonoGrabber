@@ -216,14 +216,28 @@ void Worker::start()
     igtl::MessageHeader::Pointer headerMsg;
     headerMsg = igtl::MessageHeader::New();
 
+    Lock.lockForWrite();
+    Terminate = false;
+    Lock.unlock();
+
     resultCode = session->openSocket();
-    if (resultCode != 0) {
-        qWarning() << "Connection to server failed. Error code: " << resultCode;
-        emit stopped(IGTLinkClient::SocketOpenError);
-        return;
-    } else {
-        qDebug() << "Socket opened. Reading data loop ...";
+//    if (resultCode != 0) {
+//        qWarning() << "Connection to server failed. Error code: " << resultCode;
+//        emit stopped(IGTLinkClient::SocketOpenError);
+//        return;
+//    } else {
+//        qDebug() << "Socket opened. Reading data loop ...";
+//    }
+
+    bool t;
+    while (resultCode != 0) {
+        Lock.lockForRead();
+        t = Terminate;
+        Lock.unlock();
+        if (!t)
+            resultCode = session->openSocket();
     }
+    qDebug() << "Socket opened. Reading data loop ...";
 
     //------------------------------------------------------------
     // Allocate a time stamp
@@ -235,9 +249,6 @@ void Worker::start()
 
     writer->openHeaderFile();
 
-    Lock.lockForWrite();
-    Terminate = false;
-    Lock.unlock();
 
     setOutput();
 
