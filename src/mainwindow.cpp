@@ -28,8 +28,8 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
 
     pathStrokeWidget->show();
 
-    MainWindowResizable* wResizable = new MainWindowResizable(session, client, nullptr);
-    wResizable->show();
+//    MainWindowResizable* wResizable = new MainWindowResizable(session, client, nullptr);
+//    wResizable->show();
 
     transform = new Transform(session->getCrop());
     QVector<qreal> radii = {.333, .666, 1};
@@ -46,11 +46,13 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
     ui->lineEdit_3->setStyleSheet("color: red");
     ui->lineEdit_3->setValidator(new QIntValidator(0,1e10,this));
 
-    startSequence = new StartSequence(transform, this);
-    startSequence->setMinimumSize(800, 300);
+    startSequence = new StartSequence(transform);
     startSequence->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+    startSequence->setStyleSheet("border: 1px solid blue");
+    ui->sonoImage->setStyleSheet("border: 1px solid blue");
     ui->mainLayout->insertWidget(0, startSequence);
     ui->mainLayout->setStretch(0, 1);
+    startSequence->setMinimumSize(500, 300);
     ui->mainLayout->setAlignment(startSequence, Qt::AlignCenter);
 //    ui->mainWindow->addWidget(startSequence);
     startSequence->show();
@@ -136,15 +138,18 @@ void MainWindow::toggleRun(bool buttonPressed)
         ui->lineEdit_3->setText(QString::number(params->getFilenameIndex()));
         ui->sonoImage->setPixmap(QPixmap());
         if (this->findChild<QWidget *>("BreastGraph")) {
-            ui->mainWindow->removeWidget(bgraph);
+            ui->mainLayout->removeWidget(bgraph);
             bgraph->reset();
             qDebug() << "reset bgraph";
         }
         if (!(this->findChild<QWidget *>("StartSequence")))
         {
             startSequence = new StartSequence(transform);
+            startSequence->setMinimumSize(500, 300);
             ui->mainLayout->insertWidget(0, startSequence);
+            ui->mainLayout->setAlignment(startSequence, Qt::AlignCenter);
             ui->mainLayout->setStretch(0, 1);
+
             startSequence->show();
             QObject::connect(client, &IGTLinkClient::position, startSequence, &StartSequence::getPos);
             QObject::connect(startSequence, &StartSequence::terminateStartSequence, this,

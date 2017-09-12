@@ -192,11 +192,11 @@ void StartSequence::rcvImgPosition(Image probePos)
 
 void StartSequence::paintEvent(QPaintEvent *)
 {
-//    if (step==0) {
-//        QTime time = QTime::currentTime();
-//        int idx = time.second() % 2;
-//        imageLR->setCurrentIndex(idx);
-//    }
+    if (step==0) {
+        QTime time = QTime::currentTime();
+        int idx = time.second() % 2;
+        imageLR->setCurrentIndex(idx);
+    }
 }
 
 
