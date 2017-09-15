@@ -4,8 +4,13 @@
 #
 #-------------------------------------------------
 
-SOURCES += pathstroke.cpp
-HEADERS += pathstroke.h
+SOURCES += pathstroke.cpp \
+    arthurstyle.cpp \
+    arthurwidgets.cpp \
+    hoverpoints.cpp
+HEADERS += pathstroke.h \
+    arthurstyle.h \
+    arthurwidgets.h
 
 SHARED_FOLDER = ../shared
 
