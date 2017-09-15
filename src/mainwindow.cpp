@@ -48,8 +48,8 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
 
     startSequence = new StartSequence(transform);
     startSequence->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-    startSequence->setStyleSheet("border: 1px solid blue");
-    ui->sonoImage->setStyleSheet("border: 1px solid blue");
+//    startSequence->setStyleSheet("border: 1px solid blue");
+//    ui->sonoImage->setStyleSheet("border: 1px solid blue");
     ui->mainLayout->insertWidget(0, startSequence);
     ui->mainLayout->setStretch(0, 1);
     startSequence->setMinimumSize(500, 300);

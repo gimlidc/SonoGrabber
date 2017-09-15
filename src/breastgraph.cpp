@@ -11,6 +11,7 @@
 #include <QPolygonF>
 #include <QDebug>
 #include <QtMath>
+#include <QMenu>
 #include <math.h>
 #include "breastgraph.h"
 #include "side.h"
@@ -52,6 +53,11 @@ BreastGraph::BreastGraph(Transform *transform, int fps, int buffSize,
         }
         this->buffSize = buffSize;
     }
+//    this->setContextMenuPolicy(Qt::CustomContextMenu);
+//    connect(this, SIGNAL(customContextMenuRequested(const QPoint &)),
+//                         this, SLOT(showFreezeMenu(const QPoint &)));
+    connect(this, &BreastGraph::freezeSig,
+            this, &BreastGraph::showFreezeMenu);
 }
 
 QPolygonF BreastGraph::getLobe(QPointF rp)
@@ -292,6 +298,15 @@ void BreastGraph::rcvImgPosition(Image imgPos)
         bool dist = checkDistance(pos0);
         bool orient = checkOrientation(pos0, posY);
 //        if (dist && orient) {
+        if (imgPos.getStatus()==FROZEN) {
+            const QPoint p = project(pos0).toPoint();
+            emit freezeSig(p);
+        }
+//        int endPos=lines.size()-1;
+//        if (endPos>0
+//                && lines.at(endPos).getStatus()==UNFROZEN
+//                && lines.at(endPos-1).getStatus()==FROZEN)
+//            delete freezeMenu;
         if (dist) {
             imgPos.setLine(project(pos0), project(posX));
             Image tmpImg = imgPos;
@@ -311,3 +326,13 @@ void BreastGraph::rcvImgPosition(Image imgPos)
     }
 }
 
+void BreastGraph::showFreezeMenu(const QPoint &pos)
+{
+    freezeMenu = new QMenu("Freeze menu", this);
+    freezeMenu->setWindowTitle("Freeze");
+    freezeMenu->addSection("<b>Vyberte akci:</b>");
+    freezeMenu->setWindowFlags(Qt::Tool); // to display title
+    QAction saveImage("Ulož snímek", this);
+    freezeMenu->addAction(&saveImage);
+    freezeMenu->exec(mapToGlobal(pos));
+}

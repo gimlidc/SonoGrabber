@@ -8,6 +8,7 @@
 #include <QVector3D>
 #include <QVector4D>
 #include <QPolygonF>
+#include <QMenu>
 #include "side.h"
 #include "transform.h"
 #include "frozen.h"
@@ -58,11 +59,16 @@ private:
     bool checkOrientation(QVector3D p0, QVector3D py);
     bool checkSpeeed(QVector3D point);
     bool frozenLastStatus = false;
+    QMenu *freezeMenu;
 
 signals:
+    void freezeSig(const QPoint &pos);
 
 public slots:
     void rcvImgPosition(Image);
+
+private slots:
+    void showFreezeMenu(const QPoint &pos);
 };
 
 
