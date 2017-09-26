@@ -13,6 +13,7 @@ public:
     Frozen getStatus() const;
     QMatrix4x4 getPosition() const;
     void setLine(QPointF p1, QPointF p2);
+    void setLine(QLineF line);
     QLineF getLine() const;
     double getTimeStamp() const;
 

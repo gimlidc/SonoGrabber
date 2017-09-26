@@ -59,6 +59,7 @@ private:
     bool checkOrientation(QVector3D p0, QVector3D py);
     bool checkSpeeed(QVector3D point);
     bool frozenLastStatus = false;
+
     QMenu *freezeMenu;
 
 signals:

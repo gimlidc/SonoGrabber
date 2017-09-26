@@ -34,6 +34,14 @@ QVector3D lastPos;
 int bufPos=0, bufLen=0;
 qreal alphaLast=1;
 
+QPainter painter;
+int freezCnt;
+
+QRect win(-(1+top)*r, -(1+top)*r, 2*(1+top)*r, 2*(1+top)*r);
+int dh;
+int dv;
+int s;
+
 BreastGraph::BreastGraph(Transform *transform, int fps, int buffSize,
                          QVector<qreal> radii, QVector<int> segments, QWidget *parent) : QWidget(parent)
 {
@@ -53,7 +61,11 @@ BreastGraph::BreastGraph(Transform *transform, int fps, int buffSize,
         }
         this->buffSize = buffSize;
     }
-//    this->setContextMenuPolicy(Qt::CustomContextMenu);
+    dh = width();
+    dv = height();
+    s = qMin(dh, dv)/((1+1.2*top));
+
+    //    this->setContextMenuPolicy(Qt::CustomContextMenu);
 //    connect(this, SIGNAL(customContextMenuRequested(const QPoint &)),
 //                         this, SLOT(showFreezeMenu(const QPoint &)));
     connect(this, &BreastGraph::freezeSig,
@@ -194,11 +206,15 @@ void BreastGraph::drawGraph(QPainter *painter,
 void BreastGraph::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
-    int dh = width();
-    int dv = height();
-    int s = qMin(dh, dv)/((1+1.2*top));
-    painter.setWindow(-(1+top)*r, -(1+top)*r, 2*(1+top)*r, (2+top)*r);
-    painter.setViewport(QRect((dh-s)/2, .9*(dv-s), s, s));
+    dh = width();
+    dv = height();
+    s = qMin(dh, dv)/((1+1.2*top));
+//    QRect win(-(1+top)*r, -(1+top)*r, 2*(1+top)*r, (2+top)*r);
+//    QRect win(-(1+top)*r, -(1+top)*r, 2*(1+top)*r, 2*(1+top)*r);
+//    painter.setWindow(-(1+top)*r, -(1+top)*r, 2*(1+top)*r, (2+top)*r);
+    painter.setWindow(win);
+    QRect viewPort((dh-s)/2, .9*(dv-s), s, s);
+    painter.setViewport(viewPort);
     painter.setRenderHint(QPainter::Antialiasing);
     drawBackground(&painter, Qt::red);
     drawSnake(&painter, Qt::green, Qt::red, lines);
@@ -295,22 +311,18 @@ void BreastGraph::rcvImgPosition(Image imgPos)
         QVector3D pos0 = transform->getOrig(trfMatrix);
         QVector3D posX = transform->getX(trfMatrix);
         QVector3D posY = transform->getY(trfMatrix);
+        QLineF line(project(pos0), project(posX));
         bool dist = checkDistance(pos0);
-        bool orient = checkOrientation(pos0, posY);
-//        if (dist && orient) {
-        if (imgPos.getStatus()==FROZEN) {
-            const QPoint p = project(pos0).toPoint();
-            emit freezeSig(p);
-        }
-//        int endPos=lines.size()-1;
-//        if (endPos>0
-//                && lines.at(endPos).getStatus()==UNFROZEN
-//                && lines.at(endPos-1).getStatus()==FROZEN)
-//            delete freezeMenu;
+//        bool orient = checkOrientation(pos0, posY);
+////        if (dist && orient) {
+////        int endPos=lines.size()-1;
+////        if (endPos>0
+////                && lines.at(endPos).getStatus()==UNFROZEN
+////                && lines.at(endPos-1).getStatus()==FROZEN)
+////            delete freezeMenu;
         if (dist) {
-            imgPos.setLine(project(pos0), project(posX));
-            Image tmpImg = imgPos;
-            lines.append(tmpImg);
+            imgPos.setLine(line);
+            lines.append(imgPos);
             if (buffSize==0) {
                 alpha.append(alphaLast);
                 alphaLast *= fade;
@@ -322,7 +334,15 @@ void BreastGraph::rcvImgPosition(Image imgPos)
                 }
             }
         }
-
+        if (imgPos.getStatus()==FROZEN) {
+            const QPointF p = line.p1();
+            QPointF pwin = p-QPointF(win.x(), win.y());
+            double scale = (double)s/(double)win.width();
+            QPointF pwscaled = pwin*scale;
+            QPointF pfyz = pwin*scale+QPointF((dh-s)/2, .9*(dv-s));
+            qDebug() << "pfyz x: " << pfyz.x() << ", pfyz y: " << pfyz.y();
+            emit freezeSig(pfyz.toPoint());
+        }
     }
 }
 
@@ -330,9 +350,9 @@ void BreastGraph::showFreezeMenu(const QPoint &pos)
 {
     freezeMenu = new QMenu("Freeze menu", this);
     freezeMenu->setWindowTitle("Freeze");
-    freezeMenu->addSection("<b>Vyberte akci:</b>");
+    freezeMenu->addSection(tr("<b>Vyberte akci:</b>"));
     freezeMenu->setWindowFlags(Qt::Tool); // to display title
-    QAction saveImage("Ulož snímek", this);
+    QAction saveImage(tr("Ulož snímek"), this);
     freezeMenu->addAction(&saveImage);
     freezeMenu->exec(mapToGlobal(pos));
 }
