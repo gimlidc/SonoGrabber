@@ -65,6 +65,9 @@ BreastGraph::BreastGraph(Transform *transform, int fps, int buffSize,
     dv = height();
     s = qMin(dh, dv)/((1+1.2*top));
 
+    menu = new FreezeMenu(0);
+//    menu->show();
+
     //    this->setContextMenuPolicy(Qt::CustomContextMenu);
 //    connect(this, SIGNAL(customContextMenuRequested(const QPoint &)),
 //                         this, SLOT(showFreezeMenu(const QPoint &)));
@@ -348,11 +351,13 @@ void BreastGraph::rcvImgPosition(Image imgPos)
 
 void BreastGraph::showFreezeMenu(const QPoint &pos)
 {
+    menu->raise();
+    menu->show();
     freezeMenu = new QMenu("Freeze menu", this);
     freezeMenu->setWindowTitle("Freeze");
     freezeMenu->addSection(tr("<b>Vyberte akci:</b>"));
     freezeMenu->setWindowFlags(Qt::Tool); // to display title
     QAction saveImage(tr("Ulož snímek"), this);
     freezeMenu->addAction(&saveImage);
-    freezeMenu->exec(mapToGlobal(pos));
+    freezeMenu->exec(mapToGlobal(pos));    
 }

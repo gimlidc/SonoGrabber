@@ -13,6 +13,7 @@
 #include "transform.h"
 #include "frozen.h"
 #include "image.h"
+#include "freezemenu.h"
 
 QT_CHARTS_USE_NAMESPACE
 
@@ -61,6 +62,7 @@ private:
     bool frozenLastStatus = false;
 
     QMenu *freezeMenu;
+    FreezeMenu *menu;
 
 signals:
     void freezeSig(const QPoint &pos);

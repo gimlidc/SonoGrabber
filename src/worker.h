@@ -2,6 +2,7 @@
 #define WORKER_H
 
 #include <QObject>
+#include <QWidget>
 #include <QMatrix4x4>
 #include <QVector4D>
 #include <QDir>
@@ -95,6 +96,10 @@ signals:
     void stopped(int);
     void imgPosition(Image);
     void position(QMatrix4x4 pos);
+
+protected:
+    void keyPressEvent(QKeyEvent *);
+//    bool eventFilter(QObject *watched, QEvent *event);
 
 private:
     bool frozenLastStatus = true;

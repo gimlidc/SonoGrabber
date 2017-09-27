@@ -1,6 +1,9 @@
 #include <QDebug>
 #include <QMatrix4x4>
 #include <QVector4D>
+#include <QObject>
+#include <QKeyEvent>
+#include <QApplication>
 #include "worker.h"
 #include "image.h"
 #include "sessionparams.h"
@@ -19,6 +22,8 @@ Worker::Worker(SessionParams * conn)
     frozenImageStored = false;
     frozenLastStatus = false;
     lastStoredTS = 0;
+
+//    installEventFilter(this);
 }
 
 Worker::~Worker() {
@@ -449,3 +454,22 @@ int Worker::ReceiveImage(igtl::Socket * socket, igtl::MessageHeader::Pointer& he
   qWarning() << "CRC check error!";
   return 0;
 }
+
+void Worker::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_S)
+    {
+        qDebug() << "key S";
+    }
+}
+
+//bool Worker::eventFilter(QObject *watched, QEvent *event)
+//{
+//    if (event->type() == QEvent::KeyPress)
+//    {
+//        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+//        if (keyEvent->key() == Qt::Key_Space)
+//            qDebug() << "space";
+//    }
+//    return false;
+//}
