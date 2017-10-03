@@ -5,16 +5,10 @@
 #-------------------------------------------------
 
 SOURCES += pathstroke.cpp \
-    mainwindowresizable.cpp \
     centralwindow.cpp \
-    startsequencescene.cpp \
-    sonoimageresizable.cpp \
     freezemenu.cpp
 HEADERS += pathstroke.h \
-    mainwindowresizable.h \
     centralwindow.h \
-    startsequencescene.h \
-    sonoimageresizable.h \
     freezemenu.h
 
 SHARED_FOLDER = ../shared
