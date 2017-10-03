@@ -7,7 +7,6 @@
 SOURCES += pathstroke.cpp \
     arthurstyle.cpp \
     arthurwidgets.cpp \
-    hoverpoints.cpp
 HEADERS += pathstroke.h \
     arthurstyle.h \
     arthurwidgets.h
