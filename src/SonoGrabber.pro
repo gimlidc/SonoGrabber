@@ -4,18 +4,20 @@
 #
 #-------------------------------------------------
 
-SOURCES += pathstroke.cpp \
-    arthurstyle.cpp \
-    arthurwidgets.cpp \
-HEADERS += pathstroke.h \
-    arthurstyle.h \
-    arthurwidgets.h
+#SOURCES += pathstroke.cpp \
+#    arthurstyle.cpp \
+#    arthurwidgets.cpp
+
+#HEADERS += pathstroke.h \
+#    arthurstyle.h \
+#    arthurwidgets.h \
+#    centralwindow.cpp
 
 SHARED_FOLDER = ../shared
 
 include($$SHARED_FOLDER/shared.pri)
 
-RESOURCES +=
+#RESOURCES +=
 
 
 QT       += core gui svg
@@ -49,7 +51,9 @@ SOURCES += main.cpp\
 #    position.cpp
     sonoimage.cpp \
     transform.cpp \
-    image.cpp
+    image.cpp \
+    freezemenu.cpp \
+    pathstroke.cpp
 
 HEADERS  += mainwindow.h \
     igtlinkclient.h \
@@ -68,7 +72,10 @@ HEADERS  += mainwindow.h \
     icorner.h \
     transform.h \
     frozen.h \
-    image.h
+    image.h \
+    centralwindow.h \
+    pathstroke.h \
+    freezemenu.h
 
 FORMS    += mainwindow.ui \
     startsequence.ui \
@@ -90,7 +97,7 @@ else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/..
 else:unix: PRE_TARGETDEPS += $$PWD/../../../../../usr/local/lib/igtl/libOpenIGTLink.a
 
 
-DISTFILES += ../sonoGrabber.ini
+#DISTFILES += ../sonoGrabber.ini
 
 RESOURCES += \
     images.qrc
