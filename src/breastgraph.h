@@ -64,6 +64,8 @@ private:
     QMenu *freezeMenu;
     FreezeMenu *menu;
 
+
+
 signals:
     void freezeSig(const QPoint &pos);
 

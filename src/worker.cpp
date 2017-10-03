@@ -455,21 +455,3 @@ int Worker::ReceiveImage(igtl::Socket * socket, igtl::MessageHeader::Pointer& he
   return 0;
 }
 
-void Worker::keyPressEvent(QKeyEvent *event)
-{
-    if (event->key() == Qt::Key_S)
-    {
-        qDebug() << "key S";
-    }
-}
-
-//bool Worker::eventFilter(QObject *watched, QEvent *event)
-//{
-//    if (event->type() == QEvent::KeyPress)
-//    {
-//        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-//        if (keyEvent->key() == Qt::Key_Space)
-//            qDebug() << "space";
-//    }
-//    return false;
-//}

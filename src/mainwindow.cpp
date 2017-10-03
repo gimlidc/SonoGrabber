@@ -28,9 +28,6 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
 
     pathStrokeWidget->show();
 
-//    MainWindowResizable* wResizable = new MainWindowResizable(session, client, nullptr);
-//    wResizable->show();
-
     transform = new Transform(session->getCrop());
     QVector<qreal> radii = {.333, .666, 1};
     QVector<int> segments = {0, 4, 8};
@@ -48,8 +45,6 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
 
     startSequence = new StartSequence(transform);
     startSequence->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-//    startSequence->setStyleSheet("border: 1px solid blue");
-//    ui->sonoImage->setStyleSheet("border: 1px solid blue");
     ui->mainLayout->insertWidget(0, startSequence);
     ui->mainLayout->setStretch(0, 1);
     startSequence->setMinimumSize(500, 300);
@@ -201,4 +196,12 @@ void MainWindow::changeState(QString state)
 void MainWindow::updateTime()
 {
     ui->lineEdit_2->setText(SessionNameGenerator::generateCurrentDateTime());
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_S)
+    {
+        qDebug() << "key S";
+    }
 }

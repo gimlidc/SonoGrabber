@@ -104,3 +104,4 @@ void IGTLinkClient::receiveFrozen(int imgNumber)
 {
     emit frozen(imgNumber);
 }
+

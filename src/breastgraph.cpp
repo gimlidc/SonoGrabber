@@ -361,3 +361,4 @@ void BreastGraph::showFreezeMenu(const QPoint &pos)
     freezeMenu->addAction(&saveImage);
     freezeMenu->exec(mapToGlobal(pos));    
 }
+

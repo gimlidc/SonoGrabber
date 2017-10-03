@@ -46,6 +46,10 @@ signals:
     void stopListening();
     void position(QMatrix4x4 transform);
 
+protected:
+    void keyPressEvent(QKeyEvent *);
+//    bool eventFilter(QObject *watched, QEvent *event);
+
 private:
     Ui::MainWindow *ui;
     QString dirPath;
