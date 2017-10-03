@@ -4,6 +4,8 @@
 #include <QSvgWidget>
 #include <QStackedWidget>
 #include <QLayoutItem>
+#include <QLabel>
+#include <QHBoxLayout>
 #include <QTimer>
 #include <QTime>
 #include <QDebug>
@@ -25,6 +27,7 @@ StartSequence::StartSequence(Transform *pos, QWidget *parent) :
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
     timer->start(1000);
 
+
     initImage(false);
     this->position = pos;
 }
@@ -38,10 +41,14 @@ void StartSequence::initImage(bool reset)
         ui->heading->updateGeometry();
 
         QSvgWidget *imageL = new QSvgWidget(":/images/sel_left_wtracker.svg");
+        imageL->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         QSvgWidget *imageR = new QSvgWidget(":/images/sel_right_wtracker.svg");
+        imageR->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         imageLR = new QStackedWidget();
+        imageLR->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         imageLR->addWidget(imageL);
         imageLR->addWidget(imageR);
+        imageLR->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         w = imageLR->width();
         if (reset) {
             ui->startBox->replaceWidget(img, imageLR);

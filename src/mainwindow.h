@@ -40,16 +40,15 @@ public slots:
     void listeningStopped(int e);
 //    void receivePos(QVector4D pos);
     void sequenceTerminator();
-//    void setBreastGraph();
-//    void startImage();    
-
-//protected:
-//    void mousePressEvent(QMouseEvent *event);
 
 signals:
     void startListening();
     void stopListening();
     void position(QMatrix4x4 transform);
+
+protected:
+    void keyPressEvent(QKeyEvent *);
+//    bool eventFilter(QObject *watched, QEvent *event);
 
 private:
     Ui::MainWindow *ui;
@@ -67,8 +66,6 @@ private:
     void showBreastGraph();
 
     Transform *transform;
-//    BreastSelector *breastSelector;
-//    void selectBreast();
 };
 
 #endif // MAINWINDOW_H

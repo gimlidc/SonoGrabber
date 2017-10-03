@@ -54,6 +54,9 @@ public:
 private:
     QVector4D *in;
 
+
+
+
 public slots:
     void startReading();
     void stopReading();

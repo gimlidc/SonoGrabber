@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include "pathstroke.h"
 #include <QApplication>
 #include <QtDebug>
 #include <QSettings>

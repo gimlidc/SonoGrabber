@@ -1,6 +1,9 @@
 #include <QDebug>
 #include <QMatrix4x4>
 #include <QVector4D>
+#include <QObject>
+#include <QKeyEvent>
+#include <QApplication>
 #include "worker.h"
 #include "image.h"
 #include "sessionparams.h"
@@ -19,6 +22,8 @@ Worker::Worker(SessionParams * conn)
     frozenImageStored = false;
     frozenLastStatus = false;
     lastStoredTS = 0;
+
+//    installEventFilter(this);
 }
 
 Worker::~Worker() {
@@ -216,14 +221,28 @@ void Worker::start()
     igtl::MessageHeader::Pointer headerMsg;
     headerMsg = igtl::MessageHeader::New();
 
+    Lock.lockForWrite();
+    Terminate = false;
+    Lock.unlock();
+
     resultCode = session->openSocket();
-    if (resultCode != 0) {
-        qWarning() << "Connection to server failed. Error code: " << resultCode;
-        emit stopped(IGTLinkClient::SocketOpenError);
-        return;
-    } else {
-        qDebug() << "Socket opened. Reading data loop ...";
+//    if (resultCode != 0) {
+//        qWarning() << "Connection to server failed. Error code: " << resultCode;
+//        emit stopped(IGTLinkClient::SocketOpenError);
+//        return;
+//    } else {
+//        qDebug() << "Socket opened. Reading data loop ...";
+//    }
+
+    bool t;
+    while (resultCode != 0) {
+        Lock.lockForRead();
+        t = Terminate;
+        Lock.unlock();
+        if (!t)
+            resultCode = session->openSocket();
     }
+    qDebug() << "Socket opened. Reading data loop ...";
 
     //------------------------------------------------------------
     // Allocate a time stamp
@@ -235,9 +254,6 @@ void Worker::start()
 
     writer->openHeaderFile();
 
-    Lock.lockForWrite();
-    Terminate = false;
-    Lock.unlock();
 
     setOutput();
 
@@ -438,3 +454,4 @@ int Worker::ReceiveImage(igtl::Socket * socket, igtl::MessageHeader::Pointer& he
   qWarning() << "CRC check error!";
   return 0;
 }
+

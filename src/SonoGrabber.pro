@@ -47,7 +47,6 @@ SOURCES += main.cpp\
 #    breastselector.cpp \
     startsequence.cpp \
     breastgraph.cpp \
-    breastselector.cpp \
 #    position.cpp
     sonoimage.cpp \
     transform.cpp \
@@ -65,7 +64,6 @@ HEADERS  += mainwindow.h \
     startsequence.h \
     breastgraph.h \
     side.h \
-    breastselector.h \
 #    position.h
     sonoimage.h \
     icorner.h \
@@ -74,7 +72,8 @@ HEADERS  += mainwindow.h \
     image.h
 
 FORMS    += mainwindow.ui \
-    startsequence.ui
+    startsequence.ui \
+    mainwindowResize.ui
 
 DISTFILES += ../sonoGrabber.ini
 

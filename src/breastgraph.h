@@ -8,10 +8,12 @@
 #include <QVector3D>
 #include <QVector4D>
 #include <QPolygonF>
+#include <QMenu>
 #include "side.h"
 #include "transform.h"
 #include "frozen.h"
 #include "image.h"
+#include "freezemenu.h"
 
 QT_CHARTS_USE_NAMESPACE
 
@@ -59,10 +61,19 @@ private:
     bool checkSpeeed(QVector3D point);
     bool frozenLastStatus = false;
 
+    QMenu *freezeMenu;
+    FreezeMenu *menu;
+
+
+
 signals:
+    void freezeSig(const QPoint &pos);
 
 public slots:
     void rcvImgPosition(Image);
+
+private slots:
+    void showFreezeMenu(const QPoint &pos);
 };
 
 

@@ -34,6 +34,11 @@ void Image::setLine(QPointF p1, QPointF p2)
     line2D = QLineF(p1, p2);
 }
 
+void Image::setLine(QLineF line)
+{
+    line2D = line;
+}
+
 QLineF Image::getLine() const
 {
     return line2D;

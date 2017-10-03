@@ -1,6 +1,6 @@
 #include "mainwindow.h"
-//#include "breastselector.h"
-#include "ui_mainwindow.h"
+#include "ui_mainwindowResize.h"
+#include "mainwindowresizable.h"
 #include "sonoimage.h"
 #include "sessionnamegenerator.h"
 #include "igtlinkclient.h"
@@ -44,8 +44,13 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
     ui->lineEdit_3->setValidator(new QIntValidator(0,1e10,this));
 
     startSequence = new StartSequence(transform);
+    startSequence->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+    ui->mainLayout->insertWidget(0, startSequence);
+    ui->mainLayout->setStretch(0, 1);
+    startSequence->setMinimumSize(500, 300);
+    ui->mainLayout->setAlignment(startSequence, Qt::AlignCenter);
+//    ui->mainWindow->addWidget(startSequence);
     startSequence->show();
-    ui->mainWindow->addWidget(startSequence);
     connect(this, &MainWindow::position, startSequence, &StartSequence::getPos);
     this->client = client;
 
@@ -83,9 +88,10 @@ void MainWindow::newSession()
 
 void MainWindow::showBreastGraph()
 {
-    ui->mainWindow->addWidget(bgraph);
+    ui->mainLayout->insertWidget(0, bgraph);
+    ui->mainLayout->setStretch(0, 1);
 //    ui->mainWindow->addWidget(ui->sonoImage);
-    ui->mainWindow->addWidget(image);
+//    ui->mainWindow->addWidget(image);
     bgraph->show();
 }
 
@@ -99,7 +105,7 @@ void MainWindow::setOutputDir(QString dirPath)
 
 void MainWindow::sequenceTerminator()
 {
-    ui->mainWindow->removeWidget(startSequence);
+//    ui->mainWindow->removeWidget(startSequence);
     delete startSequence;
     showBreastGraph();
 }
@@ -127,14 +133,18 @@ void MainWindow::toggleRun(bool buttonPressed)
         ui->lineEdit_3->setText(QString::number(params->getFilenameIndex()));
         ui->sonoImage->setPixmap(QPixmap());
         if (this->findChild<QWidget *>("BreastGraph")) {
-            ui->mainWindow->removeWidget(bgraph);
+            ui->mainLayout->removeWidget(bgraph);
             bgraph->reset();
             qDebug() << "reset bgraph";
         }
         if (!(this->findChild<QWidget *>("StartSequence")))
         {
             startSequence = new StartSequence(transform);
-            ui->mainWindow->addWidget(startSequence);
+            startSequence->setMinimumSize(500, 300);
+            ui->mainLayout->insertWidget(0, startSequence);
+            ui->mainLayout->setAlignment(startSequence, Qt::AlignCenter);
+            ui->mainLayout->setStretch(0, 1);
+
             startSequence->show();
             QObject::connect(client, &IGTLinkClient::position, startSequence, &StartSequence::getPos);
             QObject::connect(startSequence, &StartSequence::terminateStartSequence, this,
@@ -170,10 +180,10 @@ void MainWindow::listeningStopped(int e)
 
 void MainWindow::showImage(QImage newImage)
 {
-//    qDebug() << "drawing";
+    qDebug() << "drawing";
     ui->sonoImage->setPixmap(QPixmap::fromImage(newImage));
-    ui->sonoImage->setScaledContents(true);
-    ui->sonoImage->adjustSize();
+//    ui->sonoImage->setScaledContents(true);
+//    ui->sonoImage->adjustSize();
     ui->sonoImage->repaint();
 }
 
@@ -186,4 +196,12 @@ void MainWindow::changeState(QString state)
 void MainWindow::updateTime()
 {
     ui->lineEdit_2->setText(SessionNameGenerator::generateCurrentDateTime());
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_S)
+    {
+        qDebug() << "key S";
+    }
 }
