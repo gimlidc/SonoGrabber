@@ -180,11 +180,18 @@ void MainWindow::listeningStopped(int e)
 
 void MainWindow::showImage(QImage newImage)
 {
+    bool kbdLocalStat;
     qDebug() << "drawing";
-    ui->sonoImage->setPixmap(QPixmap::fromImage(newImage));
-//    ui->sonoImage->setScaledContents(true);
-//    ui->sonoImage->adjustSize();
-    ui->sonoImage->repaint();
+//    while (!kbdFreezeLock.tryLockForRead());
+    kbdFreezeLock.lockForRead();
+    kbdLocalStat = kbdFreeze;
+    kbdFreezeLock.unlock();
+    if (!kbdLocalStat) {
+        ui->sonoImage->setPixmap(QPixmap::fromImage(newImage));
+        //    ui->sonoImage->setScaledContents(true);
+        //    ui->sonoImage->adjustSize();
+        ui->sonoImage->repaint();
+    }
 }
 
 
@@ -200,8 +207,14 @@ void MainWindow::updateTime()
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
-    if (event->key() == Qt::Key_S)
+    if (event->key() == Qt::Key_F)
     {
-        qDebug() << "key S";
+        qDebug() << "key F";
+//        while (!kbdFreezeLock.tryLockForWrite());
+        kbdFreezeLock.lockForWrite();
+        kbdFreeze = !kbdFreeze;
+        if (kbdFreeze)
+            changeState("FROZEN");
+        kbdFreezeLock.unlock();
     }
 }

@@ -7,6 +7,7 @@
 #include <QTimer>
 #include <QtSvg/QSvgWidget>
 #include <QVector4D>
+#include <QReadWriteLock>
 //#include "breastselector.h"
 #include "sessionparams.h"
 #include "sonoimage.h"
@@ -48,7 +49,6 @@ signals:
 
 protected:
     void keyPressEvent(QKeyEvent *);
-//    bool eventFilter(QObject *watched, QEvent *event);
 
 private:
     Ui::MainWindow *ui;
@@ -60,10 +60,13 @@ private:
     void newSession();
     void showDiag();
     IGTLinkClient * client;
+    bool kbdFreeze=false;
 
     StartSequence *startSequence;
     BreastGraph *bgraph;
     void showBreastGraph();
+
+    QReadWriteLock kbdFreezeLock;
 
     Transform *transform;
 };

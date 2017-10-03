@@ -97,9 +97,6 @@ signals:
     void imgPosition(Image);
     void position(QMatrix4x4 pos);
 
-//protected:
-//    void keyPressEvent(QKeyEvent *);
-//    bool eventFilter(QObject *watched, QEvent *event);
 
 private:
     bool frozenLastStatus = true;
