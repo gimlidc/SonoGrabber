@@ -198,6 +198,14 @@ void MainWindow::showImage(QImage newImage)
 void MainWindow::changeState(QString state)
 {
     ui->state->setText(state);
+    systemState = state;
+}
+
+void MainWindow::kbdSetState(QString state) {
+    if (state.compare("FROZEN")==0) // equals
+        ui->state->setText(state);
+    else if (systemState.compare("FROZEN")!=0) // not equal
+        ui->state->setText(state);
 }
 
 void MainWindow::updateTime()
@@ -213,8 +221,10 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 //        while (!kbdFreezeLock.tryLockForWrite());
         kbdFreezeLock.lockForWrite();
         kbdFreeze = !kbdFreeze;
-        if (kbdFreeze)
-            changeState("FROZEN");
         kbdFreezeLock.unlock();
+        if (kbdFreeze)
+            kbdSetState("FROZEN");
+        else
+            kbdSetState(systemState);
     }
 }

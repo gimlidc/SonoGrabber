@@ -61,10 +61,12 @@ private:
     void showDiag();
     IGTLinkClient * client;
     bool kbdFreeze=false;
+    void kbdSetState(QString state);
 
     StartSequence *startSequence;
     BreastGraph *bgraph;
     void showBreastGraph();
+    QString systemState;
 
     QReadWriteLock kbdFreezeLock;
 
