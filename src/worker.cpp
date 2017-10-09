@@ -61,10 +61,16 @@ void Worker::writeAndNotify(char * imgBuffer, QSize dimensions, bool isFrozen)
 {
     if (!isFrozen || !frozenImageStored) {
         writer->writeImage(imgBuffer, dimensions);
+    }
+
+}
+
+void Worker::notify(char *imgBuffer, QSize dimensions, bool isFrozen)
+{
+    if (!isFrozen || !frozenImageStored) {
         frozenImageStored = isFrozen;
         emit imageReceived(imgBuffer, dimensions, getCurrentState());
     }
-
 }
 
 void Worker::writeTransformCropped(const igtl::TransformMessage::Pointer &transMsg)
@@ -137,8 +143,10 @@ void Worker::flushData(double ts)
 
         updateState(isFrozen,isCropped);
 
+//        if (isFrozen && !frozenLastStatus &&
+//                writer->getImageCounter()>0) {
         if (isFrozen && !frozenLastStatus &&
-                writer->getImageCounter()>0) {
+                imageCounter>0) {
             cnt++;
             Image probe = Image(pos, ts, FROZEN);
             emit imgPosition(probe);
@@ -161,8 +169,10 @@ void Worker::flushData(double ts)
         } else {
             imgBuffer = (char *) imgMsgList[0]->GetScalarPointer();
         }
+        imageCounter++;
 
-        if (isFrozen && writer->getImageCounter()<1) {
+//        if (isFrozen && writer->getImageCounter()<1) {
+        if (isFrozen && imageCounter) {
             frozenImageStored = isFrozen;
             emit imageReceived(imgBuffer, area, getCurrentState());
             return;
@@ -172,16 +182,29 @@ void Worker::flushData(double ts)
             writer->writeFrozenIndexAndPos(pos.map(QVector4D(0, 0, 0, 1)));
         }
 
-        writer->writeHeader(imgMsgList[0]);
-        writer->startSequence(ts);
-        for (int i = 0; i < transTS.size(); ++i) {
-            writeTransformCropped(transMsgList[i]);
-            //qDebug() << transMsgList[i]->GetDeviceName();
-        }
+        notify(imgBuffer, area, isFrozen);
+        if (saveVideo) {
+            writer->writeHeader(imgMsgList[0]);
+            writer->startSequence(ts);
+            for (int i = 0; i < transTS.size(); ++i) {
+                writeTransformCropped(transMsgList[i]);
+                //qDebug() << transMsgList[i]->GetDeviceName();
+            }
 
-        writeAndNotify(imgBuffer, area, isFrozen);
-        writer->closeSequence();
+            writeAndNotify(imgBuffer, area, isFrozen);
+            writer->closeSequence();
+        }
     }
+}
+
+void Worker::startRecord()
+{
+    saveVideo = true;
+}
+
+void Worker::stopRecord()
+{
+    saveVideo = false;
 }
 
 void Worker::setOutput()

@@ -11,6 +11,7 @@ public:
 //    Image(QMatrix4x4 pos, Frozen status);
     Image(QMatrix4x4 pos, double ts, Frozen status);
     Frozen getStatus() const;
+    void setStatus(Frozen status);
     QMatrix4x4 getPosition() const;
     void setLine(QPointF p1, QPointF p2);
     void setLine(QLineF line);

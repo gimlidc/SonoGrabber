@@ -71,8 +71,8 @@ BreastGraph::BreastGraph(Transform *transform, int fps, int buffSize,
     //    this->setContextMenuPolicy(Qt::CustomContextMenu);
 //    connect(this, SIGNAL(customContextMenuRequested(const QPoint &)),
 //                         this, SLOT(showFreezeMenu(const QPoint &)));
-    connect(this, &BreastGraph::freezeSig,
-            this, &BreastGraph::showFreezeMenu);
+//    connect(this, &BreastGraph::freezeSig,
+//            this, &BreastGraph::freezeMenuAtPoint);
 }
 
 QPolygonF BreastGraph::getLobe(QPointF rp)
@@ -337,28 +337,27 @@ void BreastGraph::rcvImgPosition(Image imgPos)
                 }
             }
         }
-        if (imgPos.getStatus()==FROZEN) {
-            const QPointF p = line.p1();
-            QPointF pwin = p-QPointF(win.x(), win.y());
-            double scale = (double)s/(double)win.width();
-            QPointF pwscaled = pwin*scale;
-            QPointF pfyz = pwin*scale+QPointF((dh-s)/2, .9*(dv-s));
-            qDebug() << "pfyz x: " << pfyz.x() << ", pfyz y: " << pfyz.y();
-            emit freezeSig(pfyz.toPoint());
-        }
+//        if (imgPos.getStatus()==FROZEN) {
+//            const QPointF p = line.p1();
+//            QPointF pwin = p-QPointF(win.x(), win.y());
+//            double scale = (double)s/(double)win.width();
+//            QPointF pwscaled = pwin*scale;
+//            QPointF pfyz = pwin*scale+QPointF((dh-s)/2, .9*(dv-s));
+//            emit freezeSig(pfyz.toPoint());
+//        }
     }
 }
 
-void BreastGraph::showFreezeMenu(const QPoint &pos)
-{
-    menu->raise();
-    menu->show();
-    freezeMenu = new QMenu("Freeze menu", this);
-    freezeMenu->setWindowTitle("Freeze");
-    freezeMenu->addSection(tr("<b>Vyberte akci:</b>"));
-    freezeMenu->setWindowFlags(Qt::Tool); // to display title
-    QAction saveImage(tr("Ulož snímek"), this);
-    freezeMenu->addAction(&saveImage);
-    freezeMenu->exec(mapToGlobal(pos));    
-}
+//void BreastGraph::freezeMenuAtPoint(const QPoint &pos)
+//{
+//    menu->raise();
+//    menu->show();
+//    freezeMenu = new QMenu("Freeze menu", this);
+//    freezeMenu->setWindowTitle("Freeze");
+//    freezeMenu->addSection(tr("<b>Vyberte akci:</b>"));
+//    freezeMenu->setWindowFlags(Qt::Tool); // to display title
+//    QAction saveImage(tr("Ulož snímek"), this);
+//    freezeMenu->addAction(&saveImage);
+//    freezeMenu->exec(mapToGlobal(pos));
+//}
 

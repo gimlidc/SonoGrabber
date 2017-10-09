@@ -24,6 +24,11 @@ Frozen Image::getStatus() const
     return status;
 }
 
+void Image::setStatus(Frozen status)
+{
+    this->status = status;
+}
+
 QMatrix4x4 Image::getPosition() const
 {
     return position;

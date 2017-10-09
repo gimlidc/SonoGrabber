@@ -15,6 +15,7 @@
 #include "igtlinkclient.h"
 #include "breastgraph.h"
 #include "transform.h"
+#include "freezemenu.h"
 #include "side.h"
 
 namespace Ui {
@@ -41,11 +42,18 @@ public slots:
     void listeningStopped(int e);
 //    void receivePos(QVector4D pos);
     void sequenceTerminator();
+    void rcvImgPosition(Image);
+    void unfreeze();
+
 
 signals:
     void startListening();
     void stopListening();
     void position(QMatrix4x4 transform);
+    void imgPosition(Image);
+    void freezeMenu();
+    void hideFreezeMenu();
+    void stopRecord();
 
 protected:
     void keyPressEvent(QKeyEvent *);
@@ -61,12 +69,15 @@ private:
     void showDiag();
     IGTLinkClient * client;
     bool kbdFreeze=false;
+    bool statusSetFrozen=false;
     void kbdSetState(QString state);
 
     StartSequence *startSequence;
     BreastGraph *bgraph;
     void showBreastGraph();
     QString systemState;
+    FreezeMenu *menu;
+    int freezeCnt;
 
     QReadWriteLock kbdFreezeLock;
 

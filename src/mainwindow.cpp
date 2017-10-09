@@ -54,6 +54,8 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
     connect(this, &MainWindow::position, startSequence, &StartSequence::getPos);
     this->client = client;
 
+    menu = new FreezeMenu(0);
+
     // connect client actions with UI
     QObject::connect(this,&MainWindow::startListening,client,&IGTLinkClient::startReading);
     QObject::connect(this,&MainWindow::stopListening,client,&IGTLinkClient::stopReading);
@@ -66,7 +68,16 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
     QObject::connect(startSequence, &StartSequence::terminateStartSequence, this,
                      &MainWindow::sequenceTerminator);
 
-    QObject::connect(client, &IGTLinkClient::imgPosition, bgraph, &BreastGraph::rcvImgPosition);
+//    QObject::connect(client, &IGTLinkClient::imgPosition, bgraph, &BreastGraph::rcvImgPosition);
+    // pass image position and freeze status to breastgraph
+    QObject::connect(client, &IGTLinkClient::imgPosition, this, &MainWindow::rcvImgPosition);
+    QObject::connect(this, &MainWindow::imgPosition, bgraph, &BreastGraph::rcvImgPosition);
+
+    // handle freezemenu
+    QObject::connect(this, &MainWindow::freezeMenu, menu, &FreezeMenu::showMenu);
+    QObject::connect(this, &MainWindow::hideFreezeMenu, menu, &FreezeMenu::hideMenu);
+    QObject::connect(menu, &FreezeMenu::unfreeze, this, &MainWindow::unfreeze);
+    connect(menu, &FreezeMenu::startRecord, client, &IGTLinkClient::startRecord);
 }
 
 MainWindow::~MainWindow()
@@ -218,13 +229,44 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     if (event->key() == Qt::Key_F)
     {
         qDebug() << "key F";
-//        while (!kbdFreezeLock.tryLockForWrite());
         kbdFreezeLock.lockForWrite();
         kbdFreeze = !kbdFreeze;
         kbdFreezeLock.unlock();
         if (kbdFreeze)
             kbdSetState("FROZEN");
-        else
+        else {
             kbdSetState(systemState);
+        }
     }
 }
+
+void MainWindow::rcvImgPosition(Image img)
+{
+    if (kbdFreeze) {
+        if (!statusSetFrozen) {
+            img.setStatus(Frozen::FROZEN);
+            statusSetFrozen = true;
+            emit imgPosition(img);
+        }
+    } else {
+        emit imgPosition(img);
+        if (img.getStatus()==FROZEN)
+            statusSetFrozen = true;
+    }
+    if (img.getStatus()==FROZEN) {
+        freezeCnt++;
+        if (freezeCnt>4)
+            emit freezeMenu();
+    } else {
+        if (!kbdFreeze && statusSetFrozen) {
+            statusSetFrozen = false;
+            emit hideFreezeMenu();
+        }
+    }
+}
+
+void MainWindow::unfreeze()
+{
+    kbdFreeze = false;
+}
+

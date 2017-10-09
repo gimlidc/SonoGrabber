@@ -50,6 +50,7 @@ class Worker : public QObject
     void writeTransformCropped(const igtl::TransformMessage::Pointer &transMsg);
     void flushData(double ts);
     void writeAndNotify(char * imgBuffer, QSize dimensions, bool isFrozen);
+    void notify(char * imgBuffer, QSize dimensions, bool isFrozen);
     const QString& updateState(bool isFrozen, bool isCropped);
     const QString& setState(const QString& state);
     const QString& getCurrentState();
@@ -72,6 +73,8 @@ public slots:
      * @brief start creates new connection (Plus server) and start to process incoming data
      */
     void start();
+    void startRecord();
+    void stopRecord();
 
 signals:
     /**
@@ -100,9 +103,11 @@ signals:
 
 private:
     bool frozenLastStatus = true;
+    bool saveVideo = false;
     QMatrix4x4 pos;
     QMap<QString, QMatrix4x4> transforms;
     void probePos(const igtl::TransformMessage::Pointer &transMsg, double ts);
+    int imageCounter=0;
 };
 
 #endif // WORKER_H

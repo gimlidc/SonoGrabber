@@ -33,6 +33,9 @@ IGTLinkClient::IGTLinkClient(SessionParams * connection, qint64 refreshRate, QOb
 //    connect(worker, &Worker::position, this, &IGTLinkClient::receivePos);
     connect(worker, &Worker::imgPosition, this, &IGTLinkClient::rcvImgPosition);
 
+    connect(this, &IGTLinkClient::startRecordSig, worker, &Worker::startRecord);
+    connect(this, &IGTLinkClient::stopRecordSig, worker, &Worker::stopRecord);
+
     firstImage = true;
     for (int i = 0; i < 256; i++) {
         grayScaleColorTable.push_back(QColor(i, i, i).rgb());
@@ -105,3 +108,12 @@ void IGTLinkClient::receiveFrozen(int imgNumber)
     emit frozen(imgNumber);
 }
 
+void IGTLinkClient::startRecord()
+{
+    emit startRecordSig();
+}
+
+void IGTLinkClient::stopRecord()
+{
+    emit stopRecordSig();
+}

@@ -64,6 +64,8 @@ public slots:
     void rcvImgPosition(Image);
     void receivePos(QMatrix4x4 pos);
     void receiveFrozen(int imgNumber);
+    void startRecord();
+    void stopRecord();
 private slots:    
     void receiveStopSignal(int e);
 signals:
@@ -74,6 +76,8 @@ signals:
     void imgPosition(Image);
     void position(QMatrix4x4 pos);
     void frozen(int imgNumber);
+    void startRecordSig();
+    void stopRecordSig();
 };
 
 #endif // IGTLINKCLIENT_H

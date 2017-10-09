@@ -73,7 +73,8 @@ public slots:
     void rcvImgPosition(Image);
 
 private slots:
-    void showFreezeMenu(const QPoint &pos);
+//    void freezeMenuAtPoint(const QPoint &pos);
+//    void freezeMenuCentered();
 };
 
 
