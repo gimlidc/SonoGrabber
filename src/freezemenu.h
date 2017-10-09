@@ -17,18 +17,21 @@ protected:
 private:
     QGroupBox *menu;
     QVBoxLayout *buttons, *stopLayout;
+    QDialogButtonBox *menuBox;
     bool record=false;
 
 signals:
     void unfreeze();
     void startRecord();
+    void stopRecord();
 
 public slots:
     void showMenu();
     void hideMenu();
 
 private slots:
-    void handleRecord();
+    void startRecordSlot();
+    void stopRecordSlot();
 
 };
 

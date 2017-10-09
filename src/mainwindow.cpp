@@ -5,7 +5,7 @@
 #include "sessionnamegenerator.h"
 #include "igtlinkclient.h"
 #include "side.h"
-#include "pathstroke.h"
+//#include "pathstroke.h"
 #include <QDebug>
 #include <QPixmap>
 #include <QGraphicsView>
@@ -24,9 +24,9 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
 
     qRegisterMetaType<Image>();
 
-    PathStrokeWidget* pathStrokeWidget = new PathStrokeWidget(this);
+//    PathStrokeWidget* pathStrokeWidget = new PathStrokeWidget(this);
 
-    pathStrokeWidget->show();
+//    pathStrokeWidget->show();
 
     transform = new Transform(session->getCrop());
     QVector<qreal> radii = {.333, .666, 1};
@@ -192,8 +192,6 @@ void MainWindow::listeningStopped(int e)
 void MainWindow::showImage(QImage newImage)
 {
     bool kbdLocalStat;
-    qDebug() << "drawing";
-//    while (!kbdFreezeLock.tryLockForRead());
     kbdFreezeLock.lockForRead();
     kbdLocalStat = kbdFreeze;
     kbdFreezeLock.unlock();
@@ -255,7 +253,8 @@ void MainWindow::rcvImgPosition(Image img)
     }
     if (img.getStatus()==FROZEN) {
         freezeCnt++;
-        if (freezeCnt>4)
+        qDebug() << "freezeCnt: " << freezeCnt;
+        if (freezeCnt>3)
             emit freezeMenu();
     } else {
         if (!kbdFreeze && statusSetFrozen) {

@@ -77,7 +77,7 @@ private:
     void showBreastGraph();
     QString systemState;
     FreezeMenu *menu;
-    int freezeCnt;
+    int freezeCnt=0;
 
     QReadWriteLock kbdFreezeLock;
 
