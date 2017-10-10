@@ -7,6 +7,7 @@ FreezeMenu::FreezeMenu(QWidget *parent) : QWidget(parent)
 
     buttons = new QVBoxLayout;
     menuBox = new QDialogButtonBox(Qt::Vertical);
+    stopRecordBox = new QDialogButtonBox(Qt::Vertical);
     this->setStyleSheet("QPushButton {padding: 30px; margin: 20px; font-size: 40pt}");
 
     QPushButton *saveButton = new QPushButton(tr("&Ulož snímek"));
@@ -28,14 +29,18 @@ FreezeMenu::FreezeMenu(QWidget *parent) : QWidget(parent)
     menuBox->addButton(renderButton, QDialogButtonBox::ActionRole);
     menuBox->addButton(regionButton, QDialogButtonBox::ActionRole);
 
+
+//    stopLayout = new QVBoxLayout;
+    QPushButton *stopRecord = new QPushButton(tr("&Ukonči záznam"));
+    stopRecordBox->addButton(stopRecord, QDialogButtonBox::ActionRole);
+//    stopRecord->setFont(font);
+//    stopLayout->addWidget(stopRecord);
+
     buttons->addWidget(menuBox);
+    buttons->addWidget(stopRecordBox);
+    stopRecordBox->setVisible(false);
     setLayout(buttons);
     adjustSize();
-
-    stopLayout = new QVBoxLayout;
-    QPushButton *stopRecord = new QPushButton(tr("&Ukonči záznam"));
-    stopRecord->setFont(font);
-    stopLayout->addWidget(stopRecord);
 
     connect(stopRecord, SIGNAL(clicked(bool)), this, SLOT(stopRecordSlot()));
 
@@ -50,12 +55,15 @@ FreezeMenu::FreezeMenu(QWidget *parent) : QWidget(parent)
 
 void FreezeMenu::showMenu()
 {
-    this->layout()->deleteLater();
-    if (!record) {
-        setLayout(buttons);
+    qDebug() << "record: " << record;
+    if (record) {
+        menuBox->setVisible(false);
+        stopRecordBox->setVisible(true);
     } else {
-        setLayout(stopLayout);
+        menuBox->setVisible(true);
+        stopRecordBox->setVisible(false);
     }
+    adjustSize();
     raise();
     show();
 }
@@ -75,6 +83,7 @@ void FreezeMenu::keyPressEvent(QKeyEvent *event)
 
 void FreezeMenu::startRecordSlot()
 {
+    qDebug() << "startRecord slot";
     emit startRecord();
     record = true;
     hide();
@@ -82,6 +91,7 @@ void FreezeMenu::startRecordSlot()
 
 void FreezeMenu::stopRecordSlot()
 {
+    qDebug() << "stopRecord slot";
     emit stopRecord();
     record = false;
     hide();

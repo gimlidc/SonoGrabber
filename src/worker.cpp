@@ -205,6 +205,7 @@ void Worker::startRecord()
 void Worker::stopRecord()
 {
     saveVideo = false;
+    emit stopped(IGTLinkClient::UserInterrupt);
 }
 
 void Worker::setOutput()

@@ -17,7 +17,7 @@ protected:
 private:
     QGroupBox *menu;
     QVBoxLayout *buttons, *stopLayout;
-    QDialogButtonBox *menuBox;
+    QDialogButtonBox *menuBox, *stopRecordBox;
     bool record=false;
 
 signals:
