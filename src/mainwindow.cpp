@@ -78,6 +78,7 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
     QObject::connect(this, &MainWindow::hideFreezeMenu, menu, &FreezeMenu::hideMenu);
     QObject::connect(menu, &FreezeMenu::unfreeze, this, &MainWindow::unfreeze);
     connect(menu, &FreezeMenu::startRecord, client, &IGTLinkClient::startRecord);
+    connect(menu, &FreezeMenu::stopRecord, client, &IGTLinkClient::stopRecord);
 }
 
 MainWindow::~MainWindow()
@@ -172,8 +173,10 @@ void MainWindow::toggleRun(bool buttonPressed)
 
 void MainWindow::listeningStopped(int e)
 {
+    qDebug() << "listening stopped";
     switch ((IGTLinkClient::ErrorType)e) {
     case IGTLinkClient::UserInterrupt:
+    case IGTLinkClient::RecordingStopped:
         ui->state->setText("OK");
         params->incFilenameIndex();
         break;
@@ -185,7 +188,7 @@ void MainWindow::listeningStopped(int e)
         ui->state->setText("SOCKET ERROR");
     }
     ui->lineEdit_3->setText(QString::number(params->getFilenameIndex()));
-    if (ui->pushButtonRun->isChecked())
+    if (e!=IGTLinkClient::RecordingStopped && ui->pushButtonRun->isChecked())
         ui->pushButtonRun->setChecked(false);
 }
 
@@ -226,7 +229,6 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_F)
     {
-        qDebug() << "key F";
         kbdFreezeLock.lockForWrite();
         kbdFreeze = !kbdFreeze;
         kbdFreezeLock.unlock();
@@ -253,13 +255,13 @@ void MainWindow::rcvImgPosition(Image img)
     }
     if (img.getStatus()==FROZEN) {
         freezeCnt++;
-        qDebug() << "freezeCnt: " << freezeCnt;
         if (freezeCnt>3)
             emit freezeMenu();
     } else {
         if (!kbdFreeze && statusSetFrozen) {
             statusSetFrozen = false;
             emit hideFreezeMenu();
+            ui->lineEdit_3->setText(QString::number(params->getFilenameIndex()));
         }
     }
 }

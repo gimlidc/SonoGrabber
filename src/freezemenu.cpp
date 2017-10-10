@@ -55,7 +55,6 @@ FreezeMenu::FreezeMenu(QWidget *parent) : QWidget(parent)
 
 void FreezeMenu::showMenu()
 {
-    qDebug() << "record: " << record;
     if (record) {
         menuBox->setVisible(false);
         stopRecordBox->setVisible(true);
@@ -83,7 +82,6 @@ void FreezeMenu::keyPressEvent(QKeyEvent *event)
 
 void FreezeMenu::startRecordSlot()
 {
-    qDebug() << "startRecord slot";
     emit startRecord();
     record = true;
     hide();
@@ -91,7 +89,6 @@ void FreezeMenu::startRecordSlot()
 
 void FreezeMenu::stopRecordSlot()
 {
-    qDebug() << "stopRecord slot";
     emit stopRecord();
     record = false;
     hide();

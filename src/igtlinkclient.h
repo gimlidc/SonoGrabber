@@ -46,7 +46,7 @@ public:
      */
     enum ErrorType
     {
-        UserInterrupt, ReceiveError, SocketOpenError
+        UserInterrupt, RecordingStopped, ReceiveError, SocketOpenError
     };
     explicit IGTLinkClient(SessionParams * connection, qint64 refreshRate = 200, QObject *parent = 0);
     ~IGTLinkClient();

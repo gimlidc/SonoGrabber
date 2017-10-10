@@ -63,6 +63,7 @@ void IGTLinkClient::stopReading()
 
 void IGTLinkClient::receiveStopSignal(int e)
 {
+    qDebug() << "igt: receive stop";
     emit stopped((ErrorType) e);
 }
 
@@ -115,5 +116,8 @@ void IGTLinkClient::startRecord()
 
 void IGTLinkClient::stopRecord()
 {
+    qDebug() << "igt: stop record";
     emit stopRecordSig();
+    emit stopped(IGTLinkClient::RecordingStopped);
+
 }

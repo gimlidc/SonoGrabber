@@ -204,8 +204,9 @@ void Worker::startRecord()
 
 void Worker::stopRecord()
 {
+    qDebug() << "worker: stop record";
     saveVideo = false;
-    emit stopped(IGTLinkClient::UserInterrupt);
+//    emit stopped(IGTLinkClient::UserInterrupt);
 }
 
 void Worker::setOutput()
