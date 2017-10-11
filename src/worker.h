@@ -32,7 +32,9 @@ class Worker : public QObject
 {
     Q_OBJECT
     static bool Terminate;
+    static bool saveVideo;
     static QReadWriteLock Lock;
+    static QReadWriteLock RecordLock;
 
     SessionParams * session;
     Writer * writer;
@@ -67,14 +69,15 @@ public:
      * @return true if worker is running, false otherwise (stopped/error)
      */
     static int isRunning();
+    static void startRecord();
+    static void stopRecord();
 
 public slots:
     /**
      * @brief start creates new connection (Plus server) and start to process incoming data
      */
     void start();
-    void startRecord();
-    void stopRecord();
+    void testSlot();
 
 signals:
     /**
@@ -103,7 +106,6 @@ signals:
 
 private:
     bool frozenLastStatus = true;
-    bool saveVideo = false;
     QMatrix4x4 pos;
     QMap<QString, QMatrix4x4> transforms;
     void probePos(const igtl::TransformMessage::Pointer &transMsg, double ts);

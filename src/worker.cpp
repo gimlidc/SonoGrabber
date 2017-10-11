@@ -59,8 +59,10 @@ const QString& Worker::updateState(bool isFrozen, bool isCropped)
 
 void Worker::writeAndNotify(char * imgBuffer, QSize dimensions, bool isFrozen)
 {
+    qDebug() << "write and notify 1";
     if (!isFrozen || !frozenImageStored) {
         writer->writeImage(imgBuffer, dimensions);
+        qDebug() << "write and notify 2: image";
     }
 
 }
@@ -75,7 +77,7 @@ void Worker::notify(char *imgBuffer, QSize dimensions, bool isFrozen)
 
 void Worker::writeTransformCropped(const igtl::TransformMessage::Pointer &transMsg)
 {
-
+    qDebug() << "write transform";
     int i = session->getTransNames().indexOf(transMsg->GetDeviceName());
     if (i==0) {
         igtl::TransformMessage::Pointer tMsg;
@@ -183,7 +185,11 @@ void Worker::flushData(double ts)
         }
 
         notify(imgBuffer, area, isFrozen);
-        if (saveVideo) {
+        bool s;
+        RecordLock.lockForRead();
+        s = saveVideo;
+        RecordLock.unlock();
+        if (s) {
             writer->writeHeader(imgMsgList[0]);
             writer->startSequence(ts);
             for (int i = 0; i < transTS.size(); ++i) {
@@ -199,13 +205,18 @@ void Worker::flushData(double ts)
 
 void Worker::startRecord()
 {
+    qDebug() << "worker: start record";
+    RecordLock.lockForWrite();
     saveVideo = true;
+    RecordLock.unlock();
 }
 
 void Worker::stopRecord()
 {
     qDebug() << "worker: stop record";
+    RecordLock.lockForWrite();
     saveVideo = false;
+    RecordLock.unlock();
 //    emit stopped(IGTLinkClient::UserInterrupt);
 }
 
@@ -228,6 +239,11 @@ void Worker::stop()
     Lock.unlock();
 }
 
+void Worker::testSlot()
+{
+    qDebug() << "worker: test";
+}
+
 int Worker::isRunning()
 {
     int r;
@@ -239,6 +255,7 @@ int Worker::isRunning()
 
 void Worker::start()
 {
+    qDebug() << "worker: start";
     int resultCode;
     currentState="";
     frozenImageStored = false;

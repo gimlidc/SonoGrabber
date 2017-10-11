@@ -108,6 +108,7 @@ void Writer::writeImage(char* buffer, QSize imgSize)
     }
     rawFile.write((const char *)buffer, imgSize.width() * imgSize.height());
     rawFile.flush();
+    qDebug() << "write image";
 }
 
 void Writer::closeSequence()

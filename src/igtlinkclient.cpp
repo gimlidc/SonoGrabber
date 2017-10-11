@@ -14,6 +14,8 @@
 #include <QDateTime>
 
 QReadWriteLock Worker::Lock;
+QReadWriteLock Worker::RecordLock;
+bool Worker::saveVideo = false;
 bool Worker::Terminate = true;
 
 IGTLinkClient::IGTLinkClient(SessionParams * connection, qint64 refreshRate, QObject *parent) : QObject(parent)
@@ -25,16 +27,16 @@ IGTLinkClient::IGTLinkClient(SessionParams * connection, qint64 refreshRate, QOb
     qRegisterMetaType<igtl::TransformMessage::Pointer>("igtl::TransformMessage::Pointer");
     qRegisterMetaType<igtl::ImageMessage::Pointer>("igtl::ImageMessage::Pointer");
     connect(&_workerThread, &QThread::finished, worker, &QObject::deleteLater);
+    connect(this, &IGTLinkClient::testWorker, worker, &Worker::testSlot);
     connect(this, &IGTLinkClient::startWorker, worker, &Worker::start);
+    connect(this, &IGTLinkClient::startRecordSig, worker, &Worker::startRecord);
+    connect(this, &IGTLinkClient::stopRecordSig, worker, &Worker::stopRecord);
     lastRefreshTime = QDateTime::currentMSecsSinceEpoch();
     guiRefreshRateMs = refreshRate;
     connect(worker, &Worker::imageReceived, this, &IGTLinkClient::showImage);
     connect(worker, &Worker::stopped, this, &IGTLinkClient::receiveStopSignal);
 //    connect(worker, &Worker::position, this, &IGTLinkClient::receivePos);
     connect(worker, &Worker::imgPosition, this, &IGTLinkClient::rcvImgPosition);
-
-    connect(this, &IGTLinkClient::startRecordSig, worker, &Worker::startRecord);
-    connect(this, &IGTLinkClient::stopRecordSig, worker, &Worker::stopRecord);
 
     firstImage = true;
     for (int i = 0; i < 256; i++) {
@@ -54,6 +56,7 @@ IGTLinkClient::~IGTLinkClient()
 void IGTLinkClient::startReading()
 {
     emit startWorker();
+    emit testWorker();
 }
 
 void IGTLinkClient::stopReading()
@@ -111,13 +114,13 @@ void IGTLinkClient::receiveFrozen(int imgNumber)
 
 void IGTLinkClient::startRecord()
 {
-    emit startRecordSig();
+    Worker::startRecord();
 }
 
 void IGTLinkClient::stopRecord()
 {
     qDebug() << "igt: stop record";
-    emit stopRecordSig();
+    Worker::stopRecord();
     emit stopped(IGTLinkClient::RecordingStopped);
 
 }

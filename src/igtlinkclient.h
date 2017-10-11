@@ -78,6 +78,7 @@ signals:
     void frozen(int imgNumber);
     void startRecordSig();
     void stopRecordSig();
+    void testWorker();
 };
 
 #endif // IGTLINKCLIENT_H
