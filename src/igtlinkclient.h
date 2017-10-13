@@ -76,9 +76,6 @@ signals:
     void imgPosition(Image);
     void position(QMatrix4x4 pos);
     void frozen(int imgNumber);
-    void startRecordSig();
-    void stopRecordSig();
-    void testWorker();
 };
 
 #endif // IGTLINKCLIENT_H

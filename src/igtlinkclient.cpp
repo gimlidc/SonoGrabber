@@ -27,10 +27,7 @@ IGTLinkClient::IGTLinkClient(SessionParams * connection, qint64 refreshRate, QOb
     qRegisterMetaType<igtl::TransformMessage::Pointer>("igtl::TransformMessage::Pointer");
     qRegisterMetaType<igtl::ImageMessage::Pointer>("igtl::ImageMessage::Pointer");
     connect(&_workerThread, &QThread::finished, worker, &QObject::deleteLater);
-    connect(this, &IGTLinkClient::testWorker, worker, &Worker::testSlot);
     connect(this, &IGTLinkClient::startWorker, worker, &Worker::start);
-    connect(this, &IGTLinkClient::startRecordSig, worker, &Worker::startRecord);
-    connect(this, &IGTLinkClient::stopRecordSig, worker, &Worker::stopRecord);
     lastRefreshTime = QDateTime::currentMSecsSinceEpoch();
     guiRefreshRateMs = refreshRate;
     connect(worker, &Worker::imageReceived, this, &IGTLinkClient::showImage);
@@ -56,7 +53,6 @@ IGTLinkClient::~IGTLinkClient()
 void IGTLinkClient::startReading()
 {
     emit startWorker();
-    emit testWorker();
 }
 
 void IGTLinkClient::stopReading()
@@ -119,7 +115,6 @@ void IGTLinkClient::startRecord()
 
 void IGTLinkClient::stopRecord()
 {
-    qDebug() << "igt: stop record";
     Worker::stopRecord();
     emit stopped(IGTLinkClient::RecordingStopped);
 

@@ -239,11 +239,6 @@ void Worker::stop()
     Lock.unlock();
 }
 
-void Worker::testSlot()
-{
-    qDebug() << "worker: test";
-}
-
 int Worker::isRunning()
 {
     int r;

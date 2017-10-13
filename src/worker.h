@@ -77,7 +77,6 @@ public slots:
      * @brief start creates new connection (Plus server) and start to process incoming data
      */
     void start();
-    void testSlot();
 
 signals:
     /**
