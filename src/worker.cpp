@@ -59,10 +59,8 @@ const QString& Worker::updateState(bool isFrozen, bool isCropped)
 
 void Worker::writeAndNotify(char * imgBuffer, QSize dimensions, bool isFrozen)
 {
-    qDebug() << "write and notify 1";
     if (!isFrozen || !frozenImageStored) {
         writer->writeImage(imgBuffer, dimensions);
-        qDebug() << "write and notify 2: image";
     }
 
 }

@@ -19,6 +19,7 @@ private:
     QVBoxLayout *buttons, *stopLayout;
     QDialogButtonBox *menuBox, *stopRecordBox;
     bool record=false;
+    QTimer *timer;
 
 signals:
     void unfreeze();

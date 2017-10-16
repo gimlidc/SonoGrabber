@@ -51,7 +51,7 @@ signals:
     void stopListening();
     void position(QMatrix4x4 transform);
     void imgPosition(Image);
-    void freezeMenu();
+    void showFreezeMenu();
     void hideFreezeMenu();
     void stopRecord();
 

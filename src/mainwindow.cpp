@@ -54,6 +54,8 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
     connect(this, &MainWindow::position, startSequence, &StartSequence::getPos);
     this->client = client;
 
+    ui->state->setText("WAITING");
+
     menu = new FreezeMenu(0);
 
     // connect client actions with UI
@@ -74,7 +76,7 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
     QObject::connect(this, &MainWindow::imgPosition, bgraph, &BreastGraph::rcvImgPosition);
 
     // handle freezemenu
-    QObject::connect(this, &MainWindow::freezeMenu, menu, &FreezeMenu::showMenu);
+    QObject::connect(this, &MainWindow::showFreezeMenu, menu, &FreezeMenu::showMenu);
     QObject::connect(this, &MainWindow::hideFreezeMenu, menu, &FreezeMenu::hideMenu);
     QObject::connect(menu, &FreezeMenu::unfreeze, this, &MainWindow::unfreeze);
     connect(menu, &FreezeMenu::startRecord, client, &IGTLinkClient::startRecord);
@@ -119,6 +121,7 @@ void MainWindow::sequenceTerminator()
 {
 //    ui->mainWindow->removeWidget(startSequence);
     delete startSequence;
+    ui->state->setText("SCANNING");
     showBreastGraph();
 }
 
@@ -177,11 +180,11 @@ void MainWindow::listeningStopped(int e)
     switch ((IGTLinkClient::ErrorType)e) {
     case IGTLinkClient::UserInterrupt:
     case IGTLinkClient::RecordingStopped:
-        ui->state->setText("OK");
+        // ui->state->setText("OK");
         params->incFilenameIndex();
         break;
     case IGTLinkClient::ReceiveError:
-        ui->state->setText("REC ERROR");
+        // ui->state->setText("REC ERROR");
         params->incFilenameIndex();
         break;
     case IGTLinkClient::SocketOpenError:
@@ -209,7 +212,10 @@ void MainWindow::showImage(QImage newImage)
 
 void MainWindow::changeState(QString state)
 {
-    ui->state->setText(state);
+    if (state.compare("CROPPED")==0)
+        ui->state->setText("SCANNING");
+    else
+        ui->state->setText(state);
     systemState = state;
 }
 
@@ -256,9 +262,9 @@ void MainWindow::rcvImgPosition(Image img)
     if (img.getStatus()==FROZEN) {
         freezeCnt++;
         if (freezeCnt>3)
-            emit freezeMenu();
+            emit showFreezeMenu();
     } else {
-        if (!kbdFreeze && statusSetFrozen) {
+        if (!kbdFreeze && img.getStatus()!=FROZEN && statusSetFrozen) {
             statusSetFrozen = false;
             emit hideFreezeMenu();
             ui->lineEdit_3->setText(QString::number(params->getFilenameIndex()));

@@ -10,31 +10,23 @@ FreezeMenu::FreezeMenu(QWidget *parent) : QWidget(parent)
     stopRecordBox = new QDialogButtonBox(Qt::Vertical);
     this->setStyleSheet("QPushButton {padding: 30px; margin: 20px; font-size: 40pt}");
 
-    QPushButton *saveButton = new QPushButton(tr("&Ulož snímek"));
-    QPushButton *renderButton = new QPushButton(tr("&Záznam pro 3D"));
-    QPushButton *regionButton = new QPushButton(tr("&Vyznač oblast"));
+    timer = new QTimer(this);
+
+    QPushButton *saveButton = new QPushButton(tr("&Save image"));
+    QPushButton *renderButton = new QPushButton(tr("&Record 3D"));
+    QPushButton *regionButton = new QPushButton(tr("&Mark region"));
 
     connect(renderButton, SIGNAL(clicked(bool)), this, SLOT(startRecordSlot()));
 
     QFont font = saveButton->font();
-//    font.setPointSize(25);
-//    saveButton->setFont(font);
-//    renderButton->setFont(font);
-//    regionButton->setFont(font);
-//    buttons->addWidget(saveButton);
-//    buttons->addWidget(renderButton);
-//    buttons->addWidget(regionButton);
 
     menuBox->addButton(saveButton, QDialogButtonBox::ActionRole);
     menuBox->addButton(renderButton, QDialogButtonBox::ActionRole);
     menuBox->addButton(regionButton, QDialogButtonBox::ActionRole);
 
 
-//    stopLayout = new QVBoxLayout;
-    QPushButton *stopRecord = new QPushButton(tr("&Ukonči záznam"));
+    QPushButton *stopRecord = new QPushButton(tr("&Info: data saved"));
     stopRecordBox->addButton(stopRecord, QDialogButtonBox::ActionRole);
-//    stopRecord->setFont(font);
-//    stopLayout->addWidget(stopRecord);
 
     buttons->addWidget(menuBox);
     buttons->addWidget(stopRecordBox);
@@ -58,7 +50,12 @@ void FreezeMenu::showMenu()
     if (record) {
         menuBox->setVisible(false);
         stopRecordBox->setVisible(true);
+        connect(timer, SIGNAL(timeout()), this, SLOT(hideMenu()));
+        timer->start(5000);
+        record = false;
+        emit stopRecord();
     } else {
+        disconnect(timer, SIGNAL(timeout()), this, SLOT(hideMenu()));
         menuBox->setVisible(true);
         stopRecordBox->setVisible(false);
     }
