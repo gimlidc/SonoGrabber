@@ -68,7 +68,7 @@ MainWindow::MainWindow(SessionParams * session, IGTLinkClient * client, QWidget 
     QObject::connect(client, &IGTLinkClient::imgPosition, startSequence,
                      &StartSequence::rcvImgPosition);
     QObject::connect(startSequence, &StartSequence::terminateStartSequence, this,
-                     &MainWindow::sequenceTerminator);
+                     &MainWindow::switchToBreastGraph);
 
 //    QObject::connect(client, &IGTLinkClient::imgPosition, bgraph, &BreastGraph::rcvImgPosition);
     // pass image position and freeze status to breastgraph
@@ -100,14 +100,14 @@ void MainWindow::newSession()
 
 }
 
-void MainWindow::showBreastGraph()
-{
-    ui->mainLayout->insertWidget(0, bgraph);
-    ui->mainLayout->setStretch(0, 1);
-//    ui->mainWindow->addWidget(ui->sonoImage);
-//    ui->mainWindow->addWidget(image);
-    bgraph->show();
-}
+//void MainWindow::showBreastGraph()
+//{
+//    ui->mainLayout->insertWidget(0, bgraph);
+//    ui->mainLayout->setStretch(0, 1);
+////    ui->mainWindow->addWidget(ui->sonoImage);
+////    ui->mainWindow->addWidget(image);
+//    bgraph->show();
+//}
 
 
 void MainWindow::setOutputDir(QString dirPath)
@@ -117,12 +117,14 @@ void MainWindow::setOutputDir(QString dirPath)
     ui->lineEdit_3->setText(QString::number(params->getFilenameIndex()));
 }
 
-void MainWindow::sequenceTerminator()
+void MainWindow::switchToBreastGraph()
 {
-//    ui->mainWindow->removeWidget(startSequence);
     delete startSequence;
     ui->state->setText("SCANNING");
-    showBreastGraph();
+    ui->mainLayout->insertWidget(0, bgraph);
+    ui->mainLayout->setStretch(0, 1);
+    bgraph->show();
+    scanning = true;
 }
 
 
@@ -163,13 +165,15 @@ void MainWindow::toggleRun(bool buttonPressed)
             startSequence->show();
             QObject::connect(client, &IGTLinkClient::position, startSequence, &StartSequence::getPos);
             QObject::connect(startSequence, &StartSequence::terminateStartSequence, this,
-                             &MainWindow::sequenceTerminator);
+                             &MainWindow::switchToBreastGraph);
 
         }
         else
         {
             startSequence->reset();
         }
+        scanning = false;
+        changeState("WAITING");
     }
 }
 
@@ -182,6 +186,7 @@ void MainWindow::listeningStopped(int e)
     case IGTLinkClient::RecordingStopped:
         // ui->state->setText("OK");
         params->incFilenameIndex();
+        scanning = false;
         break;
     case IGTLinkClient::ReceiveError:
         // ui->state->setText("REC ERROR");
@@ -212,11 +217,20 @@ void MainWindow::showImage(QImage newImage)
 
 void MainWindow::changeState(QString state)
 {
-    if (state.compare("CROPPED")==0)
-        ui->state->setText("SCANNING");
-    else
-        ui->state->setText(state);
     systemState = state;
+    displayState(state);
+}
+
+void MainWindow::displayState(QString state)
+{
+    if (scanning)
+        if (state=="OK" || state=="CROPPED")
+            ui->state->setText("SCANNING");
+        else
+            ui->state->setText(state);
+    else {
+        ui->state->setText("WAITING");
+    }
 }
 
 void MainWindow::kbdSetState(QString state) {
@@ -239,9 +253,9 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         kbdFreeze = !kbdFreeze;
         kbdFreezeLock.unlock();
         if (kbdFreeze)
-            kbdSetState("FROZEN");
+            displayState("FROZEN");
         else {
-            kbdSetState(systemState);
+            displayState(systemState);
         }
     }
 }

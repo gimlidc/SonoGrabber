@@ -41,7 +41,7 @@ public slots:
     void updateTime();
     void listeningStopped(int e);
 //    void receivePos(QVector4D pos);
-    void sequenceTerminator();
+    void switchToBreastGraph();
     void rcvImgPosition(Image);
     void unfreeze();
 
@@ -71,6 +71,9 @@ private:
     bool kbdFreeze=false;
     bool statusSetFrozen=false;
     void kbdSetState(QString state);
+    void displayState(QString state);
+
+    bool scanning = false;
 
     StartSequence *startSequence;
     BreastGraph *bgraph;
