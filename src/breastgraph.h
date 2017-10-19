@@ -52,6 +52,10 @@ private:
     void drawBackgroundImage(const QColor color);
     void drawSnake(QPainter *painter, const QColor inLimit,
                    const QColor overLimit, const QVector<Image> extPoints);
+    void drawSnakeImage(const QColor inLimit,
+                        const QColor overLimit, const QVector<Image> extPoints);
+//    QPainterPath drawSnakePath(QPainter *painter, QPainterPath *path, const QColor inLimit,
+//                       const QColor overLimit, const QVector<Image> extPoints);
     void drawProbe(QPainter *painter, const QColor probe, const QColor freeze,
                    const QVector<Image> lines);
     void drawGraph(QPainter *painter,

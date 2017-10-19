@@ -63,10 +63,13 @@ BreastGraph::BreastGraph(Transform *transform, int fps, int buffSize,
     }
     dh = width();
     dv = height();
-    s = qMin(dh, dv)/((1+1.2*top));
+//    s = qMin(dh, dv)/((1+1.2*top));
+    s = qMin(dh, dv)/((1+top));
 
     menu = new FreezeMenu(0);
-    graph = QPixmap(width(), height());
+//    graph = QPixmap(s, s*(1+top));
+//    graph = QPixmap(win.width(), win.height());
+    graph = QPixmap(dh, dv);
     graph.fill();
 
 //    menu->show();
@@ -103,15 +106,31 @@ BreastGraph::~BreastGraph()
 {
 }
 
+//void BreastGraph::drawBackground(QPainter *painter, const QColor color)
+//{
+//    // background
+//    painter->save();
+//    painter->setPen(QPen(color));
+//    painter->setBrush(QBrush(color, Qt::SolidPattern));
+//    painter->drawEllipse(QPointF(0.0,0.0), r, r);
+//    painter->rotate((side==Side::LEFT) ? -angle : angle);
+//    painter->drawPolygon(lobe);
+//    painter->restore();
+//}
+
 void BreastGraph::drawBackground(QPainter *painter, const QColor color)
 {
-    // background
     painter->save();
     painter->setPen(QPen(color));
     painter->setBrush(QBrush(color, Qt::SolidPattern));
-    painter->drawEllipse(QPointF(0.0,0.0), r, r);
-    painter->rotate((side==Side::LEFT) ? -angle : angle);
-    painter->drawPolygon(lobe);
+
+    QPainterPath path, p2;
+    path.addEllipse(QPointF(0.0, 0.0), r, r);
+    p2.addPolygon(lobe);
+    QTransform t;
+    t.rotate(side==LEFT ? -angle : angle);
+    painter->drawPath(path.united(t.map(p2)));
+
     painter->restore();
 }
 
@@ -120,7 +139,8 @@ void BreastGraph::drawBackgroundImage(const QColor color)
     QPainter p(&graph);
     p.setWindow(win);
 //    QRect viewPort((dh-s)/2, .9*(dv-s), s, s);
-//    p.setViewport(viewPort);
+    QRect viewPort(0, 0, dh, dv);
+    p.setViewport(viewPort);
     p.setRenderHint(QPainter::Antialiasing);
     p.setPen(QPen(color));
     p.setBrush(QBrush(color, Qt::SolidPattern));
@@ -170,6 +190,58 @@ void BreastGraph::drawSnake(QPainter *painter, const QColor inLimit,
     painter->restore();
 
 }
+
+void BreastGraph::drawSnakeImage(const QColor inLimit,
+                            const QColor overLimit, const QVector<Image> lines)
+{
+    int end = lines.size()-1;
+    if (end>0) {
+        // green "snake"
+        QPainter p(&graph);
+        p.setWindow(win);
+//        QRect viewPort((dh-s)/2, .9*(dv-s), s, s);
+        QRect viewPort(0, 0, dh, dv);
+        p.setViewport(viewPort);
+
+        p.setPen(QPen(inLimit, 0));
+
+        if (getSpeed(lines, end))
+            p.setBrush(QBrush(inLimit, Qt::SolidPattern));
+        else
+            p.setBrush(QBrush(overLimit, Qt::SolidPattern));
+        QLineF line1 = lines.at(end-1).getLine();
+        QLineF line2 = lines.at(end).getLine();
+        QPointF points[4] = {line1.p1(), line1.p2(), line2.p2(), line2.p1()};
+        p.drawPolygon(points, 4);
+    }
+
+}
+
+//QPainterPath BreastGraph::drawSnakePath(QPainter *painter, QPainterPath *path, const QColor inLimit,
+//                                const QColor overLimit, const QVector<Image> lines)
+//{
+//    int end = lines.size()-1;
+//    QPainterPath p;
+//    if (end>0) {
+//        QPainterPath newSeg;
+//        painter->save();
+//        painter->setPen(QPen(inLimit, 0));
+//        if (getSpeed(lines, end)<speed)
+//            painter->setBrush(QBrush(inLimit, Qt::SolidPattern));
+//        else
+//            painter->setBrush(QBrush(overLimit, Qt::SolidPattern));
+//        QLineF line1 = lines.at(end-1).getLine();
+//        QLineF line2 = lines.at(end).getLine();
+//        const QVector<QPointF> points{line1.p1(), line1.p2(), line2.p2(), line2.p1()};
+//        newSeg.addPolygon(QPolygonF(points));
+//        newSeg.closeSubpath();
+//        p = path->united(newSeg);
+//        painter->drawPath(p);
+//        painter->restore();
+//    } else
+//        p = *path;
+//    return p;
+//}
 
 void BreastGraph::drawProbe(QPainter *painter, const QColor probe,
                             const QColor freeze,
@@ -255,11 +327,11 @@ void BreastGraph::paintEvent(QPaintEvent *event)
     QPainter painter(this);
     //    painter.setWindow(win);
     QRect viewPort((dh-s)/2, .9*(dv-s), s, s);
-    //    painter.setViewport(viewPort);
+    //painter.setViewport(viewPort);
 
-//    QRect dirtyRect = event->rect();
-//    painter.drawPixmap(dirtyRect, graph, dirtyRect);
-    painter.drawPixmap(viewPort, graph);
+    QRect dirtyRect = event->rect();
+    painter.drawPixmap(dirtyRect, graph, dirtyRect);
+//    painter.drawPixmap(viewPort, graph);
 }
 
 void BreastGraph::reset()
@@ -357,6 +429,8 @@ void BreastGraph::rcvImgPosition(Image imgPos)
         if (dist) {
             imgPos.setLine(line);
             lines.append(imgPos);
+            drawSnakeImage(Qt::green, Qt::red, lines);
+            update();
             if (buffSize==0) {
                 alpha.append(alphaLast);
                 alphaLast *= fade;
