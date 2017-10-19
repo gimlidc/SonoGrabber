@@ -9,6 +9,7 @@
 #include <QVector4D>
 #include <QPolygonF>
 #include <QMenu>
+#include <QtGui/QPainterPath>
 #include "side.h"
 #include "transform.h"
 #include "frozen.h"
@@ -31,6 +32,7 @@ public:
 private:
     QPolygonF lobe;
     Transform *transform;
+    QPixmap graph;
     int buffSize=0;
     int fps;
     Frozen freeze;
@@ -44,8 +46,10 @@ private:
     Side side = Side::ND;
     QVector3D un, vn;
     QVector3D origin;
+    QPainterPath background;
     void setPlane(QVector<QVector3D> refPoints);
     void drawBackground(QPainter *painter, const QColor color);
+    void drawBackgroundImage(const QColor color);
     void drawSnake(QPainter *painter, const QColor inLimit,
                    const QColor overLimit, const QVector<Image> extPoints);
     void drawProbe(QPainter *painter, const QColor probe, const QColor freeze,
