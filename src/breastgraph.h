@@ -32,7 +32,7 @@ public:
 private:
     QPolygonF lobe;
     Transform *transform;
-    QPixmap graph;
+    QPixmap graph, sectors;
     int buffSize=0;
     int fps;
     Frozen freeze;
@@ -48,6 +48,7 @@ private:
     QVector3D origin;
     QPainterPath background;
     void setPlane(QVector<QVector3D> refPoints);
+    void setView(QPainter *p);
     void drawBackground(QPainter *painter, const QColor color);
     void drawBackgroundImage(const QColor color);
     void drawSnake(QPainter *painter, const QColor inLimit,
@@ -60,6 +61,7 @@ private:
                    const QVector<Image> lines);
     void drawGraph(QPainter *painter,
                    QVector<qreal> radii, QVector<int> segments);
+    void drawGraphImage(QVector<qreal> radii, QVector<int> segments);
     // get speed between the last and before-last element of probe position
     qreal getSpeed(QVector<Image> *probe);
     // get speed between the idx and idx-1 element of probe position

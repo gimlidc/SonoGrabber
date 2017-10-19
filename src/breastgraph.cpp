@@ -20,7 +20,7 @@
 
 qreal r = 100;
 qreal rp; //armpit
-qreal top = .3;
+qreal top = .5;
 qreal imgHeight;
 qreal fade = 0.99;
 bool planeSet = false;
@@ -30,6 +30,7 @@ QVector<QPointF> refProjection, probePos;
 QVector<Image> lines;
 QVector<Frozen> freezPoints;
 QVector<qreal> alpha;
+QVector<int> frozen;
 QVector3D lastPos;
 int bufPos=0, bufLen=0;
 qreal alphaLast=1;
@@ -64,13 +65,15 @@ BreastGraph::BreastGraph(Transform *transform, int fps, int buffSize,
     dh = width();
     dv = height();
 //    s = qMin(dh, dv)/((1+1.2*top));
-    s = qMin(dh, dv)/((1+top));
+    s = qMin(dh, dv)/((1+1.2*top));
 
     menu = new FreezeMenu(0);
 //    graph = QPixmap(s, s*(1+top));
 //    graph = QPixmap(win.width(), win.height());
     graph = QPixmap(dh, dv);
     graph.fill();
+    sectors = QPixmap(dh, dv);
+    sectors.fill(Qt::transparent);
 
 //    menu->show();
 
@@ -134,14 +137,24 @@ void BreastGraph::drawBackground(QPainter *painter, const QColor color)
     painter->restore();
 }
 
+void BreastGraph::setView(QPainter *p)
+{
+    p->setWindow(win);
+    QRect viewPort(0, dv-s, s, s);
+    p->setViewport(viewPort);
+    p->setRenderHint(QPainter::Antialiasing);
+}
+
 void BreastGraph::drawBackgroundImage(const QColor color)
 {
     QPainter p(&graph);
-    p.setWindow(win);
-//    QRect viewPort((dh-s)/2, .9*(dv-s), s, s);
-    QRect viewPort(0, 0, dh, dv);
-    p.setViewport(viewPort);
-    p.setRenderHint(QPainter::Antialiasing);
+//    QRect win1(-(1+top)*r, -(1+top)*r, 2*(1+top)*r, 2*(1+top)*r);
+//    p.setWindow(win);
+////    QRect viewPort((dh-s)/2, .9*(dv-s), dh/2, s);
+//    QRect viewPort(0, dv-s, s, s);
+//    p.setViewport(viewPort);
+//    p.setRenderHint(QPainter::Antialiasing);
+    setView(&p);
     p.setPen(QPen(color));
     p.setBrush(QBrush(color, Qt::SolidPattern));
     p.drawEllipse(QPointF(0.0,0.0), r, r);
@@ -198,10 +211,11 @@ void BreastGraph::drawSnakeImage(const QColor inLimit,
     if (end>0) {
         // green "snake"
         QPainter p(&graph);
-        p.setWindow(win);
-//        QRect viewPort((dh-s)/2, .9*(dv-s), s, s);
-        QRect viewPort(0, 0, dh, dv);
-        p.setViewport(viewPort);
+        setView(&p);
+//        p.setWindow(win);
+////        QRect viewPort((dh-s)/2, .9*(dv-s), s, s);
+//        QRect viewPort(0, 0, dh, dv);
+//        p.setViewport(viewPort);
 
         p.setPen(QPen(inLimit, 0));
 
@@ -217,31 +231,6 @@ void BreastGraph::drawSnakeImage(const QColor inLimit,
 
 }
 
-//QPainterPath BreastGraph::drawSnakePath(QPainter *painter, QPainterPath *path, const QColor inLimit,
-//                                const QColor overLimit, const QVector<Image> lines)
-//{
-//    int end = lines.size()-1;
-//    QPainterPath p;
-//    if (end>0) {
-//        QPainterPath newSeg;
-//        painter->save();
-//        painter->setPen(QPen(inLimit, 0));
-//        if (getSpeed(lines, end)<speed)
-//            painter->setBrush(QBrush(inLimit, Qt::SolidPattern));
-//        else
-//            painter->setBrush(QBrush(overLimit, Qt::SolidPattern));
-//        QLineF line1 = lines.at(end-1).getLine();
-//        QLineF line2 = lines.at(end).getLine();
-//        const QVector<QPointF> points{line1.p1(), line1.p2(), line2.p2(), line2.p1()};
-//        newSeg.addPolygon(QPolygonF(points));
-//        newSeg.closeSubpath();
-//        p = path->united(newSeg);
-//        painter->drawPath(p);
-//        painter->restore();
-//    } else
-//        p = *path;
-//    return p;
-//}
 
 void BreastGraph::drawProbe(QPainter *painter, const QColor probe,
                             const QColor freeze,
@@ -251,21 +240,26 @@ void BreastGraph::drawProbe(QPainter *painter, const QColor probe,
     painter->save();
     for (int i=0; i<bufLen; i++) {
         if (lines.at(lines.size()-i-1).getStatus()==Frozen::UNFROZEN) {
-            blueCol.setAlphaF(alpha[i]);
-            painter->setPen(QPen(blueCol, 0));
-            QLineF line = lines.at(lines.size()-i-1).getLine();
-            painter->drawLine(line);
-            painter->drawEllipse(line.p2(), 2, 2);
+            if (alpha[i]>0.01) {
+                blueCol.setAlphaF(alpha[i]);
+                painter->setPen(QPen(blueCol, 0));
+                QLineF line = lines.at(lines.size()-i-1).getLine();
+                painter->drawLine(line);
+                painter->drawEllipse(line.p2(), 2, 2);
+            } else {
+                break;
+            }
         }
     }
     painter->setPen(QPen(freeze, 3));
-    for (int i=0; i<lines.size(); i++) {
-        if (lines.at(i).getStatus()==Frozen::FROZEN) {
+    for (int idx=0; idx<frozen.size(); idx++) {
+        int i = frozen.at(idx);
+//        if (lines.at(i).getStatus()==Frozen::FROZEN) {
             QLineF line = lines.at(i).getLine();
             painter->drawLine(line);
             QPointF point = line.p2();
             painter->drawEllipse(point, 2.0, 2.0);
-        }
+//        }
     }
     painter->restore();
 }
@@ -293,6 +287,31 @@ void BreastGraph::drawGraph(QPainter *painter,
     painter->rotate((side==Side::LEFT) ? -angle : angle);
     painter->drawPolyline(lobe);
     painter->restore();
+}
+
+void BreastGraph::drawGraphImage(QVector<qreal> radii,
+                                 QVector<int> segments)
+{
+    QPainter p(&sectors);
+    setView(&p);
+
+    p.save();
+    p.setPen(QPen(Qt::black, 0, Qt::SolidLine));
+    p.setBrush(QBrush(Qt::transparent, Qt::SolidPattern));
+    qreal r1 = 0;
+    for (int i=0; i<radii.size(); i++) {
+        qreal r2 = r*radii[i];
+        p.drawEllipse(QPointF(0.0,0.0), r2, r2);
+        for (int cnt=0; cnt<segments[i]; cnt++) {
+            p.drawLine(QPointF(r1,0), QPointF(r2,0));
+            p.rotate(360.0/segments[i]);
+        }
+        r1 = r2;
+    }
+    p.restore();
+    p.save();
+    p.rotate((side==Side::LEFT) ? -angle : angle);
+    p.drawPolyline(lobe);
 }
 
 //void BreastGraph::paintEvent(QPaintEvent *event)
@@ -325,12 +344,20 @@ void BreastGraph::drawGraph(QPainter *painter,
 void BreastGraph::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
     //    painter.setWindow(win);
-    QRect viewPort((dh-s)/2, .9*(dv-s), s, s);
+    QRect viewPort(0, (dv-s), s, s);
     //painter.setViewport(viewPort);
 
     QRect dirtyRect = event->rect();
     painter.drawPixmap(dirtyRect, graph, dirtyRect);
+    QRect w = painter.window();
+    painter.setWindow(win);
+    painter.setViewport(viewPort);
+    drawProbe(&painter, Qt::blue, Qt::red, lines);
+    drawGraph(&painter, radii, segments);
+//    painter.setWindow(w);
+//    painter.drawPixmap(dirtyRect, sectors, dirtyRect);
 //    painter.drawPixmap(viewPort, graph);
 }
 
@@ -412,6 +439,7 @@ void BreastGraph::rcvImgPosition(Image imgPos)
             *points<<project(QVector3D(pos));
             lastPos = transform->getC(trfMatrix);
             drawBackgroundImage(Qt::red);
+            drawGraphImage(radii, segments);
         }
     } else {
         QVector3D pos0 = transform->getOrig(trfMatrix);
@@ -428,9 +456,20 @@ void BreastGraph::rcvImgPosition(Image imgPos)
 ////            delete freezeMenu;
         if (dist) {
             imgPos.setLine(line);
-            lines.append(imgPos);
-            drawSnakeImage(Qt::green, Qt::red, lines);
-            update();
+            int endPos=lines.size();
+            if (lines.size()==0 ||
+                    line.p1()!=lines.at(0).getLine().p1() ||
+                    line.p2()!=lines.at(0).getLine().p2()) {
+                lines.append(imgPos);
+                if (lines.at(endPos).getStatus()==FROZEN)
+                    frozen.append(endPos);
+                drawSnakeImage(Qt::green, Qt::red, lines);
+                update();
+            } else {
+                buffSize=endPos;
+                bufPos=buffSize-1;
+                bufLen=buffSize;
+            }
             if (buffSize==0) {
                 alpha.append(alphaLast);
                 alphaLast *= fade;
@@ -441,6 +480,7 @@ void BreastGraph::rcvImgPosition(Image imgPos)
                     bufLen++;
                 }
             }
+
         }
 //        if (imgPos.getStatus()==FROZEN) {
 //            const QPointF p = line.p1();
