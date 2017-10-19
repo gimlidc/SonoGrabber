@@ -66,10 +66,9 @@ BreastGraph::BreastGraph(Transform *transform, int fps, int buffSize,
     s = qMin(dh, dv)/((1+1.2*top));
 
     menu = new FreezeMenu(0);
-    graph = QPixmap(win.size());
+    graph = QPixmap(width(), height());
     graph.fill();
 
-    drawBackgroundImage(Qt::red);
 //    menu->show();
 
     //    this->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -340,6 +339,7 @@ void BreastGraph::rcvImgPosition(Image imgPos)
             setPlane(refPoints);
             *points<<project(QVector3D(pos));
             lastPos = transform->getC(trfMatrix);
+            drawBackgroundImage(Qt::red);
         }
     } else {
         QVector3D pos0 = transform->getOrig(trfMatrix);
