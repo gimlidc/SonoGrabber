@@ -25,9 +25,13 @@ public:
     explicit BreastGraph(Transform *transform, int fps, int buffSize,
                          QVector<qreal> radii, QVector<int> segments, QWidget *parent = 0);
     ~BreastGraph();
-    void paintEvent(QPaintEvent *);
     QPointF project(QVector3D x);
     void reset();
+
+
+protected:
+    void paintEvent(QPaintEvent *) override;
+    void resizeEvent(QResizeEvent *event) override;
 
 private:
     QPolygonF lobe;

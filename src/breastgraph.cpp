@@ -64,6 +64,7 @@ BreastGraph::BreastGraph(Transform *transform, int fps, int buffSize,
     }
     dh = width();
     dv = height();
+    qDebug() << "dh: " << dh << ", dv: " << dv;
 //    s = qMin(dh, dv)/((1+1.2*top));
     s = qMin(dh, dv)/((1+1.2*top));
 
@@ -72,8 +73,6 @@ BreastGraph::BreastGraph(Transform *transform, int fps, int buffSize,
 //    graph = QPixmap(win.width(), win.height());
     graph = QPixmap(dh, dv);
     graph.fill();
-    sectors = QPixmap(dh, dv);
-    sectors.fill(Qt::transparent);
 
 //    menu->show();
 
@@ -351,14 +350,23 @@ void BreastGraph::paintEvent(QPaintEvent *event)
 
     QRect dirtyRect = event->rect();
     painter.drawPixmap(dirtyRect, graph, dirtyRect);
-    QRect w = painter.window();
+    drawSnakeImage(Qt::green, Qt::red, lines);
     painter.setWindow(win);
     painter.setViewport(viewPort);
     drawProbe(&painter, Qt::blue, Qt::red, lines);
     drawGraph(&painter, radii, segments);
-//    painter.setWindow(w);
-//    painter.drawPixmap(dirtyRect, sectors, dirtyRect);
-//    painter.drawPixmap(viewPort, graph);
+}
+
+void BreastGraph::resizeEvent(QResizeEvent *event)
+{
+    dh = width();
+    dv = height();
+    s = qMin(dh, dv)/((1+1.2*top));
+    graph = QPixmap(QSize(dh, dv));
+    graph.fill(Qt::transparent);
+    drawBackgroundImage(Qt::red);
+    update();
+    QWidget::resizeEvent(event);
 }
 
 void BreastGraph::reset()
@@ -439,7 +447,6 @@ void BreastGraph::rcvImgPosition(Image imgPos)
             *points<<project(QVector3D(pos));
             lastPos = transform->getC(trfMatrix);
             drawBackgroundImage(Qt::red);
-            drawGraphImage(radii, segments);
         }
     } else {
         QVector3D pos0 = transform->getOrig(trfMatrix);
