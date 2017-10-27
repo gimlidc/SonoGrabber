@@ -5,11 +5,14 @@
 
 Writer::Writer(QDir targetDir, int chunkSize)
 {
-    dir = targetDir;
-    headerFile.setFileName(dir.absolutePath() + "/" + "header.mhd");
     imageCounter = 0;
     fileCounter = 0;
-    rawFile.setFileName(dir.absolutePath() + "/" + SessionNameGenerator::generateRawFileName(fileCounter));
+    dir = targetDir;
+    QString subdirPath = dir.absolutePath() + "/" + QString("%1").arg(fileCounter,3,10,QChar('0'));
+    recSubdir = QDir(subdirPath);
+    headerFile.setFileName(recSubdir.absolutePath() + "/" + "header.mhd");
+//    rawFile.setFileName(dir.absolutePath() + "/" + seqSubdir + "/" + SessionNameGenerator::generateRawFileName(fileCounter));
+    rawFile.setFileName(recSubdir.absolutePath() + "/" + "record.raw");
     frozenSeqFile.setFileName(dir.absolutePath() + "/" + "frozen.txt");
     frozenSeqPosFile.setFileName(dir.absolutePath() + "/" + "frozenIdxPos.txt");
     this->chunkSize = chunkSize;
@@ -21,6 +24,18 @@ Writer::~Writer()
 }
 
 int Writer::createOutDir()
+{
+    int r1 = createDir(dir.absolutePath());
+    int r2 = createRecordSubdir();
+    return qMax(r1, r2);
+}
+
+int Writer::createRecordSubdir()
+{
+    return createDir(recSubdir);
+}
+
+int Writer::createDir(QDir dir)
 {
     if (dir.exists()) {
         qWarning() << "Directory exists data can be overwritten: " << dir.absolutePath();

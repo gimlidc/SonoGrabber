@@ -33,6 +33,8 @@ class Writer
     QTextStream tstr;
     /** position in the output data file where the number of frames must be entered */
     qint64 indexOfDimZ;
+    /** recording subdirectory (based on the recording number) */
+    QDir recSubdir;
 
 public:
     Writer(QDir targetDir, int chunkSize);
@@ -51,7 +53,11 @@ public:
     void writeFrozenIndex();
     void writeFrozenIndexAndPos(QVector4D pos);
     int createOutDir();
+    int createRecordSubdir();
     int getImageCounter() {return imageCounter; }
+
+private:
+    int createDir(QDir dir);
 };
 
 #endif // WIRTER_H
